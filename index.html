@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>FIFA World Cup 2026 Prediction Challenge - V22 Firebase Test</title>
+<title>FIFA World Cup 2026 Prediction Challenge - V23 Firebase Test</title>
 <style>
 :root{
   --navy:#04112d;--navy2:#071b45;--blue:#0d3a91;--panel:#09255c;--panel2:#0d3176;
@@ -16,6 +16,7 @@ html{scroll-behavior:smooth}
 body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#fff;background:radial-gradient(circle at 15% 0%,rgba(55,212,255,.24),transparent 30%),radial-gradient(circle at 85% 5%,rgba(248,200,74,.22),transparent 30%),linear-gradient(180deg,#02091f 0%,#061633 45%,#081d45 100%);min-height:100vh;overflow-x:hidden}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(120deg,transparent 0 38%,rgba(255,255,255,.04) 38% 39%,transparent 39% 100%),repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 88px);z-index:-1}
 .hidden{display:none!important}
+.firebase-toast{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:9999;display:none;max-width:min(92vw,520px);padding:14px 18px;border-radius:18px;background:linear-gradient(135deg,#32d17f,#b6ffce);color:#061633;font-weight:1000;box-shadow:0 18px 44px rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.6);text-align:center}.firebase-toast.show{display:block;animation:toastDrop .35s ease both}@keyframes toastDrop{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}
 .hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 16px 44px;text-align:center;position:relative}
 .hero-shell{width:min(980px,100%);position:relative;margin:auto}
 .hero-card{position:relative;background:linear-gradient(180deg,rgba(8,29,69,.9),rgba(5,14,36,.94));border:1px solid rgba(255,255,255,.18);box-shadow:var(--shadow);border-radius:34px;padding:52px clamp(18px,5vw,64px) 30px;overflow:hidden}
@@ -88,6 +89,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 </style>
 </head>
 <body>
+<div id="firebaseToast" class="firebase-toast" role="status" aria-live="polite"></div>
 <section class="hero" id="landing">
   <div class="hero-shell">
     <div class="trophy left"></div><div class="trophy right"></div>
@@ -158,6 +160,13 @@ function teamLabel(team){const src=flagFor(team); const flag=src?`<img class="fl
 function leagueFor(email){return email.toLowerCase().endsWith('@lego.com')?'LEGO League':'Friends & Family League'}
 function niceDate(date){return new Date(date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
 function ukToCet(date, uk){let s=String(uk).toLowerCase().replace('kick-off','').trim(), h=0,m=0;if(s.includes('.')){let p=s.replace('am','').replace('pm','').split('.');h=+p[0];m=+p[1];}else h=parseInt(s)||0;if(s.includes('pm')&&h!==12)h+=12;if(s.includes('am')&&h===12)h=0;h=(h+1)%24;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} CET`;}
+function showToast(message){
+  const toast=$('#firebaseToast');
+  if(!toast){ alert(message); return; }
+  toast.textContent=message;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2200);
+}
 $('#entryForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const name=$('#nameInput').value.trim();
@@ -170,9 +179,8 @@ $('#entryForm').addEventListener('submit',async e=>{
     }
     state.user={name,email,league};
     save();
-    boot();
-    setTab('predictions');
-    window.scrollTo({top:0,behavior:'smooth'});
+    showToast(`✓ Registration saved. Welcome ${name}!`);
+    setTimeout(()=>{boot();setTab('predictions');window.scrollTo({top:0,behavior:'smooth'});},650);
   }catch(err){
     console.error('Firebase save failed:',err);
     alert('Save failed. Please check Firebase rules/config and try again.');
@@ -213,7 +221,32 @@ function updateWinnerReveal(){
   }
 }
 
-$('#lockBtn').addEventListener('click',()=>{state.locked=true;save();$('#lockStatus').textContent='✓ Full tournament prediction locked locally in this conceptual build.';});
+function groupPredictionPayload(){
+  return fixtures.map(f=>{
+    const p=state.predictions[f.id]||{};
+    return {matchId:f.id, group:f.group, date:f.date, ukTime:f.ukTime, cetTime:ukToCet(f.date,f.ukTime), venue:f.venue, homeTeam:f.home, awayTeam:f.away, homeScore:p.home===''||p.home===undefined?null:Number(p.home), awayScore:p.away===''||p.away===undefined?null:Number(p.away)};
+  });
+}
+function knockoutPredictionPayload(){
+  return Object.entries(state.bracket||{}).map(([matchId,selectedTeam])=>({matchId, selectedTeam}));
+}
+$('#lockBtn').addEventListener('click',async()=>{
+  if(!state.user){alert('Please enter your name and email first.');return;}
+  try{
+    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), version:'v23-full-prediction-test'};
+    if(window.saveFullPredictionToFirebase){
+      await window.saveFullPredictionToFirebase(payload);
+      $('#lockStatus').textContent='✓ Full tournament prediction saved to Firebase test_predictions.';
+      showToast('✓ Full prediction saved to Firebase');
+    }else{
+      $('#lockStatus').textContent='✓ Full tournament prediction locked locally. Firebase function not found.';
+    }
+    state.locked=true;save();
+  }catch(err){
+    console.error('Full prediction save failed:',err);
+    alert('Prediction save failed. Check Firebase rules/config and try again.');
+  }
+});
 // V22: Keep the landing page as the first screen, even if you have tested before.
 // If local data exists, pre-fill it but do not skip the landing page.
 if(state.user){
@@ -240,13 +273,30 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 window.savePlayerEntryToFirebase = async function({name,email,league}){
-  await addDoc(collection(db, "test_entries"), {
+  const entry = {
     name,
     email,
     league,
     createdAt: serverTimestamp(),
     source: "github-pages-test",
-    version: "v22-firebase-registration"
+    version: "v23-firebase-registration"
+  };
+  await addDoc(collection(db, "test_entries"), entry);
+  await addDoc(collection(db, "test_users"), entry);
+};
+
+window.saveFullPredictionToFirebase = async function(payload){
+  await addDoc(collection(db, "test_predictions"), {
+    name: payload.user.name,
+    email: payload.user.email,
+    league: payload.user.league,
+    groupPredictions: payload.groupPredictions,
+    knockoutPicks: payload.knockoutPicks,
+    predictedWinner: payload.predictedWinner,
+    submittedAtLocal: payload.submittedAtLocal,
+    submittedAt: serverTimestamp(),
+    source: "github-pages-test",
+    version: "v23-full-prediction-test"
   });
 };
 </script>

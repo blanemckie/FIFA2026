@@ -1,34 +1,32 @@
-# FIFA World Cup 2026 Prediction Challenge - V22 Firebase Test Concept
+# FIFA World Cup 2026 Prediction Challenge - V23 Firebase Test
 
-## What changed in V22
+Conceptual GitHub Pages build with Firebase test registration and full prediction save.
 
-- Keeps the landing page as the first screen.
-- Pre-fills saved test details if they exist, but does not skip the landing page.
-- Connects the landing-page name/email form to Firebase Firestore.
-- Saves test entries into the `test_entries` collection.
-- Automatically assigns league:
-  - `@lego.com` = LEGO
-  - anything else = Friends & Family
+## What changed in V23
 
-## How to upload to GitHub Pages
+- Registration saves to Firebase `test_entries`.
+- Registration also saves to Firebase `test_users` for a cleaner future admin structure.
+- Lock In Full Tournament Prediction saves a full submission to Firebase `test_predictions`.
+- Submission includes name, email, league, all group-stage score predictions, knockout picks and predicted winner.
+- Added a short success toast after registration and after full prediction save.
+- Test collections are deliberately prefixed with `test_` so they can be deleted before the real launch.
 
-Upload the contents of this ZIP to your GitHub repository root:
+## Upload to GitHub
 
-- `index.html`
-- `README.md`
+Upload the contents of this ZIP to the root of the `FIFA2026` repository. Do not upload the ZIP file itself.
 
-Your live URL should remain:
+## Firebase collections used
 
-https://blanemckie.github.io/FIFA2026/
+- `test_entries`
+- `test_users`
+- `test_predictions`
 
-## How to test
+## Before full launch
 
-1. Open the live GitHub Pages URL.
-2. Enter a test name and email.
-3. Click **Start Predicting →**.
-4. Check Firebase Firestore.
-5. You should see a collection called `test_entries`.
+Replace test collections with real collections such as:
 
-## Note on GitHub secret scanning
+- `entries`
+- `users`
+- `predictions`
 
-GitHub may flag the Firebase web API key as a public Google API key. This is expected for Firebase client-side web apps. The key is not a password. Before wider sharing, Firestore rules and API key restrictions should be tightened.
+And tighten Firestore security rules.
