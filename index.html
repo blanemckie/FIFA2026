@@ -104,7 +104,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
         <p>Enter your details to start your World Cup prediction.</p>
         <label>Name<input id="nameInput" required placeholder="e.g. Blane" autocomplete="name"></label>
         <label>Email<input id="emailInput" required type="email" placeholder="you@example.com" autocomplete="email"></label>
-        <button class="primary" type="submit">Start Predicting →</button>
+        <button class="primary" type="button" onclick="savePlayerEntry()">
+  Start Predicting →
+</button>
       </form>
     </div>
   </div>
@@ -196,5 +198,71 @@ function updateWinnerReveal(){
 
 $('#lockBtn').addEventListener('click',()=>{state.locked=true;save();$('#lockStatus').textContent='✓ Full tournament prediction locked locally in this conceptual build.';});
 boot();
+</script>
+  <script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDgiFVKBAXtxQPSTygPfC2PR8Zjb4n_vZE",
+  authDomain: "fifa-2026-92000.firebaseapp.com",
+  projectId: "fifa-2026-92000",
+  storageBucket: "fifa-2026-92000.firebasestorage.app",
+  messagingSenderId: "260493484978",
+  appId: "1:260493484978:web:77c2c2d99bcd34892d3aab"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.savePlayerEntry = async function() {
+
+  const name =
+    document.getElementById("playerName").value.trim();
+
+  const email =
+    document.getElementById("playerEmail").value.trim();
+
+  if(!name || !email){
+    alert("Please enter name and email");
+    return;
+  }
+
+  const league =
+    email.endsWith("@lego.com")
+      ? "LEGO"
+      : "Friends & Family";
+
+  try {
+
+    await addDoc(
+      collection(db,"test_entries"),
+      {
+        name,
+        email,
+        league,
+        createdAt: serverTimestamp()
+      }
+    );
+
+    alert("Saved successfully");
+
+  } catch(error){
+
+    console.error(error);
+
+    alert("Save failed");
+
+  }
+
+};
+
 </script>
 </body></html>
