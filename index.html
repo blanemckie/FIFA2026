@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>FIFA World Cup 2026 Prediction Challenge - V21 Concept</title>
+<title>FIFA World Cup 2026 Prediction Challenge - V22 Firebase Test</title>
 <style>
 :root{
   --navy:#04112d;--navy2:#071b45;--blue:#0d3a91;--panel:#09255c;--panel2:#0d3176;
@@ -104,9 +104,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
         <p>Enter your details to start your World Cup prediction.</p>
         <label>Name<input id="nameInput" required placeholder="e.g. Blane" autocomplete="name"></label>
         <label>Email<input id="emailInput" required type="email" placeholder="you@example.com" autocomplete="email"></label>
-        <button class="primary" type="button" onclick="savePlayerEntry()">
-  Start Predicting →
-</button>
+        <button class="primary" type="submit">Start Predicting →</button>
       </form>
     </div>
   </div>
@@ -160,7 +158,26 @@ function teamLabel(team){const src=flagFor(team); const flag=src?`<img class="fl
 function leagueFor(email){return email.toLowerCase().endsWith('@lego.com')?'LEGO League':'Friends & Family League'}
 function niceDate(date){return new Date(date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
 function ukToCet(date, uk){let s=String(uk).toLowerCase().replace('kick-off','').trim(), h=0,m=0;if(s.includes('.')){let p=s.replace('am','').replace('pm','').split('.');h=+p[0];m=+p[1];}else h=parseInt(s)||0;if(s.includes('pm')&&h!==12)h+=12;if(s.includes('am')&&h===12)h=0;h=(h+1)%24;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} CET`;}
-$('#entryForm').addEventListener('submit',e=>{e.preventDefault();state.user={name:$('#nameInput').value.trim(),email:$('#emailInput').value.trim(),league:leagueFor($('#emailInput').value)};save();boot();setTab('predictions');window.scrollTo({top:0,behavior:'smooth'});});
+$('#entryForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const name=$('#nameInput').value.trim();
+  const email=$('#emailInput').value.trim().toLowerCase();
+  if(!name||!email){alert('Please enter your name and email.');return;}
+  const league=leagueFor(email);
+  try{
+    if(window.savePlayerEntryToFirebase){
+      await window.savePlayerEntryToFirebase({name,email,league});
+    }
+    state.user={name,email,league};
+    save();
+    boot();
+    setTab('predictions');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(err){
+    console.error('Firebase save failed:',err);
+    alert('Save failed. Please check Firebase rules/config and try again.');
+  }
+});
 $$('.tabs button').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab))); function setTab(id){$$('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));$$('.panel').forEach(p=>p.classList.toggle('active',p.id===id));}
 function boot(){if(state.user){$('#landing').classList.add('hidden');$('#tabs').classList.remove('hidden');$('#app').classList.remove('hidden');$('#welcomeTitle').textContent=`${state.user.name}, pick your scores`;renderAll();}}
 function renderAll(){renderFixtures();renderBracket();renderLeaderboard();renderResults();updateProgress();}
@@ -197,18 +214,18 @@ function updateWinnerReveal(){
 }
 
 $('#lockBtn').addEventListener('click',()=>{state.locked=true;save();$('#lockStatus').textContent='✓ Full tournament prediction locked locally in this conceptual build.';});
-boot();
+// V22: Keep the landing page as the first screen, even if you have tested before.
+// If local data exists, pre-fill it but do not skip the landing page.
+if(state.user){
+  const n=$('#nameInput');
+  const e=$('#emailInput');
+  if(n) n.value=state.user.name||'';
+  if(e) e.value=state.user.email||'';
+}
 </script>
-  <script type="module">
-
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDgiFVKBAXtxQPSTygPfC2PR8Zjb4n_vZE",
@@ -222,47 +239,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-window.savePlayerEntry = async function() {
-
-  const name =
-    document.getElementById("playerName").value.trim();
-
-  const email =
-    document.getElementById("playerEmail").value.trim();
-
-  if(!name || !email){
-    alert("Please enter name and email");
-    return;
-  }
-
-  const league =
-    email.endsWith("@lego.com")
-      ? "LEGO"
-      : "Friends & Family";
-
-  try {
-
-    await addDoc(
-      collection(db,"test_entries"),
-      {
-        name,
-        email,
-        league,
-        createdAt: serverTimestamp()
-      }
-    );
-
-    alert("Saved successfully");
-
-  } catch(error){
-
-    console.error(error);
-
-    alert("Save failed");
-
-  }
-
+window.savePlayerEntryToFirebase = async function({name,email,league}){
+  await addDoc(collection(db, "test_entries"), {
+    name,
+    email,
+    league,
+    createdAt: serverTimestamp(),
+    source: "github-pages-test",
+    version: "v22-firebase-registration"
+  });
 };
-
 </script>
 </body></html>

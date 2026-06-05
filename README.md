@@ -1,16 +1,34 @@
-# FIFA World Cup 2026 Prediction Challenge - V21 Concept
+# FIFA World Cup 2026 Prediction Challenge - V22 Firebase Test Concept
 
-## V21 update
-- Centred the explanatory text above the knockout tournament path.
-- Rewrote the copy to be more fun, engaging and game-like.
-- Added a trophy-style intro card before the Round of 32.
-- Kept the horizontal fixture-bar layout from V19.
+## What changed in V22
 
-## Concept note
-This is still a conceptual static GitHub Pages build. Firebase/live data can be added separately.
+- Keeps the landing page as the first screen.
+- Pre-fills saved test details if they exist, but does not skip the landing page.
+- Connects the landing-page name/email form to Firebase Firestore.
+- Saves test entries into the `test_entries` collection.
+- Automatically assigns league:
+  - `@lego.com` = LEGO
+  - anything else = Friends & Family
 
+## How to upload to GitHub Pages
 
-## V21 Update
-- Restored landing page as the opening screen by using a fresh V21 local storage key.
-- Replaced emoji flag display with image-based flags from FlagCDN to avoid Windows showing two-letter country codes.
-- Applies consistent flag + country name format across fixtures, knockout path and live results.
+Upload the contents of this ZIP to your GitHub repository root:
+
+- `index.html`
+- `README.md`
+
+Your live URL should remain:
+
+https://blanemckie.github.io/FIFA2026/
+
+## How to test
+
+1. Open the live GitHub Pages URL.
+2. Enter a test name and email.
+3. Click **Start Predicting →**.
+4. Check Firebase Firestore.
+5. You should see a collection called `test_entries`.
+
+## Note on GitHub secret scanning
+
+GitHub may flag the Firebase web API key as a public Google API key. This is expected for Firebase client-side web apps. The key is not a password. Before wider sharing, Firestore rules and API key restrictions should be tightened.
