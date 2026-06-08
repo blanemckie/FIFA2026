@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>FIFA World Cup 2026 Prediction Challenge - V23 Firebase Test</title>
+<title>FIFA World Cup 2026 Prediction Challenge - V39</title>
 <style>
 :root{
   --navy:#04112d;--navy2:#071b45;--blue:#0d3a91;--panel:#09255c;--panel2:#0d3176;
@@ -86,6 +86,546 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 @keyframes winnerSpin{to{transform:rotate(360deg)}}
 @media(max-width:760px){.scoring .score-grid{grid-template-columns:1fr}.scoring-row{grid-template-columns:1fr;gap:5px;text-align:center}}
 
+
+/* V24 additions: live Firebase table, fun stats and tabular build journal */
+.score-grid.v24-score{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.score-bubble{background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.16);border-radius:22px;padding:16px;text-align:center;min-height:142px;display:flex;flex-direction:column;justify-content:center;box-shadow:0 16px 36px rgba(0,0,0,.18)}
+.score-bubble .score-icon{font-size:26px;margin-bottom:8px}.score-bubble b{display:block;color:#fff;font-size:18px;margin-bottom:8px}.score-bubble strong{display:block;color:var(--gold);font-size:24px;line-height:1;margin-bottom:6px}.score-bubble span{display:block;color:#dce9ff;font-weight:750;font-size:13px;line-height:1.35}.score-bubble.champion{border-color:rgba(248,200,74,.5);background:linear-gradient(180deg,rgba(248,200,74,.18),rgba(255,255,255,.06))}
+.live-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:16px}.summary-tile{background:linear-gradient(180deg,rgba(248,200,74,.16),rgba(255,255,255,.07));border:1px solid rgba(248,200,74,.35);border-radius:20px;padding:16px;text-align:center}.summary-tile b{display:block;font-size:28px;color:#fff}.summary-tile span{color:#dce9ff;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.08em}.submission-row{display:grid;grid-template-columns:1.4fr .8fr 1fr;gap:12px;align-items:center;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);margin:10px 0}.submission-row .player-name{font-weight:1000}.submission-row .league-pill{justify-self:start;background:rgba(55,212,255,.13);border:1px solid rgba(55,212,255,.28);border-radius:999px;padding:7px 10px;font-weight:900;color:#bdf3ff;font-size:12px}.submission-row .submit-time{color:#d8e7ff;text-align:right;font-weight:800}.empty-state{text-align:center;padding:24px;color:#dce9ff}.refresh-note{text-align:center;color:#b8c9e8;font-weight:750;margin:8px 0 0}.fun-stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.stat-bubble{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:18px;min-height:158px;box-shadow:0 16px 42px rgba(0,0,0,.22)}.stat-bubble:before{content:"";position:absolute;inset:auto -30px -40px auto;width:120px;height:120px;border-radius:50%;background:rgba(248,200,74,.12)}.stat-icon{font-size:28px}.stat-title{font-weight:1000;margin:8px 0 4px}.stat-value{font-size:24px;font-weight:1000;color:#fff3a2;line-height:1.1}.stat-copy{color:#dce9ff;font-size:13px;font-weight:750;margin-top:6px}.how-build-visuals{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}.build-visual{display:inline-flex;align-items:center;gap:8px;background:rgba(248,200,74,.12);border:1px solid rgba(248,200,74,.28);border-radius:999px;padding:10px 14px;font-weight:950}.build-table{width:100%;border-collapse:separate;border-spacing:0 10px}.build-table th{text-align:left;color:#fff3a2;font-size:12px;text-transform:uppercase;letter-spacing:.09em;padding:0 12px}.build-table td{background:rgba(255,255,255,.07);border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12);padding:14px 12px;vertical-align:top}.build-table td:first-child{border-left:1px solid rgba(255,255,255,.12);border-radius:16px 0 0 16px;font-weight:1000;color:#fff}.build-table td:last-child{border-right:1px solid rgba(255,255,255,.12);border-radius:0 16px 16px 0}.build-table .small-pill{display:inline-flex;border-radius:999px;background:rgba(55,212,255,.12);border:1px solid rgba(55,212,255,.22);padding:7px 10px;font-weight:900;color:#bdf3ff;white-space:nowrap}.build-table .gold-small{background:rgba(248,200,74,.14);border-color:rgba(248,200,74,.28);color:#fff3a2}
+@media(max-width:900px){.score-grid.v24-score{grid-template-columns:1fr 1fr}.fun-stats-grid{grid-template-columns:1fr 1fr}.submission-row{grid-template-columns:1fr;gap:8px;text-align:center}.submission-row .league-pill{justify-self:center}.submission-row .submit-time{text-align:center}.live-summary{grid-template-columns:1fr}.build-table,.build-table tbody,.build-table tr,.build-table td{display:block;width:100%}.build-table thead{display:none}.build-table tr{margin:0 0 12px;display:block}.build-table td{border-left:1px solid rgba(255,255,255,.12);border-right:1px solid rgba(255,255,255,.12);border-radius:0!important}.build-table td:first-child{border-radius:16px 16px 0 0!important}.build-table td:last-child{border-radius:0 0 16px 16px!important}.build-table td:before{content:attr(data-label);display:block;color:#fff3a2;font-weight:1000;font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}}
+@media(max-width:560px){.score-grid.v24-score,.fun-stats-grid{grid-template-columns:1fr}.score-bubble{min-height:118px}.stat-bubble{min-height:130px}}
+
+
+
+/* V26 additions: cleaner play/scoring guide, league table filters and submissions review */
+.how-play-card{margin-bottom:14px;text-align:center;background:linear-gradient(135deg,rgba(248,200,74,.18),rgba(55,212,255,.10));border:1px solid rgba(248,200,74,.32)}
+.how-play-card h3{margin:0 0 8px;font-size:clamp(24px,3.5vw,34px);color:#fff3a2;letter-spacing:-.035em}.how-play-card p{max-width:780px;margin:0 auto;color:#e8f2ff;font-weight:850;line-height:1.48}.how-play-card .play-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}.play-step{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:12px;font-weight:900;color:#dce9ff}.play-step b{display:block;color:#fff;font-size:16px;margin-bottom:3px}
+.scoring.compact-v25{padding:18px}.scoring.compact-v25 h3{font-size:24px;margin-bottom:10px}.score-grid.v25-score{grid-template-columns:repeat(4,1fr);gap:10px}.score-bubble{min-height:130px}.score-bubble strong{display:block;color:#fff;font-size:24px;margin:6px 0}.score-bubble span{display:block;line-height:1.28}.score-bubble.champion{background:linear-gradient(180deg,rgba(248,200,74,.24),rgba(255,255,255,.08));border-color:rgba(248,200,74,.45)}
+.league-controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 0 16px}.league-filter{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:10px 14px;font-weight:1000;cursor:pointer}.league-filter.active{background:linear-gradient(135deg,var(--gold),#fff3a2);color:#071633;border-color:transparent}.league-table{width:100%;border-collapse:separate;border-spacing:0 10px}.league-table th{text-align:left;color:#fff3a2;text-transform:uppercase;font-size:12px;letter-spacing:.08em;padding:0 12px}.league-table th:last-child,.league-table td:last-child{text-align:right}.league-table td{background:rgba(255,255,255,.075);border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12);padding:14px 12px;font-weight:850}.league-table td:first-child{border-left:1px solid rgba(255,255,255,.12);border-radius:16px 0 0 16px;color:#fff3a2;font-weight:1000}.league-table td:last-child{border-right:1px solid rgba(255,255,255,.12);border-radius:0 16px 16px 0;font-weight:1000}.league-type{display:inline-flex;border-radius:999px;padding:7px 10px;background:rgba(55,212,255,.12);border:1px solid rgba(55,212,255,.26);color:#bdf3ff;font-size:12px;font-weight:1000}.league-type.lego{background:rgba(248,200,74,.14);border-color:rgba(248,200,74,.35);color:#fff3a2}
+.submission-shell{display:grid;grid-template-columns:minmax(240px,.7fr) 1.6fr;gap:18px;align-items:start}.submission-picker{position:sticky;top:14px}.submission-picker select{width:100%;padding:13px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.18);background:#fff;color:#071633;font-weight:900}.submission-summary{display:grid;gap:12px}.summary-header{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:16px;border-radius:20px;background:linear-gradient(135deg,rgba(248,200,74,.15),rgba(55,212,255,.09));border:1px solid rgba(248,200,74,.28)}.summary-header h3{margin:0;color:#fff}.total-points{font-size:28px;color:#fff3a2;font-weight:1000}.prediction-table{width:100%;border-collapse:separate;border-spacing:0 8px}.prediction-table th{text-align:left;color:#fff3a2;text-transform:uppercase;font-size:11px;letter-spacing:.08em;padding:0 10px}.prediction-table th:last-child,.prediction-table td:last-child{text-align:right}.prediction-table td{background:rgba(255,255,255,.07);border-top:1px solid rgba(255,255,255,.10);border-bottom:1px solid rgba(255,255,255,.10);padding:12px 10px;font-weight:800;vertical-align:middle}.prediction-table td:first-child{border-left:1px solid rgba(255,255,255,.10);border-radius:14px 0 0 14px}.prediction-table td:last-child{border-right:1px solid rgba(255,255,255,.10);border-radius:0 14px 14px 0;font-weight:1000;color:#fff3a2}.actual-pending{display:inline-flex;border-radius:999px;padding:6px 9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#cfe0ff;font-size:12px;font-weight:900}.stage-divider{margin:14px 0 6px;color:#fff3a2;font-weight:1000;text-transform:uppercase;letter-spacing:.06em;text-align:left}.sub-note{text-align:center;color:#b8c9e8;font-weight:750;margin-top:12px}
+@media(max-width:900px){.how-play-card .play-steps{grid-template-columns:1fr 1fr}.score-grid.v25-score{grid-template-columns:1fr 1fr}.submission-shell{grid-template-columns:1fr}.submission-picker{position:relative;top:auto}.league-table,.league-table tbody,.league-table tr,.league-table td,.prediction-table,.prediction-table tbody,.prediction-table tr,.prediction-table td{display:block;width:100%}.league-table thead,.prediction-table thead{display:none}.league-table tr,.prediction-table tr{margin-bottom:10px}.league-table td,.prediction-table td{border-left:1px solid rgba(255,255,255,.12);border-right:1px solid rgba(255,255,255,.12);border-radius:0!important;text-align:left!important}.league-table td:first-child,.prediction-table td:first-child{border-radius:16px 16px 0 0!important}.league-table td:last-child,.prediction-table td:last-child{border-radius:0 0 16px 16px!important}.league-table td:before,.prediction-table td:before{content:attr(data-label);display:block;color:#fff3a2;font-weight:1000;font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}.summary-header{grid-template-columns:1fr;text-align:center}}
+@media(max-width:520px){.how-play-card .play-steps,.score-grid.v25-score{grid-template-columns:1fr}}
+
+
+/* V26: Live Results merged with submissions, cleaner dropdown and compact rows */
+.live-results-submissions .page-head{text-align:center;max-width:980px;margin:0 auto 18px}.live-results-submissions .page-head p{max-width:760px;margin:8px auto 0;color:#dce9ff}
+.live-results-card{padding:18px!important}.submission-shell{grid-template-columns:minmax(250px,.55fr) minmax(0,1.9fr)!important;gap:16px!important}.picker-card{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:14px;box-shadow:0 14px 34px rgba(0,0,0,.18)}.picker-label{display:block;color:#fff3a2;text-transform:uppercase;letter-spacing:.08em;font-size:11px;font-weight:1000;margin-bottom:8px}.submission-picker select{height:48px!important;min-height:48px;padding:0 42px 0 14px!important;border-radius:14px!important;background:#fff;color:#071633;font-size:14px;font-weight:1000;white-space:normal}.sub-note{margin:12px 0 0!important;color:#dbe9ff!important;font-size:13px!important;line-height:1.35!important;font-weight:800!important}.summary-header{padding:12px 14px!important;border-radius:18px!important}.summary-header h3{font-size:20px!important}.total-points{font-size:24px!important}.prediction-table{border-spacing:0 5px!important;table-layout:fixed}.prediction-table th{font-size:10px!important;padding:0 8px 4px!important}.prediction-table th:nth-child(1){width:58%}.prediction-table th:nth-child(2){width:28%}.prediction-table th:nth-child(3){width:14%}.prediction-table td{padding:7px 9px!important;font-size:12.5px!important;line-height:1.2!important;word-break:normal;overflow-wrap:anywhere}.prediction-table td:first-child{font-size:12px!important}.stage-divider{padding:8px 10px!important;text-align:center!important;font-size:12px!important;letter-spacing:.04em!important;border-radius:12px!important;background:rgba(248,200,74,.12)!important;color:#fff3a2!important}.actual-pending{padding:4px 8px!important;font-size:10.5px!important;white-space:nowrap}.prediction-table td:last-child{font-size:13px!important}.compact-prediction{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.compact-prediction .scoreline{color:#fff3a2;font-weight:1000;white-space:nowrap}.compact-prediction .team-text{white-space:normal}.compact-prediction .match-ref{display:inline-flex;padding:2px 6px;border-radius:999px;background:rgba(255,255,255,.10);color:#b8c9e8;font-size:10px;font-weight:1000}.submission-help{margin-top:8px;color:#b8c9e8;font-size:12px;font-weight:800;text-align:center}
+@media(max-width:850px){.submission-shell{grid-template-columns:1fr!important}.submission-picker{position:static!important}.prediction-table thead{display:none}.prediction-table,.prediction-table tbody,.prediction-table tr,.prediction-table td{display:block;width:100%}.prediction-table tr{margin:7px 0;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:8px}.prediction-table td{border:none!important;background:transparent!important;border-radius:0!important;padding:4px 0!important;text-align:left!important}.prediction-table td:before{content:attr(data-label);display:block;color:#fff3a2;font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}.stage-divider{display:block!important}.stage-divider:before{display:none!important}.summary-header{grid-template-columns:1fr!important;text-align:center}.total-points{text-align:center}.live-results-card{padding:14px!important}}
+
+
+/* V27 Live Results polish */
+.live-results-submissions .page-head{margin-bottom:12px!important}
+.live-results-submissions .page-head p,.sub-note,.submission-help{display:none!important}
+.live-results-card{padding:22px!important}
+.submission-shell{grid-template-columns:minmax(260px,.42fr) minmax(0,2.1fr)!important;gap:20px!important}
+.picker-card{padding:18px!important;border-radius:24px!important;background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.055))!important}
+.picker-label{font-size:12px!important;color:#fff3a2!important;margin-bottom:10px!important}
+.submission-picker select{height:auto!important;min-height:58px!important;border-radius:20px!important;background:linear-gradient(180deg,#ffffff,#eaf3ff)!important;color:#071633!important;font-size:18px!important;font-weight:1000!important;padding:14px 46px 14px 18px!important;box-shadow:0 16px 32px rgba(0,0,0,.20)!important;border:2px solid rgba(248,200,74,.42)!important;line-height:1.15!important}
+.summary-header{padding:18px 20px!important;border-radius:24px!important;background:linear-gradient(135deg,rgba(248,200,74,.18),rgba(55,212,255,.10))!important;border:1px solid rgba(248,200,74,.34)!important}
+.summary-header h3{font-size:32px!important;line-height:1!important;margin:0!important;letter-spacing:-.04em!important}
+.points-total-card{text-align:right}.points-total-card small{color:#dce9ff;font-weight:850}.total-points{font-size:34px!important;color:#fff3a2!important;line-height:1!important}
+.prediction-table.v29-results{border-spacing:0 7px!important;table-layout:fixed!important}
+.prediction-table.v29-results th{font-size:12px!important;letter-spacing:.11em!important;padding:0 14px 8px!important;color:#fff3a2!important;text-align:left!important}
+.prediction-table.v29-results th:nth-child(1){width:62%}.prediction-table.v29-results th:nth-child(2){width:24%}.prediction-table.v29-results th:nth-child(3){width:14%;text-align:right!important}
+.prediction-table.v29-results th span{font-size:9px;color:#b8c9e8;letter-spacing:.08em}
+.prediction-table.v29-results td{padding:9px 14px!important;font-size:13px!important;line-height:1.15!important;vertical-align:middle!important}
+.prediction-table.v29-results td:first-child{overflow:visible!important}
+.prediction-table.v29-results td:last-child{text-align:right!important;font-size:14px!important;color:#fff3a2!important;white-space:nowrap!important}
+.compact-prediction{display:grid!important;grid-template-columns:48px minmax(0,1fr)!important;align-items:center!important;gap:10px!important;width:100%!important;min-width:0!important}
+.match-ref{display:inline-flex!important;justify-content:center!important;align-items:center!important;min-width:36px!important;padding:4px 8px!important;border-radius:999px!important;background:rgba(255,255,255,.10)!important;color:#b8c9e8!important;font-size:11px!important;font-weight:1000!important;white-space:nowrap!important}
+.result-fixture-line{display:grid!important;grid-template-columns:minmax(0,1fr) 88px minmax(0,1fr)!important;align-items:center!important;gap:12px!important;width:100%!important;min-width:0!important}
+.result-team{display:flex!important;align-items:center!important;gap:7px!important;min-width:0!important;font-weight:950!important;color:#fff!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.result-home{justify-content:flex-end!important;text-align:right!important}.result-away{justify-content:flex-start!important;text-align:left!important}
+.result-score{justify-self:center!important;text-align:center!important;min-width:78px!important;color:#fff3a2!important;font-weight:1000!important;white-space:nowrap!important}
+.single-pick .result-home{justify-content:flex-start!important;text-align:left!important}.single-pick .result-score{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#b8c9e8!important}.champion-pick .result-score{color:#fff3a2!important}
+.actual-pending{padding:5px 9px!important;font-size:11px!important;white-space:nowrap!important}
+.stage-divider{padding:9px 12px!important;text-align:center!important;font-size:13px!important;background:linear-gradient(90deg,rgba(248,200,74,.14),rgba(55,212,255,.08))!important;color:#fff3a2!important;border-radius:14px!important}
+.prediction-table.v29-results tfoot td{background:linear-gradient(135deg,rgba(248,200,74,.18),rgba(55,212,255,.08))!important;border:1px solid rgba(248,200,74,.25)!important;color:#fff3a2!important;font-size:16px!important;font-weight:1000!important;text-transform:uppercase;letter-spacing:.06em}
+.prediction-table.v29-results tfoot td:first-child{border-radius:16px 0 0 16px!important}.prediction-table.v29-results tfoot td:last-child{border-radius:0 16px 16px 0!important;text-align:right!important}
+@media(max-width:850px){
+  .submission-shell{grid-template-columns:1fr!important}.submission-picker{position:static!important}.picker-card{text-align:center}.summary-header{text-align:center!important}.points-total-card{text-align:center!important}.summary-header h3{font-size:28px!important}
+  .prediction-table.v29-results thead{display:none}.prediction-table.v29-results,.prediction-table.v29-results tbody,.prediction-table.v29-results tr,.prediction-table.v29-results td{display:block;width:100%}.prediction-table.v29-results tr{padding:9px!important;border-radius:16px!important;background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.10)!important}.prediction-table.v29-results td{padding:5px 0!important;border:0!important;background:transparent!important;text-align:left!important}.prediction-table.v29-results td:last-child{text-align:left!important}.compact-prediction{grid-template-columns:38px minmax(0,1fr)!important}.result-fixture-line{grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr)!important;gap:6px!important}.result-score{min-width:54px!important}.result-team{font-size:12px!important}.actual-pending{font-size:10px!important}.prediction-table.v29-results tfoot td{border-radius:0!important}.prediction-table.v29-results tfoot td:first-child{border-radius:16px 16px 0 0!important}.prediction-table.v29-results tfoot td:last-child{border-radius:0 0 16px 16px!important}
+}
+
+
+/* V30: live results alignment + knockout summaries */
+.prediction-table.v29-results{border-spacing:0 7px!important;table-layout:fixed!important;width:100%!important}
+.prediction-table.v29-results th{font-size:12px!important;letter-spacing:.11em!important;padding:0 14px 8px!important;color:#fff3a2!important;text-align:left!important;white-space:nowrap!important}
+.prediction-table.v29-results th:nth-child(1){width:64%}.prediction-table.v29-results th:nth-child(2){width:22%}.prediction-table.v29-results th:nth-child(3){width:14%;text-align:right!important}
+.prediction-table.v29-results td{padding:8px 14px!important;font-size:13px!important;line-height:1.12!important;vertical-align:middle!important;min-width:0!important}
+.prediction-table.v29-results td:last-child{text-align:right!important;font-size:14px!important;color:#fff3a2!important;white-space:nowrap!important;font-weight:1000!important}
+.result-fixture-line{display:grid!important;grid-template-columns:minmax(0,1fr) 92px minmax(0,1fr)!important;align-items:center!important;gap:18px!important;width:100%!important;min-width:0!important}
+.result-team{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important;font-weight:950!important;color:#fff!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.result-home{justify-content:flex-start!important;text-align:left!important}.result-away{justify-content:flex-end!important;text-align:right!important}
+.result-score{justify-self:center!important;text-align:center!important;min-width:84px!important;color:#fff3a2!important;font-weight:1000!important;white-space:nowrap!important;letter-spacing:.04em!important}
+.compact-prediction{display:block!important;width:100%!important;min-width:0!important}
+.stage-summary-list{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.stage-team-pill{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);font-weight:950;color:#fff;white-space:nowrap}
+.stage-summary-copy{color:#dce9ff;font-weight:850;margin:6px 0 0;font-size:12px}
+.prediction-table.v29-results tfoot td{background:linear-gradient(135deg,rgba(248,200,74,.18),rgba(55,212,255,.08))!important;border:1px solid rgba(248,200,74,.25)!important;color:#fff3a2!important;font-size:16px!important;font-weight:1000!important;text-transform:uppercase;letter-spacing:.06em}
+.prediction-table.v29-results tfoot td:first-child{border-radius:16px 0 0 16px!important}.prediction-table.v29-results tfoot td:last-child{border-radius:0 16px 16px 0!important;text-align:right!important}
+@media(max-width:850px){
+  .prediction-table.v29-results thead{display:none}.prediction-table.v29-results,.prediction-table.v29-results tbody,.prediction-table.v29-results tr,.prediction-table.v29-results td{display:block;width:100%}.prediction-table.v29-results tr{padding:9px!important;border-radius:16px!important;background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.10)!important;margin-bottom:10px!important}.prediction-table.v29-results td{padding:5px 0!important;border:0!important;background:transparent!important;text-align:left!important}.prediction-table.v29-results td:last-child{text-align:left!important}.prediction-table.v29-results td:before{content:attr(data-label);display:block;color:#fff3a2;font-weight:1000;font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}.result-fixture-line{grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr)!important;gap:8px!important}.result-score{min-width:60px!important}.result-team{font-size:12px!important}.stage-summary-list{gap:6px}.stage-team-pill{font-size:12px;padding:6px 8px}.prediction-table.v29-results tfoot td{border-radius:0!important}.prediction-table.v29-results tfoot td:first-child{border-radius:16px 16px 0 0!important}.prediction-table.v29-results tfoot td:last-child{border-radius:0 0 16px 16px!important}
+}
+
+
+
+/* V31 polish: centred stage headings, symmetrical knockout scoring, squared points */
+.stage-head{
+  text-align:center!important;
+  margin:20px auto 14px!important;
+  display:grid!important;
+  place-items:center!important;
+  gap:8px!important;
+}
+.stage-head h3,
+.stage-divider,
+.prediction-table td.stage-divider{
+  width:100%!important;
+  text-align:center!important;
+  justify-content:center!important;
+  color:#fff3a2!important;
+  text-transform:uppercase!important;
+  letter-spacing:.08em!important;
+  font-weight:1000!important;
+}
+.stage-head h3{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:10px 22px!important;
+  border-radius:18px!important;
+  background:linear-gradient(135deg,rgba(248,200,74,.20),rgba(55,212,255,.08))!important;
+  border:1px solid rgba(248,200,74,.34)!important;
+  box-shadow:0 12px 34px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.10)!important;
+}
+.stage-score{
+  border-radius:12px!important;
+  padding:8px 14px!important;
+  min-width:220px!important;
+  justify-content:center!important;
+  text-align:center!important;
+}
+.v25-score{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;
+  gap:12px!important;
+  align-items:stretch!important;
+}
+.score-bubble{
+  min-height:132px!important;
+  display:grid!important;
+  grid-template-rows:auto auto auto 1fr!important;
+  place-items:center!important;
+  text-align:center!important;
+  padding:16px 12px!important;
+}
+.score-bubble strong{
+  min-width:78px!important;
+  border-radius:12px!important;
+  padding:5px 10px!important;
+  background:rgba(248,200,74,.16)!important;
+  border:1px solid rgba(248,200,74,.30)!important;
+}
+.prediction-table.v29-results{
+  border-spacing:0 8px!important;
+}
+.prediction-table.v29-results th{
+  text-align:center!important;
+  background:rgba(5,18,45,.50)!important;
+  border-radius:10px!important;
+  padding:8px 10px!important;
+}
+.prediction-table.v29-results td:last-child,
+.prediction-table.v29-results tfoot td:last-child{
+  min-width:92px!important;
+  text-align:center!important;
+  border-radius:12px!important;
+  background:rgba(248,200,74,.12)!important;
+  border:1px solid rgba(248,200,74,.25)!important;
+  color:#fff3a2!important;
+  font-weight:1000!important;
+}
+.result-fixture-line{
+  display:grid!important;
+  grid-template-columns:minmax(170px,1fr) 92px minmax(170px,1fr)!important;
+  align-items:center!important;
+  gap:14px!important;
+  width:100%!important;
+}
+.result-team{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important;}
+.result-home{justify-content:flex-start!important;text-align:left!important;}
+.result-away{justify-content:flex-end!important;text-align:right!important;}
+.result-score{
+  justify-self:center!important;
+  min-width:72px!important;
+  text-align:center!important;
+  padding:6px 10px!important;
+  border-radius:12px!important;
+  background:rgba(5,18,45,.55)!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  color:#fff3a2!important;
+}
+.stage-summary-list{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  justify-content:center!important;
+  gap:8px!important;
+}
+.stage-team-pill{
+  min-width:120px!important;
+  justify-content:center!important;
+  text-align:center!important;
+}
+.points-total-card{
+  padding:12px 18px!important;
+  border-radius:18px!important;
+  background:rgba(5,18,45,.40)!important;
+  border:1px solid rgba(248,200,74,.28)!important;
+}
+.points-total-card .total-points,
+.total-points{
+  font-size:42px!important;
+  letter-spacing:-.03em!important;
+}
+.prediction-table tfoot td{
+  font-size:18px!important;
+  padding:14px 12px!important;
+  background:linear-gradient(135deg,rgba(248,200,74,.16),rgba(55,212,255,.08))!important;
+  border-top:1px solid rgba(248,200,74,.30)!important;
+}
+@media(max-width:700px){
+  .result-fixture-line{grid-template-columns:1fr!important;gap:6px!important;text-align:center!important;}
+  .result-home,.result-away{justify-content:center!important;text-align:center!important;}
+  .result-score{order:2;}
+  .points-total-card .total-points,.total-points{font-size:32px!important;}
+}
+
+
+
+/* V32 FIX: balanced scoring guide */
+.scoring.compact-v25{
+  padding:22px 22px 24px!important;
+}
+.scoring.compact-v25 h3{
+  text-align:center!important;
+  margin-bottom:18px!important;
+}
+.score-grid.v25-score{
+  display:grid!important;
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  gap:10px!important;
+  align-items:stretch!important;
+}
+.score-bubble{
+  min-height:150px!important;
+  padding:14px 10px!important;
+  border-radius:18px!important;
+  display:grid!important;
+  grid-template-rows:26px 42px 42px 1fr!important;
+  justify-items:center!important;
+  align-items:center!important;
+  text-align:center!important;
+}
+.score-bubble .score-icon{font-size:22px!important;line-height:1!important}
+.score-bubble b{
+  min-height:40px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  line-height:1.04!important;
+  font-size:17px!important;
+  margin:0!important;
+}
+.score-bubble strong{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:92px!important;
+  height:38px!important;
+  border-radius:12px!important;
+  padding:0 8px!important;
+  font-size:23px!important;
+  white-space:nowrap!important;
+  background:rgba(248,200,74,.16)!important;
+  border:1px solid rgba(248,200,74,.30)!important;
+}
+.score-bubble span{
+  display:block!important;
+  min-height:42px!important;
+  font-size:12px!important;
+  line-height:1.18!important;
+  color:#d8e7ff!important;
+  font-weight:900!important;
+}
+.score-bubble.champion{
+  background:linear-gradient(180deg,rgba(248,200,74,.24),rgba(255,255,255,.08))!important;
+  border-color:rgba(248,200,74,.45)!important;
+}
+@media(max-width:1250px){
+  .score-grid.v25-score{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
+@media(max-width:820px){
+  .score-grid.v25-score{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:520px){
+  .score-grid.v25-score{grid-template-columns:1fr!important}
+}
+
+
+
+/* V35: fixed Round of 32 summaries and cleaner symmetrical Live Results */
+.prediction-centre-head h2{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:10px!important;
+  padding:10px 24px!important;
+  border-radius:22px!important;
+  background:linear-gradient(135deg,rgba(248,200,74,.20),rgba(55,212,255,.10))!important;
+  border:1px solid rgba(248,200,74,.36)!important;
+  box-shadow:0 18px 42px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.10)!important;
+}
+.personal-subtitle{margin:12px auto 0!important;font-size:17px!important;color:#dce9ff!important;font-weight:850!important}
+.personal-subtitle span{color:#fff3a2!important;border:1px solid rgba(248,200,74,.38);border-radius:999px;padding:4px 10px;background:rgba(248,200,74,.12);white-space:nowrap}
+.prediction-table.v29-results th{font-size:13px!important;text-align:center!important;border:1px solid rgba(248,200,74,.20)!important;background:rgba(5,18,45,.55)!important}
+.prediction-table.v29-results th:nth-child(1){width:62%!important}.prediction-table.v29-results th:nth-child(2){width:22%!important}.prediction-table.v29-results th:nth-child(3){width:16%!important}
+.prediction-table.v29-results td{padding:10px 14px!important;vertical-align:middle!important}
+.result-fixture-line{grid-template-columns:minmax(210px,1fr) 90px minmax(210px,1fr)!important;gap:20px!important;align-items:center!important;}
+.result-team{font-size:14px!important;line-height:1.15!important;display:flex!important;align-items:center!important;gap:8px!important;}
+.result-home{justify-content:flex-start!important;text-align:left!important;}
+.result-away{justify-content:flex-end!important;text-align:right!important;}
+.result-score{justify-self:center!important;min-width:82px!important;text-align:center!important;font-size:14px!important;border-radius:12px!important;}
+.stage-divider{font-size:16px!important;letter-spacing:.09em!important;padding:11px 14px!important;margin-top:8px!important;border:1px solid rgba(248,200,74,.28)!important;background:linear-gradient(90deg,rgba(248,200,74,.18),rgba(55,212,255,.08),rgba(248,200,74,.18))!important;}
+.stage-summary-list{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;gap:9px!important;width:100%!important;align-items:stretch!important;}
+.stage-team-pill{display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;min-height:42px!important;min-width:0!important;padding:8px 10px!important;text-align:center!important;border-radius:16px!important;background:rgba(255,255,255,.09)!important;border:1px solid rgba(255,255,255,.14)!important;color:#fff!important;font-weight:950!important;white-space:normal!important;}
+.stage-summary-copy{text-align:center!important;margin-top:10px!important;color:#dce9ff!important;font-size:13px!important;font-weight:900!important;}
+.prediction-table.v29-results td:last-child{font-size:15px!important;min-width:110px!important;text-align:center!important;}
+.prediction-table.v29-results tfoot td{font-size:19px!important;padding:18px 14px!important;}
+.prediction-table.v29-results tfoot td:last-child{font-size:22px!important;}
+.stage-section .stage-head h3{font-size:28px!important;min-width:min(100%,520px)!important;}
+.stage-section .stage-score{font-size:15px!important;}
+@media(max-width:850px){
+  .result-fixture-line{grid-template-columns:1fr!important;gap:8px!important;}
+  .result-home,.result-away{justify-content:center!important;text-align:center!important;}
+  .result-score{margin:0 auto!important;}
+  .stage-summary-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .stage-section .stage-head h3{font-size:22px!important;}
+}
+@media(max-width:520px){.stage-summary-list{grid-template-columns:1fr!important;}}
+
+
+/* V35 How I Built This refresh */
+.zero-hero{background:linear-gradient(135deg,rgba(248,200,74,.20),rgba(55,212,255,.10));border:1px solid rgba(248,200,74,.42);border-radius:28px;padding:22px;margin-bottom:18px;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.22)}
+.zero-hero h3{font-size:clamp(28px,4vw,48px);margin:0 0 10px;color:#fff3a2;letter-spacing:.04em;text-transform:uppercase}.zero-hero p{max-width:960px;margin:0 auto;color:#eaf2ff;font-weight:850;line-height:1.45}.intro-story{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:20px;margin-bottom:18px;color:#eaf2ff;font-weight:750;line-height:1.62}.intro-story p{margin:0 0 12px}.intro-story p:last-child{margin-bottom:0}.metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0 20px}.metric-card{background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.15);border-radius:22px;padding:16px;text-align:center}.metric-card b{display:block;font-size:22px;color:#fff3a2}.metric-card span{display:block;margin-top:5px;color:#dce9ff;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:900}.how-table-card:before{content:"🧱";position:absolute;right:22px;top:16px;font-size:34px;opacity:.28}.how-table-card{position:relative}.build-table td:nth-child(2){font-weight:750;color:#eaf2ff}.build-table td:nth-child(3),.build-table td:nth-child(4){text-align:center}.build-summary-note{text-align:center;color:#dce9ff;font-weight:850;margin-top:12px}.build-summary-note strong{color:#fff3a2}@media(max-width:900px){.metrics-grid{grid-template-columns:1fr 1fr}.zero-hero h3{font-size:26px}}@media(max-width:520px){.metrics-grid{grid-template-columns:1fr}.zero-hero{padding:18px}}
+
+
+
+/* V36: Live Results user-friendly polish */
+.live-results-submissions .page-head{
+  background:linear-gradient(135deg,rgba(9,37,92,.96),rgba(7,27,69,.96))!important;
+  border:1px solid rgba(248,200,74,.30)!important;
+  border-radius:28px!important;
+  padding:30px 18px!important;
+  box-shadow:0 20px 58px rgba(0,0,0,.24)!important;
+  margin-bottom:22px!important;
+}
+.live-results-submissions .page-head h2{
+  font-size:clamp(40px,6vw,76px)!important;
+  line-height:.95!important;
+  color:#fff!important;
+  text-shadow:0 12px 26px rgba(0,0,0,.35)!important;
+  letter-spacing:-.04em!important;
+  margin:0!important;
+}
+.live-results-submissions .live-results-tagline{
+  display:block!important;
+  margin:12px auto 0!important;
+  max-width:760px!important;
+  color:#dce9ff!important;
+  font-weight:850!important;
+  font-size:clamp(14px,1.6vw,18px)!important;
+  text-align:center!important;
+}
+.live-results-card{padding:20px!important;border-radius:30px!important;}
+.submission-shell{grid-template-columns:minmax(260px,.36fr) minmax(0,2.25fr)!important;gap:22px!important;}
+.picker-card{
+  padding:18px!important;
+  border-radius:26px!important;
+  background:linear-gradient(180deg,rgba(13,58,145,.62),rgba(6,22,51,.7))!important;
+  border:1px solid rgba(248,200,74,.30)!important;
+}
+.picker-label{
+  display:block!important;
+  text-align:center!important;
+  color:#fff3a2!important;
+  font-size:13px!important;
+  letter-spacing:.12em!important;
+  margin-bottom:12px!important;
+}
+.submission-picker select{
+  appearance:auto!important;
+  width:100%!important;
+  min-height:64px!important;
+  padding:12px 44px 12px 18px!important;
+  border-radius:22px!important;
+  background:linear-gradient(180deg,#fff9d8,#eef7ff)!important;
+  color:#071633!important;
+  border:2px solid rgba(248,200,74,.75)!important;
+  box-shadow:0 18px 40px rgba(0,0,0,.24), inset 0 0 0 1px rgba(255,255,255,.8)!important;
+  font-size:20px!important;
+  font-weight:1000!important;
+  line-height:1.12!important;
+  text-align:left!important;
+}
+.summary-header{
+  padding:18px 22px!important;
+  border-radius:28px!important;
+  background:linear-gradient(135deg,rgba(248,200,74,.20),rgba(55,212,255,.08),rgba(255,255,255,.06))!important;
+  border:1px solid rgba(248,200,74,.45)!important;
+}
+.summary-header h3{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  margin:0!important;
+  font-size:clamp(30px,3.2vw,48px)!important;
+  line-height:1!important;
+  color:#fff!important;
+  letter-spacing:-.045em!important;
+}
+.summary-header h3:before{content:'👤';font-size:.72em;filter:drop-shadow(0 6px 10px rgba(0,0,0,.25));}
+.points-total-card{align-self:center!important;}
+.total-points{font-size:clamp(28px,3vw,42px)!important;}
+.prediction-table.v29-results{border-spacing:0 8px!important;width:100%!important;table-layout:fixed!important;}
+.prediction-table.v29-results th{
+  text-align:center!important;
+  padding:0 12px 8px!important;
+  color:#fff3a2!important;
+  font-size:13px!important;
+  letter-spacing:.13em!important;
+}
+.prediction-table.v29-results th:nth-child(1){width:58%!important;}
+.prediction-table.v29-results th:nth-child(2){width:24%!important;}
+.prediction-table.v29-results th:nth-child(3){width:18%!important;text-align:center!important;}
+.prediction-table.v29-results td{
+  padding:10px 14px!important;
+  font-size:14px!important;
+  line-height:1.15!important;
+}
+.prediction-table.v29-results td:last-child{text-align:center!important;font-size:17px!important;}
+.result-fixture-line{
+  display:grid!important;
+  grid-template-columns:minmax(180px,1fr) 96px minmax(180px,1fr)!important;
+  align-items:center!important;
+  gap:18px!important;
+  width:100%!important;
+}
+.result-team{
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+  min-width:0!important;
+  font-size:15px!important;
+  font-weight:1000!important;
+  overflow:visible!important;
+  white-space:normal!important;
+  text-overflow:clip!important;
+}
+.result-home{justify-content:flex-start!important;text-align:left!important;}
+.result-away{justify-content:flex-end!important;text-align:right!important;}
+.result-score{
+  justify-self:center!important;
+  min-width:92px!important;
+  padding:9px 12px!important;
+  border-radius:18px!important;
+  background:rgba(4,17,45,.75)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  color:#fff3a2!important;
+  font-size:17px!important;
+  font-weight:1000!important;
+  text-align:center!important;
+}
+.actual-pending{
+  display:inline-flex!important;
+  justify-content:center!important;
+  min-width:132px!important;
+  padding:7px 12px!important;
+  border-radius:999px!important;
+  font-size:12px!important;
+}
+.stage-divider{
+  font-size:15px!important;
+  letter-spacing:.11em!important;
+  padding:12px 14px!important;
+  border-radius:18px!important;
+}
+.prediction-table.v29-results tfoot td{font-size:18px!important;padding:16px!important;}
+@media(max-width:980px){
+  .submission-shell{grid-template-columns:1fr!important;}
+  .result-fixture-line{grid-template-columns:minmax(130px,1fr) 82px minmax(130px,1fr)!important;gap:10px!important;}
+  .result-team{font-size:13px!important;}
+  .result-score{min-width:76px!important;font-size:14px!important;padding:8px!important;}
+}
+@media(max-width:650px){
+  .prediction-table.v29-results thead{display:none!important;}
+  .prediction-table.v29-results,.prediction-table.v29-results tbody,.prediction-table.v29-results tr,.prediction-table.v29-results td{display:block!important;width:100%!important;}
+  .prediction-table.v29-results tr{padding:10px!important;border-radius:18px!important;background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.10)!important;margin-bottom:10px!important;}
+  .prediction-table.v29-results td{border:0!important;background:transparent!important;border-radius:0!important;padding:6px 0!important;text-align:left!important;}
+  .prediction-table.v29-results td:last-child{text-align:left!important;}
+  .prediction-table.v29-results td:before{content:attr(data-label);display:block;color:#fff3a2;font-weight:1000;font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;}
+  .result-fixture-line{grid-template-columns:1fr!important;gap:6px!important;}
+  .result-home,.result-away{justify-content:flex-start!important;text-align:left!important;}
+  .result-score{justify-self:start!important;}
+  .actual-pending{min-width:0!important;}
+  .summary-header{grid-template-columns:1fr!important;text-align:center!important;}
+  .summary-header h3{justify-content:center!important;}
+}
+
+
+
+/* V37 - Live Table uplift + robust result-pending spacing */
+.live-table-head{
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(248,200,74,.22);
+  background:
+    radial-gradient(circle at 15% 20%,rgba(248,200,74,.18),transparent 28%),
+    linear-gradient(135deg,rgba(10,36,90,.96),rgba(8,24,60,.96));
+  border-radius:28px;
+  padding:28px 22px!important;
+  box-shadow:0 24px 60px rgba(0,0,0,.24);
+}
+.live-table-head .page-kicker{display:inline-flex;margin-bottom:8px;padding:8px 13px;border-radius:999px;background:rgba(248,200,74,.14);border:1px solid rgba(248,200,74,.32);color:#fff3a2;font-size:12px;font-weight:1000;text-transform:uppercase;letter-spacing:.09em}
+.live-table-head h2{font-size:clamp(44px,7vw,86px)!important;line-height:.95!important;text-shadow:0 10px 26px rgba(0,0,0,.32)}
+.live-table-head p{max-width:820px;margin:12px auto 0!important;color:#dbe8ff!important;font-size:clamp(15px,2vw,19px)!important;font-weight:850!important}
+.live-table-card{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.045))!important;border:1px solid rgba(248,200,74,.20)!important;box-shadow:0 26px 70px rgba(0,0,0,.22)!important}
+.league-controls.upgraded{margin-bottom:20px!important;gap:12px!important}
+.league-controls.upgraded .league-filter{min-width:150px;padding:13px 18px!important;border-radius:18px!important;background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.18)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);transition:transform .15s ease, background .15s ease}
+.league-controls.upgraded .league-filter:hover{transform:translateY(-1px)}
+.league-controls.upgraded .league-filter.active{background:linear-gradient(135deg,#fff3a2,#f8c84a)!important;color:#071633!important;border-color:transparent!important}
+.live-table-summary{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px!important}
+.live-table-summary .summary-tile{border-radius:22px!important;background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.045))!important;border:1px solid rgba(255,255,255,.14)!important;padding:18px!important;text-align:center!important}
+.live-table-summary .summary-tile b{display:block;color:#fff3a2;font-size:40px!important;line-height:1;font-weight:1000}.live-table-summary .summary-tile span{display:block;color:#dbe8ff;margin-top:8px;font-weight:1000;text-transform:uppercase;letter-spacing:.06em;font-size:12px}
+.upgraded-table{border-spacing:0 12px!important}.upgraded-table th{font-size:12px!important;color:#fff3a2!important}.upgraded-table td{padding:16px 14px!important;background:linear-gradient(90deg,rgba(255,255,255,.095),rgba(255,255,255,.055))!important;border-color:rgba(255,255,255,.14)!important}.rank-badge{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:50%;background:rgba(248,200,74,.16);border:1px solid rgba(248,200,74,.35);color:#fff3a2;font-weight:1000}.leader-player{font-size:17px;font-weight:1000;color:#fff}.points-badge{display:inline-flex;align-items:center;justify-content:center;min-width:82px;padding:8px 12px;border-radius:14px;background:rgba(248,200,74,.15);border:1px solid rgba(248,200,74,.36);color:#fff3a2;font-weight:1000}
+.result-row{grid-template-columns:170px minmax(360px,1fr) 150px 160px 160px!important;align-items:center!important}.result-fixture{min-width:0!important;overflow:hidden!important}.result-fixture b{display:grid!important;grid-template-columns:minmax(120px,1fr) 34px minmax(120px,1fr)!important;align-items:center!important;gap:10px!important;width:100%!important}.result-fixture .inline-team{min-width:0!important;display:flex!important;align-items:center!important;gap:7px!important;white-space:normal!important;overflow-wrap:anywhere!important;line-height:1.15!important}.result-fixture .inline-team:first-child{justify-content:flex-start!important;text-align:left!important}.result-fixture .inline-team:last-child{justify-content:flex-end!important;text-align:right!important}.result-v{justify-self:center!important;color:#fff3a2!important;font-weight:1000!important}.pending-pill{justify-self:center!important;min-width:136px!important;text-align:center!important;white-space:nowrap!important;position:relative!important;z-index:1!important}.prediction-table{table-layout:fixed!important}.prediction-table td{overflow:hidden!important}.prediction-table th:nth-child(1),.prediction-table td:nth-child(1){width:52%!important}.prediction-table th:nth-child(2),.prediction-table td:nth-child(2){width:25%!important}.prediction-table th:nth-child(3),.prediction-table td:nth-child(3){width:23%!important}.compact-prediction{max-width:100%!important;overflow:hidden!important}.actual-pending{position:relative!important;z-index:2!important;white-space:nowrap!important;max-width:100%!important}
+@media(max-width:1100px){.result-row{grid-template-columns:1fr!important}.pending-pill{justify-self:start!important}.points-col{width:100%}.live-table-summary{grid-template-columns:1fr!important}.league-controls.upgraded .league-filter{min-width:0;flex:1 1 160px}.result-fixture b{grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr)!important}}
+@media(max-width:650px){.live-table-head{padding:22px 16px!important}.live-table-head h2{font-size:48px!important}.upgraded-table td{padding:12px!important}.result-fixture b{grid-template-columns:1fr!important}.result-fixture .inline-team:last-child{justify-content:flex-start!important;text-align:left!important}.result-v{justify-self:start!important}.pending-pill{white-space:normal!important}}
+
+
+/* V39: verified handoff, symmetrical scoring and refreshed build story */
+.score-grid.v25-score{display:grid!important;grid-template-columns:repeat(7,minmax(118px,1fr))!important;gap:12px!important;align-items:stretch!important}
+.score-grid.v25-score .score-bubble{min-height:146px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;text-align:center!important;padding:14px 10px!important}
+.score-grid.v25-score .score-bubble strong{white-space:nowrap!important;font-size:22px!important}.score-grid.v25-score .score-bubble span{min-height:38px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+.live-results-submissions .page-head h2,.live-table-head h2,.build-story-head h2{font-size:clamp(34px,5vw,58px)!important;color:#fff!important;text-shadow:0 12px 30px rgba(0,0,0,.36)}
+.live-results-submissions .page-head{padding:10px 0 2px}.submission-picker select{background:linear-gradient(135deg,#ffffff,#eaf4ff)!important;color:#061633!important;border:2px solid rgba(248,200,74,.55)!important;box-shadow:0 12px 26px rgba(0,0,0,.18)!important}.picker-label{font-size:12px!important;color:#fff3a2!important;text-align:center!important}
+.result-fixture-line{width:100%!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(76px,auto) minmax(0,1fr)!important;align-items:center!important;gap:12px!important}.result-team{min-width:0!important}.result-home{justify-content:flex-start!important;text-align:left!important}.result-away{justify-content:flex-end!important;text-align:right!important}.result-score{justify-self:center!important;white-space:nowrap!important;background:rgba(248,200,74,.14);border:1px solid rgba(248,200,74,.28);border-radius:999px;padding:6px 12px;color:#fff3a2}.actual-pending{white-space:nowrap!important;display:inline-flex!important;max-width:100%!important;justify-content:center!important}.prediction-table td{vertical-align:middle!important;overflow:visible!important}.prediction-table td:nth-child(2){text-align:center!important}.prediction-table td:nth-child(3){white-space:nowrap!important;text-align:right!important}.prediction-table tfoot td{font-size:16px!important;padding:16px 14px!important}.points-total-card{border-radius:20px!important;padding:14px 18px!important;background:linear-gradient(135deg,rgba(248,200,74,.2),rgba(255,255,255,.08));border:1px solid rgba(248,200,74,.35)}
+.how-built-page .zero-hero{border:1px solid rgba(248,200,74,.36);box-shadow:0 22px 54px rgba(0,0,0,.26)}.short-story{max-width:920px;margin:18px auto;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.14);border-radius:24px;padding:20px}.short-story p{font-weight:750;line-height:1.55;color:#e5f0ff}.v39-visuals{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.v39-visuals .build-visual{display:block;text-align:center;padding:16px;border-radius:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);font-weight:1000}.v39-visuals small{display:block;color:#c7d8f4;font-weight:750;margin-top:5px}.prompt-table td:nth-child(4){font-style:italic;color:#e7f1ff}.tips-section{margin-top:20px}.tips-section h3{text-align:center;font-size:clamp(28px,4vw,42px);margin:0 0 14px;color:#fff3a2}.tips-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.tip-card{background:linear-gradient(180deg,rgba(15,45,108,.94),rgba(8,25,62,.96));border:1px solid rgba(248,200,74,.24);border-radius:22px;padding:18px;box-shadow:0 18px 40px rgba(0,0,0,.22)}.tip-card b{display:block;color:#fff3a2;font-size:18px;margin-bottom:8px}.tip-card p{margin:0;color:#d8e7ff;font-weight:750;line-height:1.45}
+@media(max-width:1100px){.score-grid.v25-score{grid-template-columns:repeat(4,1fr)!important}.v39-visuals{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.score-grid.v25-score{grid-template-columns:repeat(2,1fr)!important}.tips-grid{grid-template-columns:1fr}.v39-visuals{grid-template-columns:1fr}.result-fixture-line{grid-template-columns:1fr!important;text-align:center!important}.result-home,.result-away{justify-content:center!important;text-align:center!important}.prediction-table td:nth-child(3){text-align:left!important}}
+@media(max-width:460px){.score-grid.v25-score{grid-template-columns:1fr!important}}
+
 </style>
 </head>
 <body>
@@ -111,11 +651,27 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     </div>
   </div>
 </section>
-<nav class="tabs hidden" id="tabs"><button data-tab="predictions" class="active">Predictions</button><button data-tab="leaderboard">Live Table</button><button data-tab="results">Live Results</button><button data-tab="how">How I Built This</button></nav>
+<nav class="tabs hidden" id="tabs"><button data-tab="predictions" class="active">Predictions</button><button data-tab="leaderboard">Live Table</button><button data-tab="submissions">Live Results</button><button data-tab="fun">Fun Stats</button><button data-tab="how">How I Built This</button></nav>
 <main class="app hidden" id="app">
   <section id="predictions" class="panel active">
-    <div class="page-head"><h2 id="welcomeTitle">Pick your scores</h2><p>All group fixtures are listed chronologically. Your tournament path builds below as you enter predictions.</p></div>
-    <section class="card scoring compact-scoring"><h3>Scoring Guide</h3><div class="score-grid"><div class="score-box"><b>5 pts</b><span>Group: correct result</span></div><div class="score-box"><b>+5 pts</b><span>Group: exact score bonus</span></div><div class="score-box"><b>5–10 pts</b><span>Knockout teams by round</span></div><div class="score-box"><b>25 pts</b><span>Correct tournament winner</span></div></div><p class="score-summary">Simple rule: pick the group scores, build your knockout route, then lock in your champion.</p></section>
+    <div class="page-head prediction-centre-head"><h2 id="welcomeTitle">🎯 Prediction Centre</h2><p id="welcomeSubtitle" class="personal-subtitle"></p></div>
+    <section class="card how-play-card">
+      <h3>⚽ How to Play</h3>
+      <p>The concept is simple. Pick the scores for each group game. Based on your picks, the knockout fixtures below automatically populate so you can build your full tournament path.</p>
+      <div class="play-steps"><div class="play-step"><b>1. Predict</b>Group scores</div><div class="play-step"><b>2. Build</b>Knockout route</div><div class="play-step"><b>3. Crown</b>Your champion</div><div class="play-step"><b>4. Lock</b>Submit once</div></div>
+    </section>
+    <section class="card scoring compact-v25">
+      <h3>Scoring Guide</h3>
+      <div class="score-grid v25-score">
+        <div class="score-bubble"><div class="score-icon">🏟️</div><b>Group</b><strong>5 pts + 5 pts</strong><span>Result + exact score<br>Max 10 pts</span></div>
+        <div class="score-bubble"><div class="score-icon">⚔️</div><b>Round of 32</b><strong>10 pts</strong><span>Per team<br>Max 320 pts</span></div>
+        <div class="score-bubble"><div class="score-icon">🏆</div><b>Round of 16</b><strong>10 pts</strong><span>Per team<br>Max 160 pts</span></div>
+        <div class="score-bubble"><div class="score-icon">🎯</div><b>Quarter-finals</b><strong>10 pts</strong><span>Per team<br>Max 80 pts</span></div>
+        <div class="score-bubble"><div class="score-icon">🔥</div><b>Semi-finals</b><strong>10 pts</strong><span>Per team<br>Max 40 pts</span></div>
+        <div class="score-bubble"><div class="score-icon">🏁</div><b>Finalists</b><strong>10 pts</strong><span>Per finalist<br>Max 20 pts</span></div>
+        <div class="score-bubble champion"><div class="score-icon">👑</div><b>Champion</b><strong>25 pts</strong><span>Correct winner<br>Max 25 pts</span></div>
+      </div>
+    </section>
     <div class="card progress-card"><strong id="progressText">0 / 72 group scores complete</strong><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div>
     <section class="fixture-list" id="fixturesList"></section>
     <section class="card tournament-path">
@@ -132,21 +688,50 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     <section class="winner-reveal" id="winnerReveal"><div class="winner-kicker">Your predicted World Cup winner is</div><div class="winner-name" id="winnerName">—</div><div class="winner-sub">Once this is set, lock in your full tournament prediction below.</div></section>
     <section class="card lock-card"><button class="primary" id="lockBtn">Lock In Full Tournament Prediction</button><div class="note">In the final build this will save your full prediction and send confirmation. In this conceptual version it saves locally in your browser.</div><div id="lockStatus" class="lock-status"></div></section>
   </section>
-  <section id="leaderboard" class="panel"><div class="page-head"><h2>Live Table</h2><p>Player leaderboard for this competition, not football tournament standings.</p></div><div class="card" id="leaderboardList"></div></section>
-  <section id="results" class="panel"><div class="page-head"><h2>Live Results</h2><p>All tournament matches in chronological order, with result status and example max/partial points from the prediction game.</p></div><div class="card" id="resultsList"></div></section>
-  <section id="how" class="panel"><div class="page-head"><h2>How I Built This</h2><p>A live build journal showing how the idea evolved with AI.</p></div><div class="card how-list">
-    <div class="how-item"><div class="how-copy"><b>Batch 1</b>Created the hidden LEGO/Friends split using email domain logic.</div><div class="how-metrics"><span class="metric-pill gold">⏱ Time taken: 20 mins</span><span class="metric-pill">💬 Prompts used: 6</span></div></div>
-    <div class="how-item"><div class="how-copy"><b>Batch 2</b>Added football atmosphere, trophy accents and tournament identity.</div><div class="how-metrics"><span class="metric-pill gold">⏱ Time taken: 30 mins</span><span class="metric-pill">💬 Prompts used: 8</span></div></div>
-    <div class="how-item"><div class="how-copy"><b>Batch 3</b>Moved to a hybrid model: exact group scores plus interactive knockout bracket.</div><div class="how-metrics"><span class="metric-pill gold">⏱ Time taken: 40 mins</span><span class="metric-pill">💬 Prompts used: 10</span></div></div>
-    <div class="how-item"><div class="how-copy"><b>Batch 4</b>Removed cluttered navigation from the landing page and made the entry flow clearer.</div><div class="how-metrics"><span class="metric-pill gold">⏱ Time taken: 25 mins</span><span class="metric-pill">💬 Prompts used: 7</span></div></div>
-    <div class="how-item"><div class="how-copy"><b>Batch 5</b>Re-centred the homepage, restored a professional dark blue sports-app style, reintroduced a subtle LEGO-style supporter, and clarified Live Table vs Live Results.</div><div class="how-metrics"><span class="metric-pill gold">⏱ Time taken: 35 mins</span><span class="metric-pill">💬 Prompts used: 9</span></div></div>
-    <div class="how-item"><div class="how-copy"><b>Batch 6 / V14</b>Removed the separate Bracket page and integrated the tournament path into the Predictions page. Replaced Group A/B/C blocks with one chronological fixture list.</div><div class="how-metrics"><span class="metric-pill gold">⏱ Time taken: 45 mins</span><span class="metric-pill">💬 Prompts used: 12</span></div></div>
-    <div class="how-item"><div class="how-copy"><b>Batch 7 / V16</b>Improved prediction-page alignment, made laptop and iPhone layouts more consistent, enhanced Live Results with max/partial points avatars, and added build metrics.</div><div class="how-metrics"><span class="metric-pill gold">⏱ Time taken: Placeholder</span><span class="metric-pill">💬 Prompts used: Placeholder</span></div></div>
-
-    <div class="how-item"><div class="how-copy"><b>Batch 9 / V18</b>Made every knockout stage match use the same horizontal fixture-bar layout as the group stage. Added scoring notes beneath each stage title and simplified the main scoring guide.</div><div class="how-metrics"><span class="metric-pill gold">⏱ Time taken: 25 mins</span><span class="metric-pill">💬 Prompts used: 3</span></div></div>
-  <div class="how-item"><div class="how-copy"><b>Batch 10 / V19</b>Standardised country flags so every displayed nation uses the same flag + country format across predictions, knockout picks and live results.</div><div class="how-metrics"><span class="metric-pill gold">⏱ Time taken: 10 mins</span><span class="metric-pill">💬 Prompts used: 1</span></div></div></div>
-    <div class="how-item"><div class="how-copy"><b>Batch 11 / V20</b>Centred and rewrote the knockout-stage introduction so the tournament path feels more fun, engaging and game-like before users start picking winners.</div><div class="how-metrics"><span class="metric-pill gold">⏱ Time taken: 10 mins</span><span class="metric-pill">💬 Prompts used: 2</span></div></div>
-    <div class="how-item"><div class="how-copy"><b>Batch 12 / V21</b>Restored the landing page as the first screen and replaced emoji flags with image-based flags so every country name displays consistently on Windows, iPhone and laptop.</div><div class="how-metrics"><span class="metric-pill gold">⏱ Time taken: 10 mins</span><span class="metric-pill">💬 Prompts used: 2</span></div></div>
+  <section id="leaderboard" class="panel live-table-panel"><div class="page-head live-table-head"><span class="page-kicker">🏆 League Standings</span><h2>Live Table</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life once scoring is connected.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🌍 All League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Main">⚽ Main League</button></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div></div></section>
+  <section id="submissions" class="panel live-results-submissions"><div class="page-head"><h2>🏆 Live Results Hub</h2><p class="live-results-tagline">Pick a player and track their World Cup story, result by result.</p></div><div class="card live-results-card"><div class="submission-shell"><aside class="submission-picker"><div class="picker-card"><label><span class="picker-label">View player result</span><select id="submissionSelect"></select></label></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
+  <section id="fun" class="panel"><div class="page-head"><h2>Fun Stats</h2><p>Live prediction trends and bragging-rights stats from Firebase submissions.</p></div><div class="card"><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more test predictions are submitted.</p></div></section>
+  <section id="how" class="panel how-built-page">
+    <div class="page-head build-story-head"><span class="page-kicker">🏗️ Build Story</span><h2>From Idea to Kick-Off</h2><p>From voice notes over dinner to a working World Cup prediction game in around 2 hours.</p></div>
+    <div class="zero-hero">
+      <h3>🏗️ From Zero to Working Prototype</h3>
+      <p>No previous website-building experience • ~2 hours of build time • Voice dictation + ChatGPT • GitHub Pages + Firebase • £0 cost</p>
+    </div>
+    <div class="intro-story short-story">
+      <p>Inspired by Damien's AI lunch chats, I decided to see how quickly I could turn an idea into a working product.</p>
+      <p>Before starting this project (and even now!), I had no prior experience building websites, hosting applications, using GitHub, configuring Firebase or developing front-end code. Everything you see here was learned and built through curiosity, experimentation and AI-assisted development.</p>
+      <p>This page tracks the main steps, approximate time taken and example prompts used to show how simple it was to get from idea to prototype.</p>
+    </div>
+    <div class="how-build-visuals v39-visuals">
+      <span class="build-visual">🎤 Voice Dictation<br><small>Most changes were spoken, not typed</small></span>
+      <span class="build-visual">🤖 AI Assisted<br><small>Built through practical prompts</small></span>
+      <span class="build-visual">⚽ Working Prototype<br><small>GitHub Pages + Firebase</small></span>
+      <span class="build-visual">⏱️ ~2 Hours<br><small>Idea to test version</small></span>
+    </div>
+    <div class="card how-table-card">
+      <table class="build-table prompt-table">
+        <thead><tr><th>Batch</th><th>What was built</th><th>Time</th><th>Example prompt</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Batch">1. Concept</td><td data-label="What was built">Game idea, one-entry flow, hidden LEGO/Main league split and scoring model.</td><td data-label="Time"><span class="small-pill gold-small">15 mins</span></td><td data-label="Example prompt">"Create a World Cup prediction game for colleagues and family."</td></tr>
+          <tr><td data-label="Batch">2. Landing Page</td><td data-label="What was built">World Cup-style landing page, entry card and mobile-first layout.</td><td data-label="Time"><span class="small-pill gold-small">15 mins</span></td><td data-label="Example prompt">"Make the homepage feel like a premium sports app."</td></tr>
+          <tr><td data-label="Batch">3. Predictions</td><td data-label="What was built">Chronological group fixtures, score inputs and progress tracker.</td><td data-label="Time"><span class="small-pill gold-small">20 mins</span></td><td data-label="Example prompt">"Show every fixture as a horizontal bar with flags and scores."</td></tr>
+          <tr><td data-label="Batch">4. Tournament Path</td><td data-label="What was built">Knockout stages moved into the Predictions page and simplified into team picks.</td><td data-label="Time"><span class="small-pill gold-small">15 mins</span></td><td data-label="Example prompt">"Build the knockout stages from my group picks."</td></tr>
+          <tr><td data-label="Batch">5. Firebase</td><td data-label="What was built">Registration connected to Firebase and entries stored in test collections.</td><td data-label="Time"><span class="small-pill gold-small">20 mins</span></td><td data-label="Example prompt">"Explain Firebase step by step as if I have never used it."</td></tr>
+          <tr><td data-label="Batch">6. Live Results</td><td data-label="What was built">Player submission summaries, result-pending holds and points columns.</td><td data-label="Time"><span class="small-pill gold-small">15 mins</span></td><td data-label="Example prompt">"Let me pick a player and view their full prediction summary."</td></tr>
+          <tr><td data-label="Batch">7. Live Table & Stats</td><td data-label="What was built">League filters, entry table and fun community stat bubbles.</td><td data-label="Time"><span class="small-pill gold-small">10 mins</span></td><td data-label="Example prompt">"Create fun stats like most popular winner and goal enthusiast."</td></tr>
+          <tr><td data-label="Batch">8. Polish</td><td data-label="What was built">Branding, mobile consistency, scoring clarity and build story refinements.</td><td data-label="Time"><span class="small-pill gold-small">10 mins</span></td><td data-label="Example prompt">"Make it cleaner, more consistent and easier to use on iPhone."</td></tr>
+        </tbody>
+      </table>
+      <p class="build-summary-note"><strong>Total:</strong> ~2 hours, ~78 prompts, minimal manual coding, hosted free on GitHub Pages with Firebase as the database.</p>
+    </div>
+    <div class="tips-section">
+      <h3>🏆 Top 3 Tips</h3>
+      <div class="tips-grid">
+        <div class="tip-card"><b>🎤 1. Dictation makes it easy</b><p>Get started by speaking in practical language. Explain what you want as if you were talking to a colleague.</p></div>
+        <div class="tip-card"><b>🧠 2. Prompt practice makes perfect</b><p>Use memory and remind AI of previous decisions, especially if errors or mistakes keep repeating, so you do not have to keep explaining the same things over and over again.</p></div>
+        <div class="tip-card"><b>🧱 3. Build in batches</b><p>Create batches before making changes. It saves time, keeps iterations cleaner and makes the project easier to steer.</p></div>
+      </div>
+    </div>
   </section>
 </main>
 <script>window.WCP_FIXTURES = [{"id": 1, "date": "2026-06-11", "ukTime": "8pm", "group": "A", "home": "Mexico", "away": "South Africa", "venue": "Mexico City, Mexico"}, {"id": 2, "date": "2026-06-12", "ukTime": "3am", "group": "A", "home": "South Korea", "away": "Czech Republic", "venue": "Zapopan, Mexico"}, {"id": 3, "date": "2026-06-12", "ukTime": "8pm", "group": "B", "home": "Canada", "away": "Bosnia & Herzegovina", "venue": "Toronto, Canada"}, {"id": 4, "date": "2026-06-13", "ukTime": "2am", "group": "D", "home": "USA", "away": "Paraguay", "venue": "Los Angeles, USA"}, {"id": 5, "date": "2026-06-13", "ukTime": "8pm", "group": "B", "home": "Qatar", "away": "Switzerland", "venue": "Santa Clara, USA"}, {"id": 6, "date": "2026-06-13", "ukTime": "11pm", "group": "C", "home": "Brazil", "away": "Morocco", "venue": "New Jersey, USA"}, {"id": 7, "date": "2026-06-14", "ukTime": "2am", "group": "C", "home": "Haiti", "away": "Scotland", "venue": "Foxborough, USA"}, {"id": 8, "date": "2026-06-14", "ukTime": "5am", "group": "D", "home": "Australia", "away": "Turkey", "venue": "Vancouver, Canada"}, {"id": 9, "date": "2026-06-14", "ukTime": "6pm", "group": "E", "home": "Germany", "away": "Curacao", "venue": "Houston, USA"}, {"id": 10, "date": "2026-06-14", "ukTime": "9pm", "group": "F", "home": "Netherlands", "away": "Japan", "venue": "Arlington, USA"}, {"id": 11, "date": "2026-06-15", "ukTime": "12am", "group": "E", "home": "Ivory Coast", "away": "Ecuador", "venue": "Philadelphia, USA"}, {"id": 12, "date": "2026-06-15", "ukTime": "3am", "group": "F", "home": "Sweden", "away": "Tunisia", "venue": "Guadalupe, Mexico"}, {"id": 13, "date": "2026-06-15", "ukTime": "5pm", "group": "H", "home": "Spain", "away": "Cape Verde", "venue": "Atlanta, USA"}, {"id": 14, "date": "2026-06-15", "ukTime": "8pm", "group": "G", "home": "Belgium", "away": "Egypt", "venue": "Seattle, USA"}, {"id": 15, "date": "2026-06-15", "ukTime": "11pm", "group": "H", "home": "Saudi Arabia", "away": "Uruguay", "venue": "Miami, USA"}, {"id": 16, "date": "2026-06-16", "ukTime": "2am", "group": "G", "home": "Iran", "away": "New Zealand", "venue": "Los Angeles, USA"}, {"id": 17, "date": "2026-06-16", "ukTime": "8pm", "group": "I", "home": "France", "away": "Senegal", "venue": "New Jersey, USA"}, {"id": 18, "date": "2026-06-16", "ukTime": "11pm", "group": "I", "home": "Iraq", "away": "Norway", "venue": "Foxborough, USA"}, {"id": 19, "date": "2026-06-17", "ukTime": "2am", "group": "J", "home": "Argentina", "away": "Algeria", "venue": "Kansas City, USA"}, {"id": 20, "date": "2026-06-17", "ukTime": "5am", "group": "J", "home": "Austria", "away": "Jordan", "venue": "Santa Clara, USA"}, {"id": 21, "date": "2026-06-17", "ukTime": "6pm", "group": "K", "home": "Portugal", "away": "DR Congo", "venue": "Houston, USA"}, {"id": 22, "date": "2026-06-17", "ukTime": "9pm", "group": "L", "home": "England", "away": "Croatia", "venue": "Arlington, USA"}, {"id": 23, "date": "2026-06-18", "ukTime": "12am", "group": "L", "home": "Ghana", "away": "Panama", "venue": "Toronto, Canada"}, {"id": 24, "date": "2026-06-18", "ukTime": "3am", "group": "K", "home": "Uzbekistan", "away": "Colombia", "venue": "Mexico City, Mexico"}, {"id": 25, "date": "2026-06-18", "ukTime": "5pm", "group": "A", "home": "Czech Republic", "away": "South Africa", "venue": "Atlanta, USA"}, {"id": 26, "date": "2026-06-18", "ukTime": "8pm", "group": "B", "home": "Switzerland", "away": "Bosnia & Herzegovina", "venue": "Los Angeles, USA"}, {"id": 27, "date": "2026-06-18", "ukTime": "11pm", "group": "B", "home": "Canada", "away": "Qatar", "venue": "Vancouver, Canada"}, {"id": 28, "date": "2026-06-19", "ukTime": "2am", "group": "A", "home": "Mexico", "away": "South Korea", "venue": "Zapopan, Mexico"}, {"id": 29, "date": "2026-06-19", "ukTime": "8pm", "group": "D", "home": "USA", "away": "Australia", "venue": "Seattle, USA"}, {"id": 30, "date": "2026-06-19", "ukTime": "11pm", "group": "C", "home": "Scotland", "away": "Morocco", "venue": "Foxborough, USA"}, {"id": 31, "date": "2026-06-20", "ukTime": "1.30am", "group": "C", "home": "Brazil", "away": "Haiti", "venue": "Philadelphia, USA"}, {"id": 32, "date": "2026-06-20", "ukTime": "4am", "group": "D", "home": "Turkey", "away": "Paraguay", "venue": "Santa Clara, USA"}, {"id": 33, "date": "2026-06-20", "ukTime": "6pm", "group": "F", "home": "Netherlands", "away": "Sweden", "venue": "Houston, USA"}, {"id": 34, "date": "2026-06-20", "ukTime": "9pm", "group": "E", "home": "Germany", "away": "Ivory Coast", "venue": "Toronto, Canada"}, {"id": 35, "date": "2026-06-21", "ukTime": "1am", "group": "E", "home": "Ecuador", "away": "Curacao", "venue": "Kansas City, USA"}, {"id": 36, "date": "2026-06-21", "ukTime": "5am", "group": "F", "home": "Tunisia", "away": "Japan", "venue": "Guadalupe, Mexico"}, {"id": 37, "date": "2026-06-21", "ukTime": "5pm", "group": "H", "home": "Spain", "away": "Saudi Arabia", "venue": "Atlanta, USA"}, {"id": 38, "date": "2026-06-21", "ukTime": "8pm", "group": "G", "home": "Belgium", "away": "Iran", "venue": "Los Angeles, USA"}, {"id": 39, "date": "2026-06-21", "ukTime": "11pm", "group": "H", "home": "Uruguay", "away": "Cape Verde", "venue": "Miami, USA"}, {"id": 40, "date": "2026-06-22", "ukTime": "2am", "group": "G", "home": "New Zealand", "away": "Egypt", "venue": "Vancouver, Canada"}, {"id": 41, "date": "2026-06-22", "ukTime": "6pm", "group": "J", "home": "Argentina", "away": "Austria", "venue": "Arlington, USA"}, {"id": 42, "date": "2026-06-22", "ukTime": "10pm", "group": "I", "home": "France", "away": "Iraq", "venue": "Philadelphia, USA"}, {"id": 43, "date": "2026-06-23", "ukTime": "1am", "group": "I", "home": "Norway", "away": "Senegal", "venue": "Toronto, Canada"}, {"id": 44, "date": "2026-06-23", "ukTime": "4am", "group": "J", "home": "Jordan", "away": "Algeria", "venue": "Santa Clara, USA"}, {"id": 45, "date": "2026-06-23", "ukTime": "6pm", "group": "K", "home": "Portugal", "away": "Uzbekistan", "venue": "Houston, USA"}, {"id": 46, "date": "2026-06-23", "ukTime": "9pm", "group": "L", "home": "England", "away": "Ghana", "venue": "Foxborough, USA"}, {"id": 47, "date": "2026-06-24", "ukTime": "12am", "group": "L", "home": "Panama", "away": "Croatia", "venue": "Foxborough, USA"}, {"id": 48, "date": "2026-06-24", "ukTime": "3am", "group": "K", "home": "Colombia", "away": "DR Congo", "venue": "Zapopan, Mexico"}, {"id": 49, "date": "2026-06-24", "ukTime": "8pm", "group": "B", "home": "Switzerland", "away": "Canada", "venue": "Vancouver, Canada"}, {"id": 50, "date": "2026-06-24", "ukTime": "8pm", "group": "B", "home": "Bosnia & Herzegovina", "away": "Qatar", "venue": "Seattle, USA"}, {"id": 51, "date": "2026-06-24", "ukTime": "11pm", "group": "C", "home": "Morocco", "away": "Haiti", "venue": "Atlanta, USA"}, {"id": 52, "date": "2026-06-24", "ukTime": "11pm", "group": "C", "home": "Scotland", "away": "Brazil", "venue": "Miami, USA"}, {"id": 53, "date": "2026-06-25", "ukTime": "2am", "group": "A", "home": "South Africa", "away": "South Korea", "venue": "Guadalupe, Mexico"}, {"id": 54, "date": "2026-06-25", "ukTime": "2am", "group": "A", "home": "Czech Republic", "away": "Mexico", "venue": "Mexico City, Mexico"}, {"id": 55, "date": "2026-06-25", "ukTime": "9pm", "group": "E", "home": "Curacao", "away": "Ivory Coast", "venue": "Philadelphia, USA"}, {"id": 56, "date": "2026-06-25", "ukTime": "9pm", "group": "E", "home": "Ecuador", "away": "Germany", "venue": "New Jersey, USA"}, {"id": 57, "date": "2026-06-26", "ukTime": "12am", "group": "F", "home": "Tunisia", "away": "Netherlands", "venue": "Kansas City, USA"}, {"id": 58, "date": "2026-06-26", "ukTime": "12am", "group": "F", "home": "Japan", "away": "Sweden", "venue": "Arlington, USA"}, {"id": 59, "date": "2026-06-26", "ukTime": "3am", "group": "D", "home": "Turkey", "away": "USA", "venue": "Los Angeles, USA"}, {"id": 60, "date": "2026-06-26", "ukTime": "3am", "group": "D", "home": "Paraguay", "away": "Australia", "venue": "Santa Clara, USA"}, {"id": 61, "date": "2026-06-26", "ukTime": "8pm", "group": "I", "home": "Norway", "away": "France", "venue": "Foxborough, USA"}, {"id": 62, "date": "2026-06-26", "ukTime": "8pm", "group": "I", "home": "Senegal", "away": "Iraq", "venue": "Toronto, Canada"}, {"id": 63, "date": "2026-06-27", "ukTime": "1am", "group": "H", "home": "Cape Verde", "away": "Saudi Arabia", "venue": "Houston, USA"}, {"id": 64, "date": "2026-06-27", "ukTime": "1am", "group": "H", "home": "Uruguay", "away": "Spain", "venue": "Zapopan, Mexico"}, {"id": 65, "date": "2026-06-27", "ukTime": "4am", "group": "G", "home": "New Zealand", "away": "Belgium", "venue": "Vancouver, Canada"}, {"id": 66, "date": "2026-06-27", "ukTime": "4am", "group": "G", "home": "Egypt", "away": "Iran", "venue": "Seattle, USA"}, {"id": 67, "date": "2026-06-27", "ukTime": "10pm", "group": "L", "home": "Panama", "away": "England", "venue": "New Jersey, USA"}, {"id": 68, "date": "2026-06-27", "ukTime": "10pm", "group": "L", "home": "Croatia", "away": "Ghana", "venue": "Philadelphia, USA"}, {"id": 69, "date": "2026-06-28", "ukTime": "12.30am", "group": "K", "home": "Colombia", "away": "Portugal", "venue": "Miami, USA"}, {"id": 70, "date": "2026-06-28", "ukTime": "12.30am", "group": "K", "home": "DR Congo", "away": "Uzbekistan", "venue": "Atlanta, USA"}, {"id": 71, "date": "2026-06-28", "ukTime": "3am", "group": "J", "home": "Algeria", "away": "Austria", "venue": "Kansas City, USA"}, {"id": 72, "date": "2026-06-28", "ukTime": "3am", "group": "J", "home": "Jordan", "away": "Argentina", "venue": "Arlington, USA"}]; window.WCP_FLAGS = {"Mexico": "\ud83c\uddf2\ud83c\uddfd", "South Africa": "\ud83c\uddff\ud83c\udde6", "South Korea": "\ud83c\uddf0\ud83c\uddf7", "Czech Republic": "\ud83c\udde8\ud83c\uddff", "Canada": "\ud83c\udde8\ud83c\udde6", "Bosnia & Herzegovina": "\ud83c\udde7\ud83c\udde6", "USA": "\ud83c\uddfa\ud83c\uddf8", "Paraguay": "\ud83c\uddf5\ud83c\uddfe", "Qatar": "\ud83c\uddf6\ud83c\udde6", "Switzerland": "\ud83c\udde8\ud83c\udded", "Brazil": "\ud83c\udde7\ud83c\uddf7", "Morocco": "\ud83c\uddf2\ud83c\udde6", "Haiti": "\ud83c\udded\ud83c\uddf9", "Scotland": "\ud83c\udff4", "Australia": "\ud83c\udde6\ud83c\uddfa", "Turkey": "\ud83c\uddf9\ud83c\uddf7", "Germany": "\ud83c\udde9\ud83c\uddea", "Curacao": "\ud83c\udde8\ud83c\uddfc", "Netherlands": "\ud83c\uddf3\ud83c\uddf1", "Japan": "\ud83c\uddef\ud83c\uddf5", "Ivory Coast": "\ud83c\udde8\ud83c\uddee", "Ecuador": "\ud83c\uddea\ud83c\udde8", "Sweden": "\ud83c\uddf8\ud83c\uddea", "Tunisia": "\ud83c\uddf9\ud83c\uddf3", "Spain": "\ud83c\uddea\ud83c\uddf8", "Cape Verde": "\ud83c\udde8\ud83c\uddfb", "Belgium": "\ud83c\udde7\ud83c\uddea", "Egypt": "\ud83c\uddea\ud83c\uddec", "Saudi Arabia": "\ud83c\uddf8\ud83c\udde6", "Uruguay": "\ud83c\uddfa\ud83c\uddfe", "Iran": "\ud83c\uddee\ud83c\uddf7", "New Zealand": "\ud83c\uddf3\ud83c\uddff", "France": "\ud83c\uddeb\ud83c\uddf7", "Senegal": "\ud83c\uddf8\ud83c\uddf3", "Iraq": "\ud83c\uddee\ud83c\uddf6", "Norway": "\ud83c\uddf3\ud83c\uddf4", "Argentina": "\ud83c\udde6\ud83c\uddf7", "Algeria": "\ud83c\udde9\ud83c\uddff", "Austria": "\ud83c\udde6\ud83c\uddf9", "Jordan": "\ud83c\uddef\ud83c\uddf4", "Portugal": "\ud83c\uddf5\ud83c\uddf9", "DR Congo": "\ud83c\udde8\ud83c\udde9", "England": "\ud83c\udff4", "Croatia": "\ud83c\udded\ud83c\uddf7", "Ghana": "\ud83c\uddec\ud83c\udded", "Panama": "\ud83c\uddf5\ud83c\udde6", "Uzbekistan": "\ud83c\uddfa\ud83c\uddff", "Colombia": "\ud83c\udde8\ud83c\uddf4"}; window.WCP_KNOCKOUTS = [{"id": "M73", "round": "R32", "date": "2026-06-28", "ukTime": "8pm", "homeSlot": "Group A runners-up", "awaySlot": "Group B runners-up"}, {"id": "M74", "round": "R32", "date": "2026-06-29", "ukTime": "9.30pm", "homeSlot": "Group E winners", "awaySlot": "Best 3rd place"}, {"id": "M75", "round": "R32", "date": "2026-06-30", "ukTime": "2am", "homeSlot": "Group F winners", "awaySlot": "Group C runners-up"}, {"id": "M76", "round": "R32", "date": "2026-06-29", "ukTime": "6pm", "homeSlot": "Group C winners", "awaySlot": "Group F runners-up"}, {"id": "M77", "round": "R32", "date": "2026-06-30", "ukTime": "10pm", "homeSlot": "Group I winners", "awaySlot": "Best 3rd place"}, {"id": "M78", "round": "R32", "date": "2026-06-30", "ukTime": "6pm", "homeSlot": "Group E runners-up", "awaySlot": "Group I runners-up"}, {"id": "M79", "round": "R32", "date": "2026-07-01", "ukTime": "2am", "homeSlot": "Group A winners", "awaySlot": "Best 3rd place"}, {"id": "M80", "round": "R32", "date": "2026-07-01", "ukTime": "5pm", "homeSlot": "Group L winners", "awaySlot": "Best 3rd place"}, {"id": "M81", "round": "R32", "date": "2026-07-02", "ukTime": "1am", "homeSlot": "Group D winners", "awaySlot": "Best 3rd place"}, {"id": "M82", "round": "R32", "date": "2026-07-01", "ukTime": "9pm", "homeSlot": "Group G winners", "awaySlot": "Best 3rd place"}, {"id": "M83", "round": "R32", "date": "2026-07-03", "ukTime": "12am", "homeSlot": "Group K runners-up", "awaySlot": "Group L runners-up"}, {"id": "M84", "round": "R32", "date": "2026-07-02", "ukTime": "8pm", "homeSlot": "Group H winners", "awaySlot": "Group J runners-up"}, {"id": "M85", "round": "R32", "date": "2026-07-03", "ukTime": "4am", "homeSlot": "Group B winners", "awaySlot": "Best 3rd place"}, {"id": "M86", "round": "R32", "date": "2026-07-03", "ukTime": "11pm", "homeSlot": "Group J winners", "awaySlot": "Group H runners-up"}, {"id": "M87", "round": "R32", "date": "2026-07-04", "ukTime": "2.30am", "homeSlot": "Group K winners", "awaySlot": "Best 3rd place"}, {"id": "M88", "round": "R32", "date": "2026-07-03", "ukTime": "7pm", "homeSlot": "Group D runners-up", "awaySlot": "Group G runners-up"}];</script>
@@ -157,7 +742,7 @@ const state=JSON.parse(localStorage.getItem('wcp-v21')||'{}'); state.user??=null
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)]; function save(){localStorage.setItem('wcp-v21',JSON.stringify(state));}
 function flagFor(team){const code=flagCodes[team]; return code ? `https://flagcdn.com/w40/${code}.png` : null;}
 function teamLabel(team){const src=flagFor(team); const flag=src?`<img class="flag-img" src="${src}" alt="${team} flag" loading="lazy">`:`<span class="flag">⚽</span>`; return `${flag}<span class="team-name">${team}</span>`;}
-function leagueFor(email){return email.toLowerCase().endsWith('@lego.com')?'LEGO League':'Friends & Family League'}
+function leagueFor(email){return email.toLowerCase().endsWith('@lego.com')?'LEGO':'Main'}
 function niceDate(date){return new Date(date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
 function ukToCet(date, uk){let s=String(uk).toLowerCase().replace('kick-off','').trim(), h=0,m=0;if(s.includes('.')){let p=s.replace('am','').replace('pm','').split('.');h=+p[0];m=+p[1];}else h=parseInt(s)||0;if(s.includes('pm')&&h!==12)h+=12;if(s.includes('am')&&h===12)h=0;h=(h+1)%24;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} CET`;}
 function showToast(message){
@@ -187,8 +772,8 @@ $('#entryForm').addEventListener('submit',async e=>{
   }
 });
 $$('.tabs button').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab))); function setTab(id){$$('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));$$('.panel').forEach(p=>p.classList.toggle('active',p.id===id));}
-function boot(){if(state.user){$('#landing').classList.add('hidden');$('#tabs').classList.remove('hidden');$('#app').classList.remove('hidden');$('#welcomeTitle').textContent=`${state.user.name}, pick your scores`;renderAll();}}
-function renderAll(){renderFixtures();renderBracket();renderLeaderboard();renderResults();updateProgress();}
+function boot(){if(state.user){$('#landing').classList.add('hidden');$('#tabs').classList.remove('hidden');$('#app').classList.remove('hidden');$('#welcomeTitle').textContent='🎯 Prediction Centre'; const sub=$('#welcomeSubtitle'); if(sub) sub.innerHTML=`<span>${state.user.name}</span>, lock in your picks. Climb the leaderboard. Chase the trophy.`; renderAll();}}
+function renderAll(){renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();updateProgress();}
 function renderFixtures(){const wrap=$('#fixturesList');wrap.innerHTML='';fixtures.forEach(f=>{const p=state.predictions[f.id]||{};const div=document.createElement('article');div.className='fixture-bar';div.innerHTML=`<div class="fixture-meta"><span class="group-tag">Group ${f.group}</span><span>📅 ${niceDate(f.date)}</span><span>🕒 ${ukToCet(f.date,f.ukTime)}</span><span>📍 ${f.venue||''}</span></div><div class="fixture-teams"><div class="team home">${teamLabel(f.home)}</div><div class="score-inputs"><input type="number" min="0" inputmode="numeric" value="${p.home??''}" data-id="${f.id}" data-side="home"><span class="vs">-</span><input type="number" min="0" inputmode="numeric" value="${p.away??''}" data-id="${f.id}" data-side="away"></div><div class="team away">${teamLabel(f.away)}</div></div><div class="status-pill">Prediction</div>`;wrap.appendChild(div);});$$('input[data-id]').forEach(inp=>inp.addEventListener('input',e=>{const id=e.target.dataset.id;state.predictions[id]??={};state.predictions[id][e.target.dataset.side]=e.target.value===''?'':Number(e.target.value);state.bracket={};save();renderBracket();updateProgress();}));}
 function updateProgress(){let done=fixtures.filter(f=>{const p=state.predictions[f.id];return p&&p.home!==''&&p.home!==undefined&&p.away!==''&&p.away!==undefined;}).length;$('#progressText').textContent=`${done} / ${fixtures.length} group scores complete`;$('#progressFill').style.width=(done/fixtures.length*100)+'%';}
 function calcTables(){const t={};fixtures.forEach(f=>{t[f.group]??={};[f.home,f.away].forEach(x=>t[f.group][x]??={team:x,p:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0});const p=state.predictions[f.id];if(!p||p.home===''||p.away===''||p.home===undefined||p.away===undefined)return;let H=t[f.group][f.home],A=t[f.group][f.away];H.p++;A.p++;H.gf+=p.home;H.ga+=p.away;A.gf+=p.away;A.ga+=p.home;H.gd=H.gf-H.ga;A.gd=A.gf-A.ga;if(p.home>p.away){H.w++;A.l++;H.pts+=3}else if(p.home<p.away){A.w++;H.l++;A.pts+=3}else{H.d++;A.d++;H.pts++;A.pts++;}});const out={};Object.keys(t).forEach(g=>out[g]=Object.values(t[g]).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf||a.team.localeCompare(b.team)));return out;}
@@ -196,15 +781,165 @@ function teamFromSlot(slot,pool){const tables=calcTables();const m=String(slot).
 function r32(){const tables=calcTables();const thirds=Object.keys(tables).map(g=>(tables[g]||[])[2]).filter(Boolean).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf).slice(0,8);const pool=[...thirds];return ko.map(m=>({...m,home:teamFromSlot(m.homeSlot,pool),away:teamFromSlot(m.awaySlot,pool)}));}
 const flows={R16:[['M73','M75'],['M74','M77'],['M76','M78'],['M79','M80'],['M83','M84'],['M81','M82'],['M86','M88'],['M85','M87']],QF:[['R16-1','R16-2'],['R16-5','R16-6'],['R16-3','R16-4'],['R16-7','R16-8']],SF:[['QF-1','QF-2'],['QF-3','QF-4']],FINAL:[['SF-1','SF-2']]};const names={R32:'Round of 32',R16:'Round of 16',QF:'Quarter-finals',SF:'Semi-finals',FINAL:'Final'};function win(id){return state.bracket[id]}
 function round(key){if(key==='R32')return r32().map(m=>({id:m.id,home:m.home,away:m.away,date:m.date,ukTime:m.ukTime}));return flows[key].map((p,i)=>({id:`${key}-${i+1}`,home:win(p[0])||`${p[0]} winner`,away:win(p[1])||`${p[1]} winner`}));}
-const scoringNotes={R32:'5 points per team correctly predicted to get through',R16:'5 points per team correctly predicted to get through',QF:'10 points per team correctly predicted to get through',SF:'10 points per team correctly predicted to get through',FINAL:'15 points for the finalist prediction + 25 points for the correct champion'};
-function renderBracket(){const wrap=$('#bracket');wrap.innerHTML='';['R32','R16','QF','SF','FINAL'].forEach(r=>{const stage=document.createElement('section');stage.className='stage-section';stage.innerHTML=`<div class="stage-head"><h3>${names[r]}</h3><span class="stage-score">${scoringNotes[r]}</span></div><div class="ko-list"></div>`;const list=stage.querySelector('.ko-list');round(r).forEach(m=>{const div=document.createElement('article');div.className='fixture-bar ko-fixture';const meta=m.date?`<span>${m.id}</span><span>📅 ${niceDate(m.date)}</span><span>🕒 ${ukToCet(m.date,m.ukTime)}</span>`:`<span>${m.id}</span><span>Auto-filled</span><span>From previous picks</span>`;div.innerHTML=`<div class="fixture-meta"><span class="group-tag">${names[r]}</span>${meta}</div><div class="fixture-teams"><div class="team home">${pick(m.id,m.home)}</div><div class="score-inputs"><span class="vs">v</span></div><div class="team away">${pick(m.id,m.away)}</div></div><div class="status-pill">Pick winner</div>`;list.appendChild(div);});wrap.appendChild(stage);});$$('.pick').forEach(btn=>btn.addEventListener('click',()=>{if(btn.classList.contains('placeholder'))return;state.bracket[btn.dataset.match]=btn.dataset.team;clearAfter(btn.dataset.match);save();renderBracket();}));updateWinnerReveal();}
+const scoringNotes={R32:'10 pts per team · max 320 pts',R16:'10 pts per team · max 160 pts',QF:'10 pts per team · max 80 pts',SF:'10 pts per team · max 40 pts',FINAL:'10 pts per finalist · max 20 pts'};
+function renderBracket(){const wrap=$('#bracket');wrap.innerHTML='';['R32','R16','QF','SF','FINAL'].forEach(r=>{const stage=document.createElement('section');stage.className='stage-section';stage.innerHTML=`<div class="stage-head"><h3>${names[r]}</h3><span class="stage-score">${scoringNotes[r]}</span></div><div class="ko-list"></div>`;const list=stage.querySelector('.ko-list');round(r).forEach(m=>{const div=document.createElement('article');div.className='fixture-bar ko-fixture';const meta=m.date?`<span>📅 ${niceDate(m.date)}</span><span>🕒 ${ukToCet(m.date,m.ukTime)}</span>`:`<span>Auto-filled</span><span>From previous picks</span>`;div.innerHTML=`<div class="fixture-meta"><span class="group-tag">${names[r]}</span>${meta}</div><div class="fixture-teams"><div class="team home">${pick(m.id,m.home)}</div><div class="score-inputs"><span class="vs">v</span></div><div class="team away">${pick(m.id,m.away)}</div></div><div class="status-pill">Pick winner</div>`;list.appendChild(div);});wrap.appendChild(stage);});$$('.pick').forEach(btn=>btn.addEventListener('click',()=>{if(btn.classList.contains('placeholder'))return;state.bracket[btn.dataset.match]=btn.dataset.team;clearAfter(btn.dataset.match);save();renderBracket();}));updateWinnerReveal();}
 function pick(match,team){let ph=String(team).includes('winner')||String(team).includes('Best 3rd')||String(team).includes('Group ');return `<button class="pick ${state.bracket[match]===team?'selected':''} ${ph?'placeholder':''}" data-match="${match}" data-team="${team}">${ph?'<span class="flag">⚽</span><b class="team-name">'+team+'</b>':teamLabel(team)}</button>`}
 function clearAfter(id){if(id.startsWith('M'))Object.keys(state.bracket).forEach(k=>{if(!k.startsWith('M'))delete state.bracket[k]});if(id.startsWith('R16'))Object.keys(state.bracket).forEach(k=>{if(k.startsWith('QF')||k.startsWith('SF')||k.startsWith('FINAL'))delete state.bracket[k]});if(id.startsWith('QF'))Object.keys(state.bracket).forEach(k=>{if(k.startsWith('SF')||k.startsWith('FINAL'))delete state.bracket[k]});if(id.startsWith('SF'))Object.keys(state.bracket).forEach(k=>{if(k.startsWith('FINAL'))delete state.bracket[k]});}
-function renderLeaderboard(){const n=state.user?.name||'You', l=state.user?.league||'Your League';$('#leaderboardList').innerHTML=[{name:n,pts:0,note:'Your score will update here'},{name:'Sample player',pts:0,note:l+' placeholder'},{name:'Sample rival',pts:0,note:l+' placeholder'}].map((p,i)=>`<div class="player-row"><div class="rank">${i+1}</div><div><b>${i===0?'🥇 ':i===1?'🥈 ':'🥉 '}${p.name}</b><br><span class="muted">${p.note}</span></div><div class="points">${p.pts}</div></div>`).join('');}
+let currentLeagueFilter='All';
+function normaliseLeague(value){
+  const v=String(value||'').toLowerCase();
+  if(v.includes('lego')) return 'LEGO';
+  return 'Main';
+}
+function getEntryRows(){
+  const rows=(window.firebaseSubmissions&&window.firebaseSubmissions.length)
+    ? window.firebaseSubmissions
+    : (state.user ? [{name:state.user.name, league:state.user.league, predictedWinner:state.bracket['FINAL-1']||null, groupPredictions:groupPredictionPayload?.()||[], knockoutPicks:knockoutPredictionPayload?.()||[], source:'local'}] : []);
+  const byName=new Map();
+  rows.forEach(r=>{
+    const key=(r.email||r.name||Math.random()).toString().toLowerCase();
+    const existing=byName.get(key)||{};
+    byName.set(key,{...existing,...r, league:normaliseLeague(r.league||existing.league), totalPoints:r.totalPoints||existing.totalPoints||0});
+  });
+  return [...byName.values()].filter(r=>r.name).sort((a,b)=>(b.totalPoints||0)-(a.totalPoints||0)||String(a.name).localeCompare(String(b.name)));
+}
+function renderLeaderboard(){
+  const allRows=getEntryRows();
+  const filtered=currentLeagueFilter==='All'?allRows:allRows.filter(r=>normaliseLeague(r.league)===currentLeagueFilter);
+  $$('.league-filter').forEach(btn=>btn.classList.toggle('active',btn.dataset.leagueFilter===currentLeagueFilter));
+  const total=allRows.length;
+  const lego=allRows.filter(r=>normaliseLeague(r.league)==='LEGO').length;
+  const main=allRows.filter(r=>normaliseLeague(r.league)==='Main').length;
+  const summary=`<div class="live-summary live-table-summary"><div class="summary-tile"><b>${total}</b><span>🌍 All Entries</span></div><div class="summary-tile"><b>${lego}</b><span>🧱 LEGO League</span></div><div class="summary-tile"><b>${main}</b><span>⚽ Main League</span></div></div>`;
+  if(!filtered.length){$('#leaderboardList').innerHTML=summary+'<div class="empty-state">No entries for this league yet.</div>';return;}
+  const table=`<table class="league-table upgraded-table"><thead><tr><th>Rank</th><th>Player</th><th>Entry</th><th>Total Points</th></tr></thead><tbody>${filtered.map((r,i)=>`<tr><td data-label="Rank"><span class="rank-badge">${i+1}</span></td><td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span></td><td data-label="Entry"><span class="league-type ${normaliseLeague(r.league)==='LEGO'?'lego':''}">${normaliseLeague(r.league)} Entry</span></td><td data-label="Total Points"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td></tr>`).join('')}</tbody></table>`;
+  $('#leaderboardList').innerHTML=summary+table+'<p class="refresh-note">Entries are live from Firebase. Points are currently placeholders until live scoring is connected.</p>';
+}
+$$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagueFilter=btn.dataset.leagueFilter;renderLeaderboard();}));
+function renderSubmissions(){
+  const rows=getEntryRows();
+  const select=$('#submissionSelect');
+  const box=$('#submissionSummary');
+  if(!select||!box) return;
+  if(!rows.length){select.innerHTML='<option>No submissions yet</option>';box.innerHTML='<div class="empty-state">Submit a test entry first, then it will appear here.</div>';return;}
+  const current=select.value;
+  select.innerHTML=rows.map((r,i)=>`<option value="${r.id||r.email||r.name||i}">${r.name||'Unknown player'}</option>`).join('');
+  if([...select.options].some(o=>o.value===current)) select.value=current;
+  const selected=rows.find((r,i)=>(r.id||r.email||r.name||i)==select.value)||rows[0];
+  renderSubmissionDetail(selected);
+}
+function maxPointsForRound(round, matchId){
+  const label=String(round||matchId||'').toLowerCase();
+  if(label.includes('champ')) return 25;
+  if(label.includes('final')) return 10;
+  if(label.includes('semi') || label.includes('sf')) return 10;
+  if(label.includes('quarter') || label.includes('qf')) return 10;
+  if(label.includes('16') || label.includes('r16')) return 5;
+  if(label.includes('32') || label.includes('r32')) return 5;
+  return 5;
+}
+function roundLabelForPick(k){
+  const raw=String(k.round||k.matchId||'');
+  const label=raw.toLowerCase();
+  if(label.includes('champ')) return 'Champion';
+  if(label.includes('final')) return 'Final Pick';
+  if(label.includes('semi') || label.includes('sf')) return 'Semi-final Picks';
+  if(label.includes('quarter') || label.includes('qf')) return 'Quarter-final Picks';
+  if(label.includes('16') || label.includes('r16')) return 'Round of 16 Picks';
+  if(label.includes('32') || label.includes('r32') || /^m\d+$/i.test(raw)) return 'Round of 32 Picks';
+  return k.round || 'Knockout Picks';
+}
+function maxPerTeamForStage(label){
+  const l=String(label||'').toLowerCase();
+  if(l.includes('champion')) return 25;
+  if(l.includes('group')) return 10;
+  return 10;
+}
+function maxTeamsForStage(label){
+  const l=String(label).toLowerCase();
+  if(l.includes('final')) return 2;
+  if(l.includes('semi')) return 4;
+  if(l.includes('quarter')) return 8;
+  if(l.includes('16')) return 16;
+  if(l.includes('32')) return 32;
+  return 0;
+}
+function stageMaxPoints(label){
+  const teams=maxTeamsForStage(label);
+  return teams ? teams * maxPerTeamForStage(label) : maxPerTeamForStage(label);
+}
+function renderSubmissionDetail(entry){
+  const box=$('#submissionSummary');
+  const groups=(entry.groupPredictions&&entry.groupPredictions.length?entry.groupPredictions:groupPredictionPayload()).slice(0,72);
+  const knockouts=(entry.knockoutPicks&&entry.knockoutPicks.length?entry.knockoutPicks:knockoutPredictionPayload()).slice(0,40);
+  const champion=entry.predictedWinner||state.bracket['FINAL-1']||'Not selected yet';
+  let rows=[];
+  let runningMax=0;
+  rows.push(`<tr><td colspan="3" class="stage-divider">Group Stage Predictions</td></tr>`);
+  groups.forEach((p,i)=>{
+    const home=teamLabel(p.homeTeam||p.home||'Team A');
+    const away=teamLabel(p.awayTeam||p.away||'Team B');
+    const score=`${p.homeScore??'—'} - ${p.awayScore??'—'}`;
+    const max=10; runningMax+=max;
+    rows.push(summaryRow(`<span class="result-fixture-line"><span class="result-team result-home">${home}</span><span class="result-score">${score}</span><span class="result-team result-away">${away}</span></span>`, max));
+  });
+  const grouped={};
+  knockouts.forEach(k=>{
+    const label=roundLabelForPick(k);
+    if(!grouped[label]) grouped[label]=[];
+    if(k.selectedTeam) grouped[label].push(k.selectedTeam);
+  });
+  ['Round of 32 Picks','Round of 16 Picks','Quarter-final Picks','Semi-final Picks','Final Pick'].forEach(label=>{
+    const teams=grouped[label]||[];
+    const per=maxPerTeamForStage(label);
+    const maxTeams=maxTeamsForStage(label);
+    const max=stageMaxPoints(label);
+    runningMax+=max;
+    const teamPills=teams.length?teams.map(t=>`<span class="stage-team-pill">${teamLabel(t)}</span>`).join(''):'<span class="stage-team-pill">Pending picks</span>';
+    rows.push(`<tr><td colspan="3" class="stage-divider">${label}</td></tr>`);
+    rows.push(summaryRow(`<div class="stage-summary-list">${teamPills}</div><div class="stage-summary-copy">0 of ${maxTeams} teams correct · ${per} pts per correct team · max ${max} pts</div>`, max));
+  });
+  rows.push(`<tr><td colspan="3" class="stage-divider">Champion Pick</td></tr>`);
+  runningMax+=25;
+  rows.push(summaryRow(`<span class="result-fixture-line single-pick champion-pick"><span class="result-team result-home">${champion==='Not selected yet'?champion:teamLabel(champion)}</span><span class="result-score">winner</span><span class="result-team result-away">🏆</span></span>`, 25));
+  const currentPoints=Number(entry.totalPoints||0);
+  box.innerHTML=`<div class="summary-header"><div><h3>${entry.name||'Selected player'}</h3></div><div class="points-total-card"><div class="total-points">${currentPoints} / ${runningMax}</div><small>Running points / max available</small></div></div><table class="prediction-table v29-results"><thead><tr><th>Your Prediction</th><th>Actual Result</th><th>Points<br><span>earned / max</span></th></tr></thead><tbody>${rows.join('')}</tbody><tfoot><tr><td colspan="2">Total Running Points</td><td>${currentPoints} / ${runningMax}</td></tr></tfoot></table>`;
+}
+function summaryRow(prediction,maxPoints){return `<tr><td data-label="Your Prediction"><span class="compact-prediction">${prediction}</span></td><td data-label="Actual Result"><span class="actual-pending">Result pending</span></td><td data-label="Points">0 / ${maxPoints}</td></tr>`}
+$('#submissionSelect')?.addEventListener('change',()=>{const rows=getEntryRows();const selected=rows.find((r,i)=>(r.id||r.email||r.name||i)==$('#submissionSelect').value);if(selected)renderSubmissionDetail(selected);});
 function initials(name){return name.split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
 const samplePlayers=[{name:'Blane McKie',type:'max'},{name:'Callum McKie',type:'partial'},{name:'John McKie',type:'max'},{name:'Louise McKie',type:'partial'},{name:'Finance Tester',type:'partial'}];
 function avatarHtml(player){return `<span class="avatar ${player.type==='partial'?'partial':''}" tabindex="0" data-name="${player.name}">${initials(player.name)}</span>`}
-function renderResults(){const all=[...fixtures,...ko.map(k=>({date:k.date,ukTime:k.ukTime,group:k.round,home:k.homeSlot,away:k.awaySlot,venue:'Knockout fixture'}))].sort((a,b)=>a.date.localeCompare(b.date)||String(a.ukTime).localeCompare(String(b.ukTime)));$('#resultsList').innerHTML=`<div class="results-legend"><span class="legend-chip">🟡 Max Points = exact / full points</span><span class="legend-chip">🔵 Partial Points = correct outcome only</span><span class="legend-chip">Hover/tap initials to see full name</span></div>`+all.map((f,i)=>{const max=i%4===0?samplePlayers.filter(p=>p.type==='max'):i%5===0?samplePlayers.filter(p=>p.type==='max').slice(0,1):[];const partial=i%3===0?samplePlayers.filter(p=>p.type==='partial'):i%2===0?samplePlayers.filter(p=>p.type==='partial').slice(0,2):[];return `<div class="result-row upcoming"><div class="result-meta"><span class="group-tag">${f.group}</span><span>📅 ${niceDate(f.date)}</span><span>🕒 ${ukToCet(f.date,f.ukTime)}</span></div><div class="result-fixture"><b><span class="inline-team">${teamLabel(f.home)}</span><span class="result-v">v</span><span class="inline-team">${teamLabel(f.away)}</span></b><small>${f.venue||''}</small></div><span class="pending-pill">Result Pending</span><div class="points-col"><strong>Max Points</strong><div class="avatar-stack">${max.length?max.map(avatarHtml).join(''):'<span class="muted">None yet</span>'}</div></div><div class="points-col"><strong>Partial Points</strong><div class="avatar-stack">${partial.length?partial.map(avatarHtml).join(''):'<span class="muted">None yet</span>'}</div></div></div>`}).join('');}
+function renderResults(){if(!$('#resultsList')) return; const all=[...fixtures,...ko.map(k=>({date:k.date,ukTime:k.ukTime,group:k.round,home:k.homeSlot,away:k.awaySlot,venue:'Knockout fixture'}))].sort((a,b)=>a.date.localeCompare(b.date)||String(a.ukTime).localeCompare(String(b.ukTime)));$('#resultsList').innerHTML=`<div class="results-legend"><span class="legend-chip">🟡 Max Points = exact / full points</span><span class="legend-chip">🔵 Partial Points = correct outcome only</span><span class="legend-chip">Hover/tap initials to see full name</span></div>`+all.map((f,i)=>{const max=i%4===0?samplePlayers.filter(p=>p.type==='max'):i%5===0?samplePlayers.filter(p=>p.type==='max').slice(0,1):[];const partial=i%3===0?samplePlayers.filter(p=>p.type==='partial'):i%2===0?samplePlayers.filter(p=>p.type==='partial').slice(0,2):[];return `<div class="result-row upcoming"><div class="result-meta"><span class="group-tag">${f.group}</span><span>📅 ${niceDate(f.date)}</span><span>🕒 ${ukToCet(f.date,f.ukTime)}</span></div><div class="result-fixture"><b><span class="inline-team">${teamLabel(f.home)}</span><span class="result-v">v</span><span class="inline-team">${teamLabel(f.away)}</span></b><small>${f.venue||''}</small></div><span class="pending-pill">Result Pending</span><div class="points-col"><strong>Max Points</strong><div class="avatar-stack">${max.length?max.map(avatarHtml).join(''):'<span class="muted">None yet</span>'}</div></div><div class="points-col"><strong>Partial Points</strong><div class="avatar-stack">${partial.length?partial.map(avatarHtml).join(''):'<span class="muted">None yet</span>'}</div></div></div>`}).join('');}
+
+window.renderLeaderboard = renderLeaderboard;
+window.renderSubmissions = renderSubmissions;
+window.renderFunStats = renderFunStats;
+function renderFunStats(){
+  const grid=$('#funStatsGrid');
+  if(!grid) return;
+  const submissions=(window.firebaseSubmissions&&window.firebaseSubmissions.length)?window.firebaseSubmissions:[];
+  const withPred=submissions.filter(s=>s.predictedWinner||s.groupPredictions||s.knockoutPicks);
+  const winners={};
+  withPred.forEach(s=>{if(s.predictedWinner) winners[s.predictedWinner]=(winners[s.predictedWinner]||0)+1});
+  const topWinner=Object.entries(winners).sort((a,b)=>b[1]-a[1])[0];
+  function totalGoals(s){return (s.groupPredictions||[]).reduce((sum,p)=>sum+(Number(p.homeScore)||0)+(Number(p.awayScore)||0),0)}
+  const goalRows=withPred.map(s=>({name:s.name||'Unknown', goals:totalGoals(s)})).sort((a,b)=>b.goals-a.goals);
+  const lowGoalRows=[...goalRows].sort((a,b)=>a.goals-b.goals);
+  const finalPairs={};
+  withPred.forEach(s=>{const picks=s.knockoutPicks||[]; const final=picks.find(p=>String(p.matchId).includes('FINAL')); if(final&&final.selectedTeam) finalPairs[final.selectedTeam]=(finalPairs[final.selectedTeam]||0)+1;});
+  const statCards=[
+    {icon:'⚽',title:'Most Popular Champion',value:topWinner?teamLabel(topWinner[0]):'Waiting',copy:topWinner?`${topWinner[1]} player pick${topWinner[1]===1?'':'s'}`:'Submit predictions to unlock this stat'},
+    {icon:'🎯',title:'Most Picked Final Winner',value:Object.entries(finalPairs).sort((a,b)=>b[1]-a[1])[0]?.[0]||'Waiting',copy:'The team most often selected in the final'},
+    {icon:'🚀',title:'Goal Enthusiast',value:goalRows[0]?goalRows[0].name:'Waiting',copy:goalRows[0]?`${goalRows[0].goals} predicted group-stage goals`:'Highest total goals predicted'},
+    {icon:'🧱',title:'Defensive Mastermind',value:lowGoalRows[0]?lowGoalRows[0].name:'Waiting',copy:lowGoalRows[0]?`${lowGoalRows[0].goals} predicted group-stage goals`:'Lowest total goals predicted'},
+    {icon:'🥅',title:'Goals Forecast',value:goalRows.length?Math.round(goalRows.reduce((s,r)=>s+r.goals,0)/goalRows.length):'—',copy:'Average predicted group-stage goals per player'},
+    {icon:'💀',title:'Biggest Shock',value:'Coming soon',copy:'Strong team most often knocked out early'},
+    {icon:'🎉',title:'Surprise Package',value:'Coming soon',copy:'Underdog most often backed to go deep'},
+    {icon:'🏆',title:'Total Brackets Locked',value:withPred.length,copy:'Full tournament submissions saved in Firebase'}
+  ];
+  grid.innerHTML=statCards.map(c=>`<article class="stat-bubble"><div class="stat-icon">${c.icon}</div><div class="stat-title">${c.title}</div><div class="stat-value">${c.value}</div><div class="stat-copy">${c.copy}</div></article>`).join('');
+}
 
 function updateWinnerReveal(){
   const winner=state.bracket['FINAL-1'];
@@ -228,16 +963,17 @@ function groupPredictionPayload(){
   });
 }
 function knockoutPredictionPayload(){
-  return Object.entries(state.bracket||{}).map(([matchId,selectedTeam])=>({matchId, selectedTeam}));
+  return Object.entries(state.bracket||{}).map(([matchId,selectedTeam])=>({matchId, round: roundLabelForPick({matchId}), selectedTeam}));
 }
 $('#lockBtn').addEventListener('click',async()=>{
   if(!state.user){alert('Please enter your name and email first.');return;}
   try{
-    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), version:'v23-full-prediction-test'};
+    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), version:'v35-round-of-32-fixed' };
     if(window.saveFullPredictionToFirebase){
       await window.saveFullPredictionToFirebase(payload);
       $('#lockStatus').textContent='✓ Full tournament prediction saved to Firebase test_predictions.';
       showToast('✓ Full prediction saved to Firebase');
+      setTimeout(()=>{setTab('submissions'); renderSubmissions(); window.scrollTo({top:0,behavior:'smooth'});},650);
     }else{
       $('#lockStatus').textContent='✓ Full tournament prediction locked locally. Firebase function not found.';
     }
@@ -258,7 +994,7 @@ if(state.user){
 </script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDgiFVKBAXtxQPSTygPfC2PR8Zjb4n_vZE",
@@ -279,7 +1015,7 @@ window.savePlayerEntryToFirebase = async function({name,email,league}){
     league,
     createdAt: serverTimestamp(),
     source: "github-pages-test",
-    version: "v23-firebase-registration"
+    version: "v27-live-results-polish"
   };
   await addDoc(collection(db, "test_entries"), entry);
   await addDoc(collection(db, "test_users"), entry);
@@ -296,8 +1032,32 @@ window.saveFullPredictionToFirebase = async function(payload){
     submittedAtLocal: payload.submittedAtLocal,
     submittedAt: serverTimestamp(),
     source: "github-pages-test",
-    version: "v23-full-prediction-test"
+    version: "v25-full-prediction-test"
   });
 };
+
+function normaliseDoc(doc){
+  const data = doc.data();
+  return { id: doc.id, ...data };
+}
+function refreshFirebaseViews(){
+  if(window.renderLeaderboard) window.renderLeaderboard();
+  if(window.renderFunStats) window.renderFunStats();
+  if(window.renderSubmissions) window.renderSubmissions();
+}
+window.firebaseSubmissions = [];
+window.firebaseEntries = [];
+window.firebasePredictions = [];
+onSnapshot(collection(db, "test_entries"), (snapshot) => {
+  window.firebaseEntries = snapshot.docs.map(normaliseDoc);
+  window.firebaseSubmissions = [...window.firebasePredictions, ...window.firebaseEntries].sort((a,b)=>String(b.submittedAtLocal||b.createdAtLocal||'').localeCompare(String(a.submittedAtLocal||a.createdAtLocal||'')));
+  refreshFirebaseViews();
+});
+onSnapshot(collection(db, "test_predictions"), (snapshot) => {
+  window.firebasePredictions = snapshot.docs.map(normaliseDoc);
+  window.firebaseSubmissions = [...window.firebasePredictions, ...window.firebaseEntries].sort((a,b)=>String(b.submittedAtLocal||b.createdAtLocal||'').localeCompare(String(a.submittedAtLocal||a.createdAtLocal||'')));
+  refreshFirebaseViews();
+});
+
 </script>
 </body></html>
