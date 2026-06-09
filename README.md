@@ -1,3 +1,10 @@
-# FIFA World Cup 2026 Prediction Challenge - V64
+# FIFA World Cup 2026 Prediction Challenge - V65
 
-V64 simplifies and recentres the Fun Stats page. It adds average-based group-stage goal stats, average conceded stats and a Most Common Scoreline badge while keeping the page concise and mobile-friendly.
+V65 consolidates the header alignment and league display fixes.
+
+## Included
+- Centres the premium page header bubbles consistently across all pages.
+- Standardises header width, spacing, icon alignment and mobile behaviour.
+- Moves Results Centre selector closer to the header/content flow.
+- Safeguards LEGO/Main league display by using the saved `league` field and falling back to `@lego.com` email detection.
+- Keeps production Firestore collections: `entries`, `users`, and `predictions`.

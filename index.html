@@ -1386,6 +1386,72 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 .stat-bubble-v64 .stat-copy,.stat-bubble .stat-copy{margin:0!important;max-width:230px!important;text-align:center!important;font-size:12.5px!important;line-height:1.25!important;}
 @media(max-width:900px){.fun-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.stat-bubble-v64,.stat-bubble{min-height:150px!important}}
 @media(max-width:560px){.fun-stats-grid{grid-template-columns:1fr!important}.stat-bubble-v64,.stat-bubble{min-height:132px!important;padding:14px 12px!important}.stat-bubble-v64 .stat-title,.stat-bubble .stat-title{min-height:auto!important}.stat-bubble-v64 .stat-value,.stat-bubble .stat-value{font-size:22px!important}}
+
+
+/* V65: header centring, spacing consistency and LEGO league display safeguards */
+.page-head.unified-final-head{
+  width:100%!important;
+  max-width:1180px!important;
+  margin:clamp(18px,3vw,36px) auto clamp(18px,3vw,32px)!important;
+  padding:0 16px!important;
+  text-align:center!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+.page-head.unified-final-head .premium-page-title{
+  width:min(92vw,1100px)!important;
+  max-width:1100px!important;
+  min-height:86px!important;
+  margin:0 auto!important;
+  padding:14px clamp(18px,4vw,46px)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:clamp(10px,2vw,22px)!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  line-height:1!important;
+  font-size:clamp(28px,4.5vw,58px)!important;
+  letter-spacing:.075em!important;
+  border-radius:999px!important;
+  border:2px solid rgba(248,200,74,.68)!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.13),rgba(255,255,255,.055))!important;
+  box-shadow:0 18px 46px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.10)!important;
+}
+.page-head.unified-final-head p{
+  max-width:900px!important;
+  margin:12px auto 0!important;
+  text-align:center!important;
+}
+.live-results-submissions .live-results-card{
+  margin-top:0!important;
+}
+.live-results-submissions .player-selector-card{
+  margin-top:0!important;
+}
+#submissions .submission-shell.player-selector-mode{
+  align-items:start!important;
+}
+.league-type.lego{
+  background:rgba(248,200,74,.18)!important;
+  border-color:rgba(248,200,74,.48)!important;
+  color:#fff3a2!important;
+}
+@media(max-width:720px){
+  .page-head.unified-final-head{margin:16px auto 18px!important;padding:0 10px!important;}
+  .page-head.unified-final-head .premium-page-title{
+    width:min(94vw,680px)!important;
+    min-height:58px!important;
+    padding:10px 14px!important;
+    gap:8px!important;
+    font-size:clamp(20px,6.2vw,30px)!important;
+    letter-spacing:.035em!important;
+    white-space:normal!important;
+  }
+  .page-head.unified-final-head p{font-size:13px!important;line-height:1.35!important;}
+}
 </style>
 <!-- V49 emergency layout repair: restore fixture/result row alignment after header changes -->
 <style>
@@ -2526,9 +2592,10 @@ function renderBracket(){const wrap=$('#bracket');wrap.innerHTML='';['R32','R16'
 function pick(match,team){let ph=String(team).includes('winner')||String(team).includes('Best 3rd')||String(team).includes('Group ');return `<button class="pick ${state.bracket[match]===team?'selected':''} ${ph?'placeholder':''}" data-match="${match}" data-team="${team}">${ph?'<span class="flag">⚽</span><b class="team-name">'+team+'</b>':teamLabel(team)}</button>`}
 function clearAfter(id){if(id.startsWith('M'))Object.keys(state.bracket).forEach(k=>{if(!k.startsWith('M'))delete state.bracket[k]});if(id.startsWith('R16'))Object.keys(state.bracket).forEach(k=>{if(k.startsWith('QF')||k.startsWith('SF')||k.startsWith('FINAL'))delete state.bracket[k]});if(id.startsWith('QF'))Object.keys(state.bracket).forEach(k=>{if(k.startsWith('SF')||k.startsWith('FINAL'))delete state.bracket[k]});if(id.startsWith('SF'))Object.keys(state.bracket).forEach(k=>{if(k.startsWith('FINAL'))delete state.bracket[k]});}
 let currentLeagueFilter='All';
-function normaliseLeague(value){
+function normaliseLeague(value, email){
   const v=String(value||'').toLowerCase();
-  if(v.includes('lego')) return 'LEGO';
+  const e=String(email||'').toLowerCase();
+  if(v.includes('lego') || e.endsWith('@lego.com')) return 'LEGO';
   return 'Main';
 }
 function isLockedPrediction(row){
@@ -2547,7 +2614,7 @@ function getEntryRows(){
   rows.forEach(r=>{
     const key=(r.email||r.name||Math.random()).toString().toLowerCase();
     const existing=byName.get(key)||{};
-    byName.set(key,{...existing,...r, league:normaliseLeague(r.league||existing.league), totalPoints:r.totalPoints||existing.totalPoints||0});
+    byName.set(key,{...existing,...r, league:normaliseLeague(r.league||existing.league, r.email||existing.email), totalPoints:r.totalPoints||existing.totalPoints||0});
   });
   return [...byName.values()].filter(r=>r.name).sort((a,b)=>(b.totalPoints||0)-(a.totalPoints||0)||String(a.name).localeCompare(String(b.name)));
 }
@@ -2827,7 +2894,7 @@ $('#lockBtn').addEventListener('click',async()=>{
   if(!validateFullPredictionBeforeLock()) return;
   if(!confirm('Are you sure you want to lock your predictions? You will not be able to change them after submitting.')) return;
   try{
-    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v63-locked-production' };
+    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v65-live' };
     if(window.saveFullPredictionToFirebase){
       await window.saveFullPredictionToFirebase(payload);
       $('#lockStatus').textContent='✓ Full tournament prediction saved to Firebase predictions.';
@@ -2882,7 +2949,7 @@ window.savePlayerEntryToFirebase = async function({name,email,league}){
     league,
     createdAt: serverTimestamp(),
     source: "github-pages-production",
-    version: "v63-locked-production",
+    version: "v65-live",
     registrationStatus: "started",
     locked: false
   };
@@ -2902,7 +2969,7 @@ window.saveFullPredictionToFirebase = async function(payload){
     league: payload.user.league,
     createdAt: serverTimestamp(),
     source: "github-pages-production",
-    version: "v63-locked-production",
+    version: "v65-live",
     locked: true,
     lockedAtLocal: payload.lockedAtLocal || null,
     lockedAt: serverTimestamp(),
