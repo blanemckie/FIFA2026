@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>FIFA World Cup 2026 Prediction Challenge - V60</title>
+<title>FIFA World Cup 2026 Prediction Challenge - V61</title>
 <style>
 :root{
   --navy:#04112d;--navy2:#071b45;--blue:#0d3a91;--panel:#09255c;--panel2:#0d3176;
@@ -2404,7 +2404,26 @@ $('#entryForm').addEventListener('submit',async e=>{
 $$('.tabs button').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab))); function setTab(id){$$('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));$$('.panel').forEach(p=>p.classList.toggle('active',p.id===id));}
 function boot(){if(state.user){$('#landing').classList.add('hidden');$('#tabs').classList.remove('hidden');$('#app').classList.remove('hidden');$('#welcomeTitle').textContent='🎯 Prediction Centre 🎯'; const sub=$('#welcomeSubtitle'); if(sub) sub.innerHTML=`<span>${state.user.name}</span>, lock in your picks. Climb the leaderboard. Chase the trophy.`; renderAll();}}
 function renderAll(){renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();updateProgress();}
-function renderFixtures(){const wrap=$('#fixturesList');wrap.innerHTML='';fixtures.forEach(f=>{const p=state.predictions[f.id]||{};const div=document.createElement('article');div.className='fixture-bar';div.innerHTML=`<div class="fixture-meta"><span class="group-tag">Group ${f.group}</span><span>📅 ${niceDate(f.date)}</span><span>🕒 ${ukToCet(f.date,f.ukTime)}</span><span>📍 ${f.venue||''}</span></div><div class="fixture-teams"><div class="team home">${teamLabel(f.home)}</div><div class="score-inputs"><input type="number" min="0" inputmode="numeric" value="${p.home??''}" data-id="${f.id}" data-side="home"><span class="vs">-</span><input type="number" min="0" inputmode="numeric" value="${p.away??''}" data-id="${f.id}" data-side="away"></div><div class="team away">${teamLabel(f.away)}</div></div><div class="status-pill">Prediction</div>`;wrap.appendChild(div);});$$('input[data-id]').forEach(inp=>inp.addEventListener('input',e=>{const id=e.target.dataset.id;state.predictions[id]??={};state.predictions[id][e.target.dataset.side]=e.target.value===''?'':Number(e.target.value);state.bracket={};save();renderBracket();updateProgress();}));}
+
+/* V61: auto-advance between group-stage score boxes after typing */
+const scoreAdvanceTimers = new WeakMap();
+function scheduleScoreAutoAdvance(input){
+  if(!input || !input.classList || !input.classList.contains('score-input')) return;
+  const value = String(input.value || '').trim();
+  if(value === '') return;
+  clearTimeout(scoreAdvanceTimers.get(input));
+  const timer = setTimeout(()=>{
+    const allScoreInputs = Array.from(document.querySelectorAll('.score-input[data-id]'));
+    const currentIndex = allScoreInputs.indexOf(input);
+    const nextInput = allScoreInputs[currentIndex + 1];
+    if(nextInput){
+      nextInput.focus();
+      if(typeof nextInput.select === 'function') nextInput.select();
+    }
+  }, 180);
+  scoreAdvanceTimers.set(input, timer);
+}
+function renderFixtures(){const wrap=$('#fixturesList');wrap.innerHTML='';fixtures.forEach(f=>{const p=state.predictions[f.id]||{};const div=document.createElement('article');div.className='fixture-bar';div.innerHTML=`<div class="fixture-meta"><span class="group-tag">Group ${f.group}</span><span>📅 ${niceDate(f.date)}</span><span>🕒 ${ukToCet(f.date,f.ukTime)}</span><span>📍 ${f.venue||''}</span></div><div class="fixture-teams"><div class="team home">${teamLabel(f.home)}</div><div class="score-inputs"><input class="score-input" type="number" min="0" inputmode="numeric" value="${p.home??''}" data-id="${f.id}" data-side="home"><span class="vs">-</span><input class="score-input" type="number" min="0" inputmode="numeric" value="${p.away??''}" data-id="${f.id}" data-side="away"></div><div class="team away">${teamLabel(f.away)}</div></div><div class="status-pill">Prediction</div>`;wrap.appendChild(div);});$$('input[data-id]').forEach(inp=>inp.addEventListener('input',e=>{const id=e.target.dataset.id;state.predictions[id]??={};state.predictions[id][e.target.dataset.side]=e.target.value===''?'':Number(e.target.value);scheduleScoreAutoAdvance(e.target);state.bracket={};save();renderBracket();updateProgress();}));}
 function updateProgress(){let done=fixtures.filter(f=>{const p=state.predictions[f.id];return p&&p.home!==''&&p.home!==undefined&&p.away!==''&&p.away!==undefined;}).length;$('#progressText').textContent=`${done} / ${fixtures.length} group scores complete`;$('#progressFill').style.width=(done/fixtures.length*100)+'%';}
 function calcTables(){const t={};fixtures.forEach(f=>{t[f.group]??={};[f.home,f.away].forEach(x=>t[f.group][x]??={team:x,p:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0});const p=state.predictions[f.id];if(!p||p.home===''||p.away===''||p.home===undefined||p.away===undefined)return;let H=t[f.group][f.home],A=t[f.group][f.away];H.p++;A.p++;H.gf+=p.home;H.ga+=p.away;A.gf+=p.away;A.ga+=p.home;H.gd=H.gf-H.ga;A.gd=A.gf-A.ga;if(p.home>p.away){H.w++;A.l++;H.pts+=3}else if(p.home<p.away){A.w++;H.l++;A.pts+=3}else{H.d++;A.d++;H.pts++;A.pts++;}});const out={};Object.keys(t).forEach(g=>out[g]=Object.values(t[g]).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf||a.team.localeCompare(b.team)));return out;}
 function teamFromSlot(slot,pool){const tables=calcTables();const m=String(slot).match(/Group ([A-L]) (winners|runners-up)/);if(m){let arr=tables[m[1]]||[];return m[2]==='winners'?arr[0]?.team||slot:arr[1]?.team||slot}if(String(slot).includes('Best 3rd')) return pool.shift()?.team||slot;return slot}
@@ -3028,7 +3047,7 @@ onSnapshot(collection(db, "predictions"), (snapshot) => {
 
 
 
-/* V60 - condensed iPhone scoring guide */
+/* V61 - condensed iPhone scoring guide */
 @media(max-width:650px){
   .scoring.compact-v25,
   .scoring{
