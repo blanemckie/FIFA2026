@@ -2740,7 +2740,7 @@ function championPopularity(team){
   const pct=total?Math.round((count/total)*100):0;
   return total?`Picked by ${count} player${count===1?'':'s'} (${pct}%)`:'Popularity updates once entries are locked.';
 }
-const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh'];
+const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Seb'];
 const allLeagueNames = ['Blane McKie'];
 function normalisePersonName(name){return String(name||'').trim().toLowerCase().replace(/\s+/g,' ');}
 function isFamilyLeagueName(name){
@@ -2979,11 +2979,76 @@ function stageMaxPoints(label){
   const teams=maxTeamsForStage(label);
   return teams ? teams * maxPerTeamForStage(label) : maxPerTeamForStage(label);
 }
+function pickTeamFromValue(value){
+  if(!value) return null;
+  if(typeof value === 'string') return value;
+  if(typeof value === 'object'){
+    return value.selectedTeam || value.team || value.winner || value.pick || value.value || value.name || null;
+  }
+  return null;
+}
+function bucketKnockoutPick(stageMap, stage, team){
+  team=pickTeamFromValue(team);
+  if(!team) return;
+  if(!stageMap[stage]) stageMap[stage]=[];
+  if(!stageMap[stage].includes(team)) stageMap[stage].push(team);
+}
+function normaliseKnockoutStageLabel(raw){
+  const label=String(raw||'').toLowerCase();
+  if(label.includes('champ')) return 'Champion';
+  if(label.includes('finalist')) return 'Finalists';
+  if(label.includes('final') && !label.includes('semi')) return 'Champion';
+  if(label.includes('semi') || label.includes('sf')) return 'Semi-final Picks';
+  if(label.includes('quarter') || label.includes('qf')) return 'Quarter-final Picks';
+  if(label.includes('16') || label.includes('r16')) return 'Round of 16 Picks';
+  if(label.includes('32') || label.includes('r32') || /^m\d+$/i.test(String(raw||''))) return 'Round of 32 Picks';
+  return null;
+}
+function extractKnockoutStages(entry){
+  const stages={
+    'Round of 32 Picks':[],
+    'Round of 16 Picks':[],
+    'Quarter-final Picks':[],
+    'Semi-final Picks':[],
+    'Finalists':[],
+    'Champion':[]
+  };
+  const arrays=[
+    entry.knockoutPicks,
+    entry.knockoutPredictions,
+    entry.predictions?.knockoutPicks,
+    entry.predictions?.knockout,
+    entry.knockout,
+    entry.bracketPicks,
+    entry.tournamentPath
+  ].filter(Array.isArray);
+  arrays.forEach(arr=>arr.forEach(k=>{
+    const stage=normaliseKnockoutStageLabel(k.round || k.stage || k.phase || k.matchId || k.id || k.key);
+    const team=pickTeamFromValue(k.selectedTeam || k.team || k.winner || k.pick || k.selection || k.value);
+    if(stage && team) bucketKnockoutPick(stages, stage, team);
+  }));
+  const objects=[entry.bracket, entry.state?.bracket, entry.predictions?.bracket, entry.knockoutMap, entry.bracketSelections].filter(o=>o && typeof o==='object' && !Array.isArray(o));
+  objects.forEach(obj=>Object.entries(obj).forEach(([key,value])=>{
+    const stage=normaliseKnockoutStageLabel(key);
+    if(stage && stage!=='Champion') bucketKnockoutPick(stages, stage, value);
+    if(stage==='Champion') bucketKnockoutPick(stages, 'Champion', value);
+  }));
+  // Legacy explicit arrays/fields
+  [['Round of 32 Picks',entry.roundOf32||entry.round32||entry.r32],['Round of 16 Picks',entry.roundOf16||entry.round16||entry.r16],['Quarter-final Picks',entry.quarterFinals||entry.qf],['Semi-final Picks',entry.semiFinals||entry.sf],['Finalists',entry.finalists||entry.finalTeams]].forEach(([stage,val])=>{
+    if(Array.isArray(val)) val.forEach(v=>bucketKnockoutPick(stages,stage,v));
+    else if(val && typeof val==='object') Object.values(val).forEach(v=>bucketKnockoutPick(stages,stage,v));
+  });
+  const champ = entry.predictedWinner || entry.champion || entry.winner || entry.finalWinner || entry.predictions?.predictedWinner || stages['Champion'][0];
+  if(champ) bucketKnockoutPick(stages,'Champion',champ);
+  // Derive later stages if a legacy payload saved only match winners by previous stage.
+  if(!stages['Finalists'].length && stages['Semi-final Picks'].length) stages['Finalists']=[...stages['Semi-final Picks']].slice(0,2);
+  return stages;
+}
 function renderSubmissionDetail(entry){
   const box=$('#submissionSummary');
   const groups=(entry.groupPredictions&&entry.groupPredictions.length?entry.groupPredictions:groupPredictionPayload()).slice(0,72);
-  const knockouts=(entry.knockoutPicks&&entry.knockoutPicks.length?entry.knockoutPicks:knockoutPredictionPayload()).slice(0,40);
-  const champion=entry.predictedWinner||state.bracket['FINAL-1']||'Not selected yet';
+  const stageMap=extractKnockoutStages(entry);
+  const champion=stageMap['Champion'][0] || entry.predictedWinner || entry.champion || entry.winner || state.bracket['FINAL-1'] || 'Not selected yet';
   let rows=[];
   let runningMax=0;
   function addStage(title){ rows.push(`<div class="stage-divider-v51">${title}</div>`); }
@@ -3003,17 +3068,8 @@ function renderSubmissionDetail(entry){
     const max=10; runningMax+=max;
     rows.push(summaryRow(prediction, max));
   });
-  const grouped={};
-  knockouts.forEach(k=>{
-    const label=roundLabelForPick(k);
-    if(!grouped[label]) grouped[label]=[];
-    if(k.selectedTeam) grouped[label].push(k.selectedTeam);
-  });
-  if(!grouped['Finalists'] || !grouped['Finalists'].length){
-    grouped['Finalists'] = [...(grouped['Semi-final Picks']||[])].slice(0,2);
-  }
   ['Round of 32 Picks','Round of 16 Picks','Quarter-final Picks','Semi-final Picks','Finalists'].forEach(label=>{
-    const teams=grouped[label]||[];
+    const teams=stageMap[label]||[];
     const per=maxPerTeamForStage(label);
     const maxTeams=maxTeamsForStage(label);
     const max=stageMaxPoints(label);
@@ -3218,7 +3274,7 @@ $('#lockBtn').addEventListener('click',async()=>{
   if(!validateFullPredictionBeforeLock()) return;
   if(!confirm('Are you sure you want to lock your predictions? You will not be able to change them after submitting.')) return;
   try{
-    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v72-family-organiser-leagues' };
+    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v73-results-mapping-fix' };
     if(window.saveFullPredictionToFirebase){
       await window.saveFullPredictionToFirebase(payload);
       $('#lockStatus').textContent='✓ Full tournament prediction saved to Firebase predictions.';
@@ -3273,7 +3329,7 @@ window.savePlayerEntryToFirebase = async function({name,email,league}){
     league: leagueFor(cleanEmail, name),
     createdAt: serverTimestamp(),
     source: "github-pages-production",
-    version: "v72-family-organiser-leagues",
+    version: "v73-results-mapping-fix",
     registrationStatus: "started",
     locked: false
   };
@@ -3293,7 +3349,7 @@ window.saveFullPredictionToFirebase = async function(payload){
     league: leagueFor(cleanEmail, payload.user.name),
     createdAt: serverTimestamp(),
     source: "github-pages-production",
-    version: "v72-family-organiser-leagues",
+    version: "v73-results-mapping-fix",
     locked: true,
     lockedAtLocal: payload.lockedAtLocal || null,
     lockedAt: serverTimestamp(),
