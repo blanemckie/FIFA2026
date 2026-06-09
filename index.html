@@ -1679,6 +1679,75 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 @media(max-width:560px){.kickoff-countdown{width:100%;border-radius:20px;padding:12px 10px}.countdown-units{gap:6px}.count-unit{border-radius:13px;padding:8px 4px}.count-unit b{font-size:22px}.count-unit span{font-size:9px}.count-sub{font-size:11px;line-height:1.35}.kickoff-countdown .count-title{font-size:14px;letter-spacing:.06em}}
 .stage-summary-box-v51.results-audit-v74 .stage-picks-v51{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(118px,1fr))!important;gap:8px!important;align-items:stretch!important}.stage-summary-box-v51.results-audit-v74 .stage-team-pill{min-height:40px!important}.stage-summary-box-v51.results-audit-v74 .summary-line-v51{text-align:center!important;}
 
+
+
+/* V75: Sky Sports-style World Cup news ticker */
+.world-cup-ticker{
+  width:min(96%,1120px);
+  margin:10px auto 14px;
+  border-radius:18px;
+  border:1.6px solid rgba(248,200,74,.55);
+  background:linear-gradient(90deg,#061633,#0d3176 42%,#061633);
+  box-shadow:0 16px 38px rgba(0,0,0,.24),0 0 24px rgba(248,200,74,.10);
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:center;
+}
+.ticker-label{
+  height:100%;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:10px 13px;
+  color:#071633;
+  background:linear-gradient(135deg,var(--gold),#fff1a7);
+  font-weight:1000;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  font-size:12px;
+  white-space:nowrap;
+}
+.ticker-track{
+  position:relative;
+  overflow:hidden;
+  min-height:38px;
+  display:flex;
+  align-items:center;
+}
+.ticker-marquee{
+  display:inline-flex;
+  align-items:center;
+  gap:24px;
+  white-space:nowrap;
+  will-change:transform;
+  animation:wcpTickerMove 84s linear infinite;
+  padding-left:100%;
+}
+.ticker-item{
+  color:#eaf2ff;
+  font-weight:900;
+  font-size:13px;
+}
+.ticker-item.breaking{color:#fff;font-weight:1000;text-shadow:0 0 12px rgba(255,59,92,.45)}
+.ticker-item.game{color:#fff3a2}
+.ticker-item.player{color:#b9f3ff}
+.ticker-item.team{color:#eaf2ff}
+.ticker-dot{
+  color:#fff3a2;
+  font-weight:1000;
+  margin-right:24px;
+}
+@keyframes wcpTickerMove{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+.world-cup-ticker:hover .ticker-marquee{animation-play-state:paused}
+@media(max-width:640px){
+  .world-cup-ticker{width:100%;grid-template-columns:1fr;border-radius:16px;margin:8px auto 12px;}
+  .ticker-label{justify-content:center;padding:8px 10px;font-size:11px;}
+  .ticker-track{min-height:36px;}
+  .ticker-marquee{animation-duration:72s;}
+  .ticker-item{font-size:12px;}
+}
+
 </style>
 <!-- V49 emergency layout repair: restore fixture/result row alignment after header changes -->
 <style>
@@ -2718,7 +2787,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     <section class="card lock-card"><button class="primary" id="lockBtn">Lock In Full Tournament Prediction</button><div class="note">You must complete every group score, knockout pick and champion selection before locking. Once locked, your entry is saved and cannot be changed.</div><div id="lockStatus" class="lock-status"></div></section>
   </section>
   <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table 🏆</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div></div></section>
-  <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">⚽ Results Centre ⚽</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="kickoff-countdown compact" data-countdown><div class="count-title">⚽ Countdown To Kick-Off ⚽</div><div class="countdown-units"><div class="count-unit"><b data-days>000</b><span>Days</span></div><div class="count-unit"><b data-hours>00</b><span>Hours</span></div><div class="count-unit"><b data-mins>00</b><span>Mins</span></div><div class="count-unit"><b data-secs>00</b><span>Secs</span></div></div><div class="count-sub">Live scoring begins when Mexico v South Africa kicks off.</div></div><div class="card live-results-card"><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
+  <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">⚽ Results Centre ⚽</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="world-cup-ticker" id="worldCupNewsTicker" aria-label="World Cup 2026 news ticker"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest World Cup 2026 headlines…</span></div></div></div><div class="kickoff-countdown compact" data-countdown><div class="count-title">⚽ Countdown To Kick-Off ⚽</div><div class="countdown-units"><div class="count-unit"><b data-days>000</b><span>Days</span></div><div class="count-unit"><b data-hours>00</b><span>Hours</span></div><div class="count-unit"><b data-mins>00</b><span>Mins</span></div><div class="count-unit"><b data-secs>00</b><span>Secs</span></div></div><div class="count-sub">Live scoring begins when Mexico v South Africa kicks off.</div></div><div class="card live-results-card"><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
   <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats 📊</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
   <section id="how" class="panel how-built-page">
     <div class="page-head unified-final-head build-story-head v46-build-head"><h2 class="premium-page-title">🛠️ From Idea to Kick-Off 🛠️</h2><p>Inspired by Damien's AI lunch chats, I built this World Cup prediction game using mainly dictation to ChatGPT over a couple of evening sessions.</p></div>
@@ -2813,7 +2882,7 @@ function championPopularity(team){
   const pct=total?Math.round((count/total)*100):0;
   return total?`Picked by ${count} player${count===1?'':'s'} (${pct}%)`:'Popularity updates once entries are locked.';
 }
-const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B'];
+const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb'];
 const allLeagueNames = ['Blane McKie'];
 function normalisePersonName(name){return String(name||'').trim().toLowerCase().replace(/\s+/g,' ');}
 function isFamilyLeagueName(name){
@@ -3390,7 +3459,7 @@ $('#lockBtn').addEventListener('click',async()=>{
   if(!validateFullPredictionBeforeLock()) return;
   if(!confirm('Are you sure you want to lock your predictions? You will not be able to change them after submitting.')) return;
   try{
-    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v74-countdown-results-audit' };
+    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v76-expanded-news-ticker' };
     if(window.saveFullPredictionToFirebase){
       await window.saveFullPredictionToFirebase(payload);
       $('#lockStatus').textContent='✓ Full tournament prediction saved to Firebase predictions.';
@@ -3405,6 +3474,74 @@ $('#lockBtn').addEventListener('click',async()=>{
     alert('Prediction save failed. Check Firebase rules/config and try again.');
   }
 });
+
+
+// V75: Live World Cup 2026 news ticker with API fetch and safe fallback.
+const WORLD_CUP_TICKER_FALLBACK = [
+  '🚨 BREAKING: Countdown to FIFA World Cup 2026 continues as predictions lock in',
+  '⚽ Mexico v South Africa opens the tournament on 11 June 2026',
+  '🏆 48 teams, 104 matches, one prediction champion',
+  '🇦🇷 Argentina prepare to defend their crown on the biggest stage',
+  '🇧🇷 Brazil chasing a sixth World Cup title',
+  '🏴 England fans dreaming of finally ending the wait',
+  '🇫🇷 France expected to be among the early favourites',
+  '🇪🇸 Spain backed by plenty of predictor-game managers',
+  '🇩🇪 Germany looking to bounce back in North America',
+  '🇵🇹 Portugal tipped by some as a serious tournament threat',
+  '🇺🇸 USA hoping home support can spark a deep run',
+  '🇲🇽 Mexico ready for a huge opening night atmosphere',
+  '🇨🇦 Canada aiming to make home advantage count',
+  '🇳🇱 Netherlands looking to finally turn final heartbreak into glory',
+  '🇧🇪 Belgium hoping their new generation can make a mark',
+  '🇭🇷 Croatia still carrying knockout pedigree into 2026',
+  '🔥 New prediction submitted — the league tables are warming up',
+  '🏡 Family League entries are gathering pace',
+  '🧱 LEGO League title race expected to be fiercely contested',
+  '🌍 Main League players starting to back their champions',
+  '👀 Dark horse champion picks already causing debate',
+  '😎 Player Optimist watch: who is predicting the tournament goal-fest?',
+  '😬 Conservative Corner: who is expecting a cagey World Cup?',
+  '🎯 Most common scoreline battle heating up as entries arrive',
+  '🚨 BREAKING: Champion pick leaderboard updated as submissions lock in',
+  '⚽ Results Centre ready to track every pick, result and point',
+  '🏆 Live Table will update once the tournament gets underway',
+  '📊 Fun Stats tracking champions, goal machines and boldest calls'
+];
+const WORLD_CUP_NEWS_API = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://news.google.com/rss/search?q=FIFA%20World%20Cup%202026&hl=en-GB&gl=GB&ceid=GB:en');
+function cleanTickerTitle(title){
+  return String(title||'').replace(/\s+-\s+[^-]+$/,'').replace(/&amp;/g,'&').trim();
+}
+function tickerClass(headline){
+  const h=String(headline||'');
+  if(h.includes('🚨')) return 'breaking';
+  if(h.includes('Family League')||h.includes('LEGO League')||h.includes('Main League')||h.includes('Player')||h.includes('prediction')||h.includes('entries')||h.includes('Champion pick')) return 'player';
+  if(h.includes('🇦🇷')||h.includes('🇧🇷')||h.includes('🏴')||h.includes('🇫🇷')||h.includes('🇪🇸')||h.includes('🇩🇪')||h.includes('🇵🇹')||h.includes('🇺🇸')||h.includes('🇲🇽')||h.includes('🇨🇦')||h.includes('🇳🇱')||h.includes('🇧🇪')||h.includes('🇭🇷')) return 'team';
+  return 'game';
+}
+function renderWorldCupTicker(items){
+  const ticker=document.getElementById('worldCupNewsTicker');
+  if(!ticker) return;
+  const track=ticker.querySelector('.ticker-track');
+  const apiHeadlines=(items||[]).filter(Boolean).slice(0,10);
+  const headlines=[...apiHeadlines,...WORLD_CUP_TICKER_FALLBACK].filter(Boolean).slice(0,32);
+  const repeated=[...headlines,...headlines];
+  track.innerHTML='<div class="ticker-marquee">'+repeated.map(h=>`<span class="ticker-item ${tickerClass(h)}">${h}</span><span class="ticker-dot">•</span>`).join('')+'</div>';
+}
+async function loadWorldCupTicker(){
+  try{
+    const res=await fetch(WORLD_CUP_NEWS_API,{cache:'no-store'});
+    if(!res.ok) throw new Error('Ticker API unavailable');
+    const data=await res.json();
+    const items=(data.items||[]).map(i=>cleanTickerTitle(i.title)).filter(Boolean);
+    renderWorldCupTicker(items.length?items:WORLD_CUP_TICKER_FALLBACK);
+  }catch(err){
+    console.warn('World Cup news ticker using fallback headlines:',err);
+    renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);
+  }
+}
+loadWorldCupTicker();
+setInterval(loadWorldCupTicker,15*60*1000);
+
 // V22: Keep the landing page as the first screen, even if you have tested before.
 // If local data exists, pre-fill it but do not skip the landing page.
 if(state.user){
@@ -3445,7 +3582,7 @@ window.savePlayerEntryToFirebase = async function({name,email,league}){
     league: leagueFor(cleanEmail, name),
     createdAt: serverTimestamp(),
     source: "github-pages-production",
-    version: "v74-countdown-results-audit",
+    version: "v76-expanded-news-ticker",
     registrationStatus: "started",
     locked: false
   };
@@ -3465,7 +3602,7 @@ window.saveFullPredictionToFirebase = async function(payload){
     league: leagueFor(cleanEmail, payload.user.name),
     createdAt: serverTimestamp(),
     source: "github-pages-production",
-    version: "v74-countdown-results-audit",
+    version: "v76-expanded-news-ticker",
     locked: true,
     lockedAtLocal: payload.lockedAtLocal || null,
     lockedAt: serverTimestamp(),
