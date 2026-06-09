@@ -1721,7 +1721,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   gap:24px;
   white-space:nowrap;
   will-change:transform;
-  animation:wcpTickerMove 280s linear infinite;
+  animation:wcpTickerMove 720s linear infinite;
   padding-left:100%;
 }
 .ticker-item{
@@ -1739,12 +1739,12 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   margin-right:24px;
 }
 @keyframes wcpTickerMove{from{transform:translateX(0)}to{transform:translateX(-100%)}}
-.world-cup-ticker:hover .ticker-marquee{animation-play-state:paused}
+.world-cup-ticker:hover .ticker-marquee,.world-cup-ticker:active .ticker-marquee{animation-play-state:paused}
 @media(max-width:640px){
   .world-cup-ticker{width:100%;grid-template-columns:1fr;border-radius:16px;margin:8px auto 12px;}
   .ticker-label{justify-content:center;padding:8px 10px;font-size:11px;}
   .ticker-track{min-height:36px;}
-  .ticker-marquee{animation-duration:280s;}
+  .ticker-marquee{animation-duration:840s;}
   .ticker-item{font-size:12px;}
 }
 
@@ -1782,6 +1782,13 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   .fun-league-controls{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}
   .fun-league-filter{min-width:0!important;padding:9px 8px!important;font-size:12px!important;}
 }
+
+
+/* V78: legal-safe World Cup style strip and landing icon cleanup */
+.lego-fan{display:none!important}
+.world-cup-brand-strip{position:relative;z-index:1;display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:14px auto 0;max-width:780px}
+.world-cup-brand-strip span{display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:999px;background:linear-gradient(135deg,rgba(248,200,74,.16),rgba(55,212,255,.10));border:1px solid rgba(248,200,74,.28);color:#eaf2ff;font-size:12px;font-weight:950;letter-spacing:.04em;box-shadow:inset 0 1px 0 rgba(255,255,255,.10)}
+@media(max-width:640px){.world-cup-brand-strip{gap:7px;margin-top:10px}.world-cup-brand-strip span{font-size:10.5px;padding:7px 9px}}
 
 </style>
 <!-- V49 emergency layout repair: restore fixture/result row alignment after header changes -->
@@ -2753,11 +2760,11 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 <section class="hero" id="landing">
   <div class="hero-shell">
     <div class="trophy left"></div><div class="trophy right"></div>
-    <div class="lego-fan" aria-label="football fan"><div class="lego-trophy">🏆</div><div class="lego-head"></div><div class="lego-body"></div></div>
     <div class="hero-card">
       <div class="kicker">Tournament predictor</div>
       <h1>FIFA World Cup 2026</h1>
       <div class="sub-title">Prediction Challenge</div>
+      <div class="world-cup-brand-strip" aria-label="World Cup themed icons"><span>🏟️ Host Stadiums</span><span>🏆 Trophy Dreams</span><span>🌎 USA • Canada • Mexico</span></div>
       <div class="gold-rule"></div>
       <div class="promise"><span class="main">⚽ Pick the Scores</span><span>🏆 Build Your Bracket</span><span>🔒 Lock It In Once</span><span>📈 Watch The Tournament Unfold</span></div>
       <p class="description">Predict every match. Build your tournament bracket. Compete for bragging rights. Follow the action live.</p>
@@ -2917,7 +2924,7 @@ function championPopularity(team){
   const pct=total?Math.round((count/total)*100):0;
   return total?`Picked by ${count} player${count===1?'':'s'} (${pct}%)`:'Popularity updates once entries are locked.';
 }
-const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice'];
+const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice','Thomas Edwards','John M'];
 const allLeagueNames = ['Blane McKie'];
 function normalisePersonName(name){return String(name||'').trim().toLowerCase().replace(/\s+/g,' ');}
 function isFamilyLeagueName(name){
@@ -3043,7 +3050,7 @@ function updateKickoffCountdown(){
 updateKickoffCountdown();
 setInterval(updateKickoffCountdown,1000);
 
-function renderAll(){renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();updateProgress();updateKickoffCountdown();}
+function renderAll(){renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();updateProgress();updateKickoffCountdown(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);}
 
 /* V61: auto-advance between group-stage score boxes after typing */
 const scoreAdvanceTimers = new WeakMap();
@@ -3437,7 +3444,6 @@ function renderFunStats(){
     {icon:'⚽',title:'Goal Machine',desc:'The team expected to score the most total group-stage goals.',value:topScoringTeam?teamLabel(topScoringTeam.team):'Waiting',copy:teamAvgCopy(topScoringTeam,'Scored')},
     {icon:'🧤',title:'Leaky Defence',desc:'The team expected to concede the most total group-stage goals.',value:topConcedingTeam?teamLabel(topConcedingTeam.team):'Waiting',copy:teamAvgCopy(topConcedingTeam,'Conceded')},
     {icon:'🎯',title:'Most Common Scoreline',desc:'The scoreline appearing most often across group predictions.',value:commonScoreline?commonScoreline[0]:'Waiting',copy:scorelineCopy},
-    {icon:'🤝',title:'Exact Score Twins',desc:'How many predictions match another player on the same fixture and scoreline.',value:predictionCount?`${exactMatchedCount} of ${predictionCount}`:'Waiting',copy:exactScoreCopy},
     {icon:'🔥',title:'Highest Scoring Match',desc:'The fixture expected to deliver the biggest goal-fest.',value:matchValue(highestMatch),copy:highestMatchCopy},
     {icon:'😴',title:'Lowest Scoring Match',desc:'The fixture expected to be the tightest or cageiest.',value:matchValue(lowestMatch),copy:lowestMatchCopy},
     {icon:'🤠',title:'Dark Horse Champion',desc:'The least-backed team that at least one player thinks can win it all.',value:darkHorse?teamLabel(darkHorse[0]):'Waiting',copy:darkHorse?`<span>${darkHorse[1]} Player${darkHorse[1]===1?'':'s'} Backed Them</span><span>${pct(darkHorse[1])} of Players</span>`:'Lowest-backed champion pick'},
@@ -3521,7 +3527,7 @@ $('#lockBtn').addEventListener('click',async()=>{
   if(!validateFullPredictionBeforeLock()) return;
   if(!confirm('Are you sure you want to lock your predictions? You will not be able to change them after submitting.')) return;
   try{
-    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v76-expanded-news-ticker' };
+    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v78-broadcast-edition' };
     if(window.saveFullPredictionToFirebase){
       await window.saveFullPredictionToFirebase(payload);
       $('#lockStatus').textContent='✓ Full tournament prediction saved to Firebase predictions.';
@@ -3538,54 +3544,91 @@ $('#lockBtn').addEventListener('click',async()=>{
 });
 
 
-// V75: Live World Cup 2026 news ticker with API fetch and safe fallback.
+// V78: Broadcast-style World Cup ticker with news/game/breaking rhythm.
 const WORLD_CUP_TICKER_FALLBACK = [
-  '🚨 BREAKING: Countdown to FIFA World Cup 2026 continues as predictions lock in',
-  '⚽ Mexico v South Africa opens the tournament on 11 June 2026',
-  '🏆 48 teams, 104 matches, one prediction champion',
-  '🇦🇷 Argentina prepare to defend their crown on the biggest stage',
-  '🇧🇷 Brazil chasing a sixth World Cup title',
-  '🏴 England fans dreaming of finally ending the wait',
-  '🇫🇷 France expected to be among the early favourites',
-  '🇪🇸 Spain backed by plenty of predictor-game managers',
-  '🇩🇪 Germany looking to bounce back in North America',
-  '🇵🇹 Portugal tipped by some as a serious tournament threat',
-  '🇺🇸 USA hoping home support can spark a deep run',
-  '🇲🇽 Mexico ready for a huge opening night atmosphere',
-  '🇨🇦 Canada aiming to make home advantage count',
-  '🇳🇱 Netherlands looking to finally turn final heartbreak into glory',
-  '🇧🇪 Belgium hoping their new generation can make a mark',
-  '🇭🇷 Croatia still carrying knockout pedigree into 2026',
-  '🔥 New prediction submitted — the league tables are warming up',
-  '🏡 Family League entries are gathering pace',
-  '🧱 LEGO League title race expected to be fiercely contested',
-  '🌍 Main League players starting to back their champions',
-  '👀 Dark horse champion picks already causing debate',
-  '😎 Player Optimist watch: who is predicting the tournament goal-fest?',
-  '😬 Conservative Corner: who is expecting a cagey World Cup?',
-  '🎯 Most common scoreline battle heating up as entries arrive',
-  '🚨 BREAKING: Champion pick leaderboard updated as submissions lock in',
-  '⚽ Results Centre ready to track every pick, result and point',
-  '🏆 Live Table will update once the tournament gets underway',
-  '📊 Fun Stats tracking champions, goal machines and boldest calls'
+  'Sky Sports-style watch: squad news and injury updates will appear here as World Cup 2026 stories develop',
+  'FIFA World Cup 2026 will be hosted across the USA, Canada and Mexico',
+  'The expanded 48-team tournament will bring more group-stage jeopardy than ever',
+  'Opening match countdown continues for Mexico v South Africa on 11 June 2026',
+  'Managers across the world continue to monitor fitness, form and squad depth before 2026',
+  'North America prepares for the biggest World Cup tournament yet'
 ];
-const WORLD_CUP_NEWS_API = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://news.google.com/rss/search?q=FIFA%20World%20Cup%202026&hl=en-GB&gl=GB&ceid=GB:en');
+const WORLD_CUP_NEWS_API = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://news.google.com/rss/search?q=(World%20Cup%202026%20football%20injury%20squad%20FIFA%20Sky%20Sports%20BBC%20ESPN)&hl=en-GB&gl=GB&ceid=GB:en');
 function cleanTickerTitle(title){
   return String(title||'').replace(/\s+-\s+[^-]+$/,'').replace(/&amp;/g,'&').trim();
 }
 function tickerClass(headline){
   const h=String(headline||'');
   if(h.includes('🚨')) return 'breaking';
-  if(h.includes('Family League')||h.includes('LEGO League')||h.includes('Main League')||h.includes('Player')||h.includes('prediction')||h.includes('entries')||h.includes('Champion pick')) return 'player';
+  if(h.includes('predict')||h.includes('backs')||h.includes('entry')||h.includes('League')||h.includes('Champion')||h.includes('goals')) return 'player';
   if(h.includes('🇦🇷')||h.includes('🇧🇷')||h.includes('🏴')||h.includes('🇫🇷')||h.includes('🇪🇸')||h.includes('🇩🇪')||h.includes('🇵🇹')||h.includes('🇺🇸')||h.includes('🇲🇽')||h.includes('🇨🇦')||h.includes('🇳🇱')||h.includes('🇧🇪')||h.includes('🇭🇷')) return 'team';
   return 'game';
+}
+function tickerValidScore(v){return v!==null && v!==undefined && v!=='' && !Number.isNaN(Number(v));}
+function latestEntriesForTicker(rows){
+  return [...(rows||[])].filter(r=>r&&r.name).sort((a,b)=>{
+    const ad=Date.parse(a.createdAt?.toDate?.() ? a.createdAt.toDate() : (a.createdAt || a.lockedAt || a.submittedAtLocal || 0));
+    const bd=Date.parse(b.createdAt?.toDate?.() ? b.createdAt.toDate() : (b.createdAt || b.lockedAt || b.submittedAtLocal || 0));
+    return (bd||0)-(ad||0);
+  }).slice(0,3);
+}
+function buildPredictionTickerHeadlines(){
+  const rows=(window.firebaseSubmissions&&window.firebaseSubmissions.length)?window.firebaseSubmissions:[];
+  const locked=rows.filter(r=>r && (r.predictedWinner || r.groupPredictions));
+  const headlines=[];
+  const championCounts={};
+  locked.forEach(r=>{ if(r.predictedWinner) championCounts[r.predictedWinner]=(championCounts[r.predictedWinner]||0)+1; });
+  const topChampion=Object.entries(championCounts).sort((a,b)=>b[1]-a[1])[0];
+  if(topChampion) headlines.push(`🏆 Champion Watch: ${topChampion[0]} leads the picks with ${topChampion[1]} backer${topChampion[1]===1?'':'s'}`);
+  const bigPredictions=[];
+  locked.forEach(r=>{
+    (r.groupPredictions||[]).forEach(p=>{
+      if(!tickerValidScore(p.homeScore)||!tickerValidScore(p.awayScore)) return;
+      const hs=Number(p.homeScore), as=Number(p.awayScore), total=hs+as;
+      if(total>=5){
+        bigPredictions.push({name:r.name||'A player', home:p.homeTeam||'Team A', away:p.awayTeam||'Team B', score:`${hs}-${as}`, total});
+      }
+    });
+  });
+  bigPredictions.sort((a,b)=>b.total-a.total);
+  bigPredictions.slice(0,6).forEach(p=>headlines.push(`🔥 ${p.name} predicts a thriller: ${p.home} ${p.score} ${p.away}`));
+  const playerTotals=locked.map(r=>({name:r.name||'A player', goals:(r.groupPredictions||[]).reduce((sum,p)=>tickerValidScore(p.homeScore)&&tickerValidScore(p.awayScore)?sum+Number(p.homeScore)+Number(p.awayScore):sum,0)})).filter(x=>x.goals>0).sort((a,b)=>b.goals-a.goals);
+  if(playerTotals[0]) headlines.push(`😎 Goal Fest Alert: ${playerTotals[0].name} is predicting ${playerTotals[0].goals} group-stage goals`);
+  if(playerTotals.length>1){
+    const cautious=[...playerTotals].sort((a,b)=>a.goals-b.goals)[0];
+    headlines.push(`🧘 Conservative Corner: ${cautious.name} is keeping things tight with ${cautious.goals} predicted goals`);
+  }
+  if(!headlines.length){
+    headlines.push('🔥 Prediction Game: big scorelines, dark horses and champion picks will appear here as entries lock in');
+    headlines.push('🏆 Champion Watch: the most popular winner pick will update from live submissions');
+  }
+  return headlines;
+}
+function buildBreakingTickerHeadlines(){
+  const rows=(window.firebaseSubmissions&&window.firebaseSubmissions.length)?window.firebaseSubmissions:[];
+  const latest=latestEntriesForTicker(rows);
+  if(!latest.length) return ['🚨 BREAKING NEWS: The next locked entry will appear here first'];
+  return latest.map(r=>`🚨 BREAKING NEWS: ${r.name} is the latest entry to lock in predictions${r.league?` for the ${normaliseLeague(r.league)} League`:''}`);
+}
+function mixTickerHeadlines(worldCupItems){
+  const wc=(worldCupItems&&worldCupItems.length?worldCupItems:WORLD_CUP_TICKER_FALLBACK).filter(Boolean).slice(0,10);
+  const game=buildPredictionTickerHeadlines();
+  const breaking=buildBreakingTickerHeadlines();
+  const mixed=[];
+  const cycles=Math.max(8, Math.ceil((wc.length+game.length+breaking.length)/4));
+  for(let i=0;i<cycles;i++){
+    mixed.push(`🌍 ${wc[i%wc.length]}`);       // 25% World Cup news
+    mixed.push(game[(i*2)%game.length]);      // 50% game insight
+    mixed.push(breaking[i%breaking.length]);  // 25% latest entries
+    mixed.push(game[(i*2+1)%game.length]);
+  }
+  return mixed.slice(0,40);
 }
 function renderWorldCupTicker(items){
   const ticker=document.getElementById('worldCupNewsTicker');
   if(!ticker) return;
   const track=ticker.querySelector('.ticker-track');
-  const apiHeadlines=(items||[]).filter(Boolean).slice(0,10);
-  const headlines=[...apiHeadlines,...WORLD_CUP_TICKER_FALLBACK].filter(Boolean).slice(0,32);
+  const headlines=mixTickerHeadlines((items||[]).map(cleanTickerTitle));
   const repeated=[...headlines,...headlines];
   track.innerHTML='<div class="ticker-marquee">'+repeated.map(h=>`<span class="ticker-item ${tickerClass(h)}">${h}</span><span class="ticker-dot">•</span>`).join('')+'</div>';
 }
