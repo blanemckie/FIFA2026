@@ -1374,6 +1374,18 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 /* V62: Just Browsing guest mode */
 .entry-or{display:flex;align-items:center;gap:10px;margin:14px 0 12px;color:#62708b;font-weight:1000;text-transform:uppercase;letter-spacing:.12em;font-size:12px}.entry-or:before,.entry-or:after{content:"";height:1px;flex:1;background:#d9e3f5}.browse-btn{width:70%;margin:0 auto;display:block;padding:13px 18px;border-radius:999px;background:transparent;color:#102044;border:2px solid rgba(16,32,68,.18);font-size:15px;font-weight:1000}.browse-btn:hover{border-color:rgba(248,200,74,.72);box-shadow:0 12px 28px rgba(248,200,74,.16);background:rgba(248,200,74,.10)}.browse-banner{margin:0 auto 16px;padding:14px 16px;border-radius:20px;background:linear-gradient(135deg,rgba(248,200,74,.16),rgba(55,212,255,.10));border:1px solid rgba(248,200,74,.34);text-align:center;color:#eaf2ff;font-weight:850;line-height:1.35}.browse-banner b{display:block;color:#fff3a2;font-size:16px;margin-bottom:3px}.browse-banner button{margin-top:10px;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,var(--gold),#fff3a2);color:#071633;font-size:13px;font-weight:1000}@media(max-width:520px){.browse-btn{width:100%;font-size:14px;padding:12px 16px}.entry-or{margin:12px 0 10px}}
 
+
+/* V64: simplified, centred Fun Stats cards */
+.fun-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:stretch!important;}
+.stat-bubble-v64,.stat-bubble{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;gap:7px!important;padding:18px 14px!important;min-height:170px!important;}
+.stat-bubble-v64 .stat-icon,.stat-bubble .stat-icon{font-size:30px!important;line-height:1!important;}
+.stat-bubble-v64 .stat-title,.stat-bubble .stat-title{margin:0!important;min-height:42px!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:14px!important;line-height:1.15!important;text-transform:uppercase!important;letter-spacing:.035em!important;}
+.stat-bubble-v64 .stat-value,.stat-bubble .stat-value{margin:0!important;width:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:clamp(19px,2.4vw,28px)!important;line-height:1.1!important;}
+.stat-bubble-v64 .stat-value .team-name,.stat-bubble .stat-value .team-name{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;text-align:center!important;}
+.stat-bubble-v64 .stat-value .flag-img,.stat-bubble .stat-value .flag-img{width:34px!important;height:24px!important;}
+.stat-bubble-v64 .stat-copy,.stat-bubble .stat-copy{margin:0!important;max-width:230px!important;text-align:center!important;font-size:12.5px!important;line-height:1.25!important;}
+@media(max-width:900px){.fun-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.stat-bubble-v64,.stat-bubble{min-height:150px!important}}
+@media(max-width:560px){.fun-stats-grid{grid-template-columns:1fr!important}.stat-bubble-v64,.stat-bubble{min-height:132px!important;padding:14px 12px!important}.stat-bubble-v64 .stat-title,.stat-bubble .stat-title{min-height:auto!important}.stat-bubble-v64 .stat-value,.stat-bubble .stat-value{font-size:22px!important}}
 </style>
 <!-- V49 emergency layout repair: restore fixture/result row alignment after header changes -->
 <style>
@@ -1813,6 +1825,18 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 /* V62: Just Browsing guest mode */
 .entry-or{display:flex;align-items:center;gap:10px;margin:14px 0 12px;color:#62708b;font-weight:1000;text-transform:uppercase;letter-spacing:.12em;font-size:12px}.entry-or:before,.entry-or:after{content:"";height:1px;flex:1;background:#d9e3f5}.browse-btn{width:70%;margin:0 auto;display:block;padding:13px 18px;border-radius:999px;background:transparent;color:#102044;border:2px solid rgba(16,32,68,.18);font-size:15px;font-weight:1000}.browse-btn:hover{border-color:rgba(248,200,74,.72);box-shadow:0 12px 28px rgba(248,200,74,.16);background:rgba(248,200,74,.10)}.browse-banner{margin:0 auto 16px;padding:14px 16px;border-radius:20px;background:linear-gradient(135deg,rgba(248,200,74,.16),rgba(55,212,255,.10));border:1px solid rgba(248,200,74,.34);text-align:center;color:#eaf2ff;font-weight:850;line-height:1.35}.browse-banner b{display:block;color:#fff3a2;font-size:16px;margin-bottom:3px}.browse-banner button{margin-top:10px;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,var(--gold),#fff3a2);color:#071633;font-size:13px;font-weight:1000}@media(max-width:520px){.browse-btn{width:100%;font-size:14px;padding:12px 16px}.entry-or{margin:12px 0 10px}}
 
+
+/* V64: simplified, centred Fun Stats cards */
+.fun-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:stretch!important;}
+.stat-bubble-v64,.stat-bubble{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;gap:7px!important;padding:18px 14px!important;min-height:170px!important;}
+.stat-bubble-v64 .stat-icon,.stat-bubble .stat-icon{font-size:30px!important;line-height:1!important;}
+.stat-bubble-v64 .stat-title,.stat-bubble .stat-title{margin:0!important;min-height:42px!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:14px!important;line-height:1.15!important;text-transform:uppercase!important;letter-spacing:.035em!important;}
+.stat-bubble-v64 .stat-value,.stat-bubble .stat-value{margin:0!important;width:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:clamp(19px,2.4vw,28px)!important;line-height:1.1!important;}
+.stat-bubble-v64 .stat-value .team-name,.stat-bubble .stat-value .team-name{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;text-align:center!important;}
+.stat-bubble-v64 .stat-value .flag-img,.stat-bubble .stat-value .flag-img{width:34px!important;height:24px!important;}
+.stat-bubble-v64 .stat-copy,.stat-bubble .stat-copy{margin:0!important;max-width:230px!important;text-align:center!important;font-size:12.5px!important;line-height:1.25!important;}
+@media(max-width:900px){.fun-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.stat-bubble-v64,.stat-bubble{min-height:150px!important}}
+@media(max-width:560px){.fun-stats-grid{grid-template-columns:1fr!important}.stat-bubble-v64,.stat-bubble{min-height:132px!important;padding:14px 12px!important}.stat-bubble-v64 .stat-title,.stat-bubble .stat-title{min-height:auto!important}.stat-bubble-v64 .stat-value,.stat-bubble .stat-value{font-size:22px!important}}
 </style>
 
 
@@ -2271,6 +2295,18 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 /* V62: Just Browsing guest mode */
 .entry-or{display:flex;align-items:center;gap:10px;margin:14px 0 12px;color:#62708b;font-weight:1000;text-transform:uppercase;letter-spacing:.12em;font-size:12px}.entry-or:before,.entry-or:after{content:"";height:1px;flex:1;background:#d9e3f5}.browse-btn{width:70%;margin:0 auto;display:block;padding:13px 18px;border-radius:999px;background:transparent;color:#102044;border:2px solid rgba(16,32,68,.18);font-size:15px;font-weight:1000}.browse-btn:hover{border-color:rgba(248,200,74,.72);box-shadow:0 12px 28px rgba(248,200,74,.16);background:rgba(248,200,74,.10)}.browse-banner{margin:0 auto 16px;padding:14px 16px;border-radius:20px;background:linear-gradient(135deg,rgba(248,200,74,.16),rgba(55,212,255,.10));border:1px solid rgba(248,200,74,.34);text-align:center;color:#eaf2ff;font-weight:850;line-height:1.35}.browse-banner b{display:block;color:#fff3a2;font-size:16px;margin-bottom:3px}.browse-banner button{margin-top:10px;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,var(--gold),#fff3a2);color:#071633;font-size:13px;font-weight:1000}@media(max-width:520px){.browse-btn{width:100%;font-size:14px;padding:12px 16px}.entry-or{margin:12px 0 10px}}
 
+
+/* V64: simplified, centred Fun Stats cards */
+.fun-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:stretch!important;}
+.stat-bubble-v64,.stat-bubble{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;gap:7px!important;padding:18px 14px!important;min-height:170px!important;}
+.stat-bubble-v64 .stat-icon,.stat-bubble .stat-icon{font-size:30px!important;line-height:1!important;}
+.stat-bubble-v64 .stat-title,.stat-bubble .stat-title{margin:0!important;min-height:42px!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:14px!important;line-height:1.15!important;text-transform:uppercase!important;letter-spacing:.035em!important;}
+.stat-bubble-v64 .stat-value,.stat-bubble .stat-value{margin:0!important;width:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:clamp(19px,2.4vw,28px)!important;line-height:1.1!important;}
+.stat-bubble-v64 .stat-value .team-name,.stat-bubble .stat-value .team-name{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;text-align:center!important;}
+.stat-bubble-v64 .stat-value .flag-img,.stat-bubble .stat-value .flag-img{width:34px!important;height:24px!important;}
+.stat-bubble-v64 .stat-copy,.stat-bubble .stat-copy{margin:0!important;max-width:230px!important;text-align:center!important;font-size:12.5px!important;line-height:1.25!important;}
+@media(max-width:900px){.fun-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.stat-bubble-v64,.stat-bubble{min-height:150px!important}}
+@media(max-width:560px){.fun-stats-grid{grid-template-columns:1fr!important}.stat-bubble-v64,.stat-bubble{min-height:132px!important;padding:14px 12px!important}.stat-bubble-v64 .stat-title,.stat-bubble .stat-title{min-height:auto!important}.stat-bubble-v64 .stat-value,.stat-bubble .stat-value{font-size:22px!important}}
 </style>
 </head>
 <body>
@@ -2658,34 +2694,64 @@ function renderFunStats(){
   if(!grid) return;
   const submissions=(window.firebaseSubmissions&&window.firebaseSubmissions.length)?window.firebaseSubmissions:[];
   const withPred=submissions.filter(s=>s.predictedWinner||s.groupPredictions||s.knockoutPicks);
-  const winners={};
-  withPred.forEach(s=>{if(s.predictedWinner) winners[s.predictedWinner]=(winners[s.predictedWinner]||0)+1});
-  const topWinner=Object.entries(winners).sort((a,b)=>b[1]-a[1])[0];
+
+  const championCounts={};
+  withPred.forEach(s=>{if(s.predictedWinner) championCounts[s.predictedWinner]=(championCounts[s.predictedWinner]||0)+1});
+  const topWinner=Object.entries(championCounts).sort((a,b)=>b[1]-a[1])[0];
+
   function totalGoals(s){return (s.groupPredictions||[]).reduce((sum,p)=>sum+(Number(p.homeScore)||0)+(Number(p.awayScore)||0),0)}
   const goalRows=withPred.map(s=>({name:s.name||'Unknown', goals:totalGoals(s)})).sort((a,b)=>b.goals-a.goals);
   const lowGoalRows=[...goalRows].sort((a,b)=>a.goals-b.goals);
+
   const teamFor={};
   const teamAgainst={};
+  const scorelines={};
+  let predictionCount=0;
+
   withPred.forEach(s=>{
     (s.groupPredictions||[]).forEach(p=>{
       const home=p.homeTeam;
       const away=p.awayTeam;
+      if(p.homeScore===null||p.homeScore===undefined||p.homeScore===''||p.awayScore===null||p.awayScore===undefined||p.awayScore==='') return;
       const hs=Number(p.homeScore)||0;
       const as=Number(p.awayScore)||0;
-      if(home){teamFor[home]=(teamFor[home]||0)+hs; teamAgainst[home]=(teamAgainst[home]||0)+as;}
-      if(away){teamFor[away]=(teamFor[away]||0)+as; teamAgainst[away]=(teamAgainst[away]||0)+hs;}
+      predictionCount++;
+      const scoreline=`${hs}-${as}`;
+      scorelines[scoreline]=(scorelines[scoreline]||0)+1;
+      if(home){
+        teamFor[home]??={goals:0,matches:0};
+        teamAgainst[home]??={goals:0,matches:0};
+        teamFor[home].goals+=hs; teamFor[home].matches+=1;
+        teamAgainst[home].goals+=as; teamAgainst[home].matches+=1;
+      }
+      if(away){
+        teamFor[away]??={goals:0,matches:0};
+        teamAgainst[away]??={goals:0,matches:0};
+        teamFor[away].goals+=as; teamFor[away].matches+=1;
+        teamAgainst[away].goals+=hs; teamAgainst[away].matches+=1;
+      }
     });
   });
-  const topScoringTeam=Object.entries(teamFor).sort((a,b)=>b[1]-a[1])[0];
-  const topConcedingTeam=Object.entries(teamAgainst).sort((a,b)=>b[1]-a[1])[0];
+
+  function topAverage(obj){
+    return Object.entries(obj)
+      .map(([team,row])=>({team, avg: row.matches?row.goals/row.matches:0, total: row.goals, matches: row.matches}))
+      .sort((a,b)=>b.avg-a.avg || b.total-a.total || a.team.localeCompare(b.team))[0];
+  }
+  const topScoringTeam=topAverage(teamFor);
+  const topConcedingTeam=topAverage(teamAgainst);
+  const commonScoreline=Object.entries(scorelines).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0]))[0];
+
+  const avgCopy = row => row ? `${row.avg.toFixed(1)} avg goals per group game` : 'Average across submitted group predictions';
   const statCards=[
     {icon:'🏆',title:'Team Most Predicted To Be Champions',value:topWinner?teamLabel(topWinner[0]):'Waiting',copy:topWinner?`${topWinner[1]} champion pick${topWinner[1]===1?'':'s'} so far`:'Submit predictions to unlock this stat'},
-    {icon:'⚽',title:'Team Expected To Score Most Goals',value:topScoringTeam?teamLabel(topScoringTeam[0]):'Waiting',copy:topScoringTeam?`${topScoringTeam[1]} goals predicted for them`:'Based on group-stage score predictions'},
-    {icon:'🥅',title:'Team Expected To Concede Most Goals',value:topConcedingTeam?teamLabel(topConcedingTeam[0]):'Waiting',copy:topConcedingTeam?`${topConcedingTeam[1]} goals predicted against them`:'Based on group-stage score predictions'},
+    {icon:'⚽',title:'Team Expected To Score Most Group Goals',value:topScoringTeam?teamLabel(topScoringTeam.team):'Waiting',copy:topScoringTeam?avgCopy(topScoringTeam):'Average across all group-stage submissions'},
+    {icon:'🥅',title:'Team Expected To Concede Most Group Goals',value:topConcedingTeam?teamLabel(topConcedingTeam.team):'Waiting',copy:topConcedingTeam?avgCopy(topConcedingTeam):'Average across all group-stage submissions'},
     {icon:'🔥',title:'Player Predicting The Most Goals',value:goalRows[0]?goalRows[0].name:'Waiting',copy:goalRows[0]?`${goalRows[0].goals} total group-stage goals predicted`:'Highest total goals predicted'},
-    {icon:'🧱',title:'Player Predicting The Fewest Goals',value:lowGoalRows[0]?lowGoalRows[0].name:'Waiting',copy:lowGoalRows[0]?`${lowGoalRows[0].goals} total group-stage goals predicted`:'Lowest total goals predicted'}
+    {icon:'🧱',title:'Player Predicting The Fewest Goals',value:lowGoalRows[0]?lowGoalRows[0].name:'Waiting',copy:lowGoalRows[0]?`${lowGoalRows[0].goals} total group-stage goals predicted`:'Lowest total goals predicted'},
+    {icon:'🎯',title:'Most Common Scoreline',value:commonScoreline?commonScoreline[0]:'Waiting',copy:commonScoreline?`${commonScoreline[1]} time${commonScoreline[1]===1?'':'s'} across group predictions`:'Most frequent submitted group-stage score'}
   ];
-  grid.innerHTML=statCards.map(c=>`<article class="stat-bubble"><div class="stat-icon">${c.icon}</div><div class="stat-title">${c.title}</div><div class="stat-value">${c.value}</div><div class="stat-copy">${c.copy}</div></article>`).join('');
+  grid.innerHTML=statCards.map(c=>`<article class="stat-bubble stat-bubble-v64"><div class="stat-icon">${c.icon}</div><div class="stat-title">${c.title}</div><div class="stat-value">${c.value}</div><div class="stat-copy">${c.copy}</div></article>`).join('');
 }
 
 function updateWinnerReveal(){
@@ -3209,4 +3275,16 @@ onSnapshot(collection(db, "predictions"), (snapshot) => {
 /* V62: Just Browsing guest mode */
 .entry-or{display:flex;align-items:center;gap:10px;margin:14px 0 12px;color:#62708b;font-weight:1000;text-transform:uppercase;letter-spacing:.12em;font-size:12px}.entry-or:before,.entry-or:after{content:"";height:1px;flex:1;background:#d9e3f5}.browse-btn{width:70%;margin:0 auto;display:block;padding:13px 18px;border-radius:999px;background:transparent;color:#102044;border:2px solid rgba(16,32,68,.18);font-size:15px;font-weight:1000}.browse-btn:hover{border-color:rgba(248,200,74,.72);box-shadow:0 12px 28px rgba(248,200,74,.16);background:rgba(248,200,74,.10)}.browse-banner{margin:0 auto 16px;padding:14px 16px;border-radius:20px;background:linear-gradient(135deg,rgba(248,200,74,.16),rgba(55,212,255,.10));border:1px solid rgba(248,200,74,.34);text-align:center;color:#eaf2ff;font-weight:850;line-height:1.35}.browse-banner b{display:block;color:#fff3a2;font-size:16px;margin-bottom:3px}.browse-banner button{margin-top:10px;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,var(--gold),#fff3a2);color:#071633;font-size:13px;font-weight:1000}@media(max-width:520px){.browse-btn{width:100%;font-size:14px;padding:12px 16px}.entry-or{margin:12px 0 10px}}
 
+
+/* V64: simplified, centred Fun Stats cards */
+.fun-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:stretch!important;}
+.stat-bubble-v64,.stat-bubble{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;gap:7px!important;padding:18px 14px!important;min-height:170px!important;}
+.stat-bubble-v64 .stat-icon,.stat-bubble .stat-icon{font-size:30px!important;line-height:1!important;}
+.stat-bubble-v64 .stat-title,.stat-bubble .stat-title{margin:0!important;min-height:42px!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:14px!important;line-height:1.15!important;text-transform:uppercase!important;letter-spacing:.035em!important;}
+.stat-bubble-v64 .stat-value,.stat-bubble .stat-value{margin:0!important;width:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:clamp(19px,2.4vw,28px)!important;line-height:1.1!important;}
+.stat-bubble-v64 .stat-value .team-name,.stat-bubble .stat-value .team-name{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;text-align:center!important;}
+.stat-bubble-v64 .stat-value .flag-img,.stat-bubble .stat-value .flag-img{width:34px!important;height:24px!important;}
+.stat-bubble-v64 .stat-copy,.stat-bubble .stat-copy{margin:0!important;max-width:230px!important;text-align:center!important;font-size:12.5px!important;line-height:1.25!important;}
+@media(max-width:900px){.fun-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.stat-bubble-v64,.stat-bubble{min-height:150px!important}}
+@media(max-width:560px){.fun-stats-grid{grid-template-columns:1fr!important}.stat-bubble-v64,.stat-bubble{min-height:132px!important;padding:14px 12px!important}.stat-bubble-v64 .stat-title,.stat-bubble .stat-title{min-height:auto!important}.stat-bubble-v64 .stat-value,.stat-bubble .stat-value{font-size:22px!important}}
 </style>
