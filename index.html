@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>FIFA World Cup 2026 Prediction Challenge - V52</title>
+<title>FIFA World Cup 2026 Prediction Challenge - V58</title>
 <style>
 :root{
   --navy:#04112d;--navy2:#071b45;--blue:#0d3a91;--panel:#09255c;--panel2:#0d3176;
@@ -1320,6 +1320,81 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 .lock-card .primary.incomplete{opacity:.92;filter:saturate(.9);}
 
 .first-prompt-callout{margin:14px 0;padding:14px 16px;border-radius:18px;background:rgba(248,200,74,.12);border:1px solid rgba(248,200,74,.35);color:#fff3a2;font-weight:850;line-height:1.45}.journey-table td:nth-child(5){font-style:italic;color:#e7f1ff}.journey-table td:nth-child(4){text-align:center}
+
+/* V58: Results Centre mobile team-name fix - prioritise full country names on iPhone */
+@media(max-width:720px){
+  .live-results-submissions .fixture-card-v51{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    grid-template-areas:"home" "score" "away" "meta"!important;
+    gap:8px!important;
+    padding:12px!important;
+  }
+  .live-results-submissions .fixture-team-v51,
+  #submissions .fixture-team-v51{
+    width:100%!important;
+    min-width:0!important;
+    min-height:44px!important;
+    justify-content:center!important;
+    text-align:center!important;
+    padding:9px 10px!important;
+    gap:8px!important;
+    font-size:clamp(13px,4vw,16px)!important;
+    line-height:1.15!important;
+  }
+  .live-results-submissions .fixture-team-v51.home,
+  .live-results-submissions .fixture-team-v51.away,
+  #submissions .fixture-team-v51.home,
+  #submissions .fixture-team-v51.away{
+    justify-content:center!important;
+    text-align:center!important;
+  }
+  .live-results-submissions .fixture-team-v51 .team-name,
+  #submissions .fixture-team-v51 .team-name,
+  .live-results-submissions .result-team .team-name,
+  .live-results-submissions .team-name{
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    word-break:normal!important;
+    overflow-wrap:normal!important;
+    max-width:none!important;
+    min-width:0!important;
+    display:inline!important;
+    text-align:center!important;
+  }
+  .live-results-submissions .fixture-team-v51 img,
+  .live-results-submissions .flag-img,
+  #submissions .fixture-team-v51 .flag-img{
+    width:28px!important;
+    height:20px!important;
+    min-width:28px!important;
+    flex:0 0 28px!important;
+  }
+  .live-results-submissions .fixture-score-v51{
+    grid-area:score!important;
+    justify-self:center!important;
+    min-width:96px!important;
+    max-width:140px!important;
+    font-size:18px!important;
+    padding:9px 12px!important;
+  }
+  .live-results-submissions .fixture-meta-v51{
+    grid-area:meta!important;
+    justify-content:center!important;
+  }
+}
+@media(max-width:430px){
+  .live-results-submissions .fixture-team-v51,
+  #submissions .fixture-team-v51{
+    font-size:14px!important;
+  }
+  .live-results-submissions .fixture-meta-v51 span{
+    font-size:9.5px!important;
+    padding:4px 6px!important;
+  }
+}
+
 </style>
 <!-- V49 emergency layout repair: restore fixture/result row alignment after header changes -->
 <style>
@@ -1705,6 +1780,81 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 }
 
 .first-prompt-callout{margin:14px 0;padding:14px 16px;border-radius:18px;background:rgba(248,200,74,.12);border:1px solid rgba(248,200,74,.35);color:#fff3a2;font-weight:850;line-height:1.45}.journey-table td:nth-child(5){font-style:italic;color:#e7f1ff}.journey-table td:nth-child(4){text-align:center}
+
+/* V58: Results Centre mobile team-name fix - prioritise full country names on iPhone */
+@media(max-width:720px){
+  .live-results-submissions .fixture-card-v51{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    grid-template-areas:"home" "score" "away" "meta"!important;
+    gap:8px!important;
+    padding:12px!important;
+  }
+  .live-results-submissions .fixture-team-v51,
+  #submissions .fixture-team-v51{
+    width:100%!important;
+    min-width:0!important;
+    min-height:44px!important;
+    justify-content:center!important;
+    text-align:center!important;
+    padding:9px 10px!important;
+    gap:8px!important;
+    font-size:clamp(13px,4vw,16px)!important;
+    line-height:1.15!important;
+  }
+  .live-results-submissions .fixture-team-v51.home,
+  .live-results-submissions .fixture-team-v51.away,
+  #submissions .fixture-team-v51.home,
+  #submissions .fixture-team-v51.away{
+    justify-content:center!important;
+    text-align:center!important;
+  }
+  .live-results-submissions .fixture-team-v51 .team-name,
+  #submissions .fixture-team-v51 .team-name,
+  .live-results-submissions .result-team .team-name,
+  .live-results-submissions .team-name{
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    word-break:normal!important;
+    overflow-wrap:normal!important;
+    max-width:none!important;
+    min-width:0!important;
+    display:inline!important;
+    text-align:center!important;
+  }
+  .live-results-submissions .fixture-team-v51 img,
+  .live-results-submissions .flag-img,
+  #submissions .fixture-team-v51 .flag-img{
+    width:28px!important;
+    height:20px!important;
+    min-width:28px!important;
+    flex:0 0 28px!important;
+  }
+  .live-results-submissions .fixture-score-v51{
+    grid-area:score!important;
+    justify-self:center!important;
+    min-width:96px!important;
+    max-width:140px!important;
+    font-size:18px!important;
+    padding:9px 12px!important;
+  }
+  .live-results-submissions .fixture-meta-v51{
+    grid-area:meta!important;
+    justify-content:center!important;
+  }
+}
+@media(max-width:430px){
+  .live-results-submissions .fixture-team-v51,
+  #submissions .fixture-team-v51{
+    font-size:14px!important;
+  }
+  .live-results-submissions .fixture-meta-v51 span{
+    font-size:9.5px!important;
+    padding:4px 6px!important;
+  }
+}
+
 </style>
 
 
@@ -2107,6 +2257,81 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   .live-results-submissions .summary-line-v51{font-size:12px!important;line-height:1.3!important;}
   .live-results-submissions .results-total-row{display:block!important;text-align:center!important;font-size:22px!important;padding:14px!important;}
   .live-results-submissions .results-total-row>div:last-child{margin-top:8px!important;font-size:26px!important;}
+}
+
+
+/* V58: Results Centre mobile team-name fix - prioritise full country names on iPhone */
+@media(max-width:720px){
+  .live-results-submissions .fixture-card-v51{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    grid-template-areas:"home" "score" "away" "meta"!important;
+    gap:8px!important;
+    padding:12px!important;
+  }
+  .live-results-submissions .fixture-team-v51,
+  #submissions .fixture-team-v51{
+    width:100%!important;
+    min-width:0!important;
+    min-height:44px!important;
+    justify-content:center!important;
+    text-align:center!important;
+    padding:9px 10px!important;
+    gap:8px!important;
+    font-size:clamp(13px,4vw,16px)!important;
+    line-height:1.15!important;
+  }
+  .live-results-submissions .fixture-team-v51.home,
+  .live-results-submissions .fixture-team-v51.away,
+  #submissions .fixture-team-v51.home,
+  #submissions .fixture-team-v51.away{
+    justify-content:center!important;
+    text-align:center!important;
+  }
+  .live-results-submissions .fixture-team-v51 .team-name,
+  #submissions .fixture-team-v51 .team-name,
+  .live-results-submissions .result-team .team-name,
+  .live-results-submissions .team-name{
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    word-break:normal!important;
+    overflow-wrap:normal!important;
+    max-width:none!important;
+    min-width:0!important;
+    display:inline!important;
+    text-align:center!important;
+  }
+  .live-results-submissions .fixture-team-v51 img,
+  .live-results-submissions .flag-img,
+  #submissions .fixture-team-v51 .flag-img{
+    width:28px!important;
+    height:20px!important;
+    min-width:28px!important;
+    flex:0 0 28px!important;
+  }
+  .live-results-submissions .fixture-score-v51{
+    grid-area:score!important;
+    justify-self:center!important;
+    min-width:96px!important;
+    max-width:140px!important;
+    font-size:18px!important;
+    padding:9px 12px!important;
+  }
+  .live-results-submissions .fixture-meta-v51{
+    grid-area:meta!important;
+    justify-content:center!important;
+  }
+}
+@media(max-width:430px){
+  .live-results-submissions .fixture-team-v51,
+  #submissions .fixture-team-v51{
+    font-size:14px!important;
+  }
+  .live-results-submissions .fixture-meta-v51 span{
+    font-size:9.5px!important;
+    padding:4px 6px!important;
+  }
 }
 
 </style>
@@ -2830,4 +3055,79 @@ onSnapshot(collection(db, "predictions"), (snapshot) => {
     grid-template-columns:100px 1fr!important;
   }
 }
+
+/* V58: Results Centre mobile team-name fix - prioritise full country names on iPhone */
+@media(max-width:720px){
+  .live-results-submissions .fixture-card-v51{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    grid-template-areas:"home" "score" "away" "meta"!important;
+    gap:8px!important;
+    padding:12px!important;
+  }
+  .live-results-submissions .fixture-team-v51,
+  #submissions .fixture-team-v51{
+    width:100%!important;
+    min-width:0!important;
+    min-height:44px!important;
+    justify-content:center!important;
+    text-align:center!important;
+    padding:9px 10px!important;
+    gap:8px!important;
+    font-size:clamp(13px,4vw,16px)!important;
+    line-height:1.15!important;
+  }
+  .live-results-submissions .fixture-team-v51.home,
+  .live-results-submissions .fixture-team-v51.away,
+  #submissions .fixture-team-v51.home,
+  #submissions .fixture-team-v51.away{
+    justify-content:center!important;
+    text-align:center!important;
+  }
+  .live-results-submissions .fixture-team-v51 .team-name,
+  #submissions .fixture-team-v51 .team-name,
+  .live-results-submissions .result-team .team-name,
+  .live-results-submissions .team-name{
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    word-break:normal!important;
+    overflow-wrap:normal!important;
+    max-width:none!important;
+    min-width:0!important;
+    display:inline!important;
+    text-align:center!important;
+  }
+  .live-results-submissions .fixture-team-v51 img,
+  .live-results-submissions .flag-img,
+  #submissions .fixture-team-v51 .flag-img{
+    width:28px!important;
+    height:20px!important;
+    min-width:28px!important;
+    flex:0 0 28px!important;
+  }
+  .live-results-submissions .fixture-score-v51{
+    grid-area:score!important;
+    justify-self:center!important;
+    min-width:96px!important;
+    max-width:140px!important;
+    font-size:18px!important;
+    padding:9px 12px!important;
+  }
+  .live-results-submissions .fixture-meta-v51{
+    grid-area:meta!important;
+    justify-content:center!important;
+  }
+}
+@media(max-width:430px){
+  .live-results-submissions .fixture-team-v51,
+  #submissions .fixture-team-v51{
+    font-size:14px!important;
+  }
+  .live-results-submissions .fixture-meta-v51 span{
+    font-size:9.5px!important;
+    padding:4px 6px!important;
+  }
+}
+
 </style>
