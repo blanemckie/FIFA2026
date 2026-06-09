@@ -2338,7 +2338,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   </section>
   <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table 🏆</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🌍 All League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Main">⚽ Main League</button></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div></div></section>
   <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">⚽ Results Centre ⚽</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="card live-results-card"><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
-  <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats 📊</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more test predictions are submitted.</p></div></section>
+  <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats 📊</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
   <section id="how" class="panel how-built-page">
     <div class="page-head unified-final-head build-story-head v46-build-head"><h2 class="premium-page-title">🛠️ From Idea to Kick-Off 🛠️</h2><p>Inspired by Damien's AI lunch chats, I built this World Cup prediction game using mainly dictation to ChatGPT over a couple of evening sessions.</p></div>
     <div class="intro-story short-story v44-intro-story v46-intro-story">
@@ -2495,10 +2495,18 @@ function normaliseLeague(value){
   if(v.includes('lego')) return 'LEGO';
   return 'Main';
 }
+function isLockedPrediction(row){
+  return row && (row.locked === true || row.submissionStatus === 'locked')
+    && Array.isArray(row.groupPredictions)
+    && Array.isArray(row.knockoutPicks)
+    && !!row.predictedWinner;
+}
 function getEntryRows(){
-  const rows=(window.firebaseSubmissions&&window.firebaseSubmissions.length)
-    ? window.firebaseSubmissions
-    : (state.user ? [{name:state.user.name, league:state.user.league, predictedWinner:state.bracket['FINAL-1']||null, groupPredictions:groupPredictionPayload?.()||[], knockoutPicks:knockoutPredictionPayload?.()||[], source:'local'}] : []);
+  // V63: League table and Results Centre only show fully locked prediction submissions.
+  // Landing-page registrations are held in users only and do not appear publicly until locked.
+  const rows=(window.firebasePredictions&&window.firebasePredictions.length)
+    ? window.firebasePredictions.filter(isLockedPrediction)
+    : (state.user && state.locked ? [{name:state.user.name, email:state.user.email, league:state.user.league, predictedWinner:state.bracket['FINAL-1']||null, groupPredictions:groupPredictionPayload?.()||[], knockoutPicks:knockoutPredictionPayload?.()||[], locked:true, submissionStatus:'locked', source:'local'}] : []);
   const byName=new Map();
   rows.forEach(r=>{
     const key=(r.email||r.name||Math.random()).toString().toLowerCase();
@@ -2529,7 +2537,7 @@ function renderSubmissions(){
   if(!dropdown||!box) return;
   if(!rows.length){
     dropdown.innerHTML='<option>No submissions yet</option>';
-    box.innerHTML='<div class="empty-state">Submit a test entry first, then it will appear here.</div>';
+    box.innerHTML='<div class="empty-state">Locked entries will appear here after players complete and submit their predictions.</div>';
     return;
   }
   if(!currentSubmissionKey || !rows.some((r,i)=>entryKey(r,i)===currentSubmissionKey)) currentSubmissionKey=entryKey(rows[0],0);
@@ -2753,7 +2761,7 @@ $('#lockBtn').addEventListener('click',async()=>{
   if(!validateFullPredictionBeforeLock()) return;
   if(!confirm('Are you sure you want to lock your predictions? You will not be able to change them after submitting.')) return;
   try{
-    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v62-browse-mode' };
+    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v63-locked-production' };
     if(window.saveFullPredictionToFirebase){
       await window.saveFullPredictionToFirebase(payload);
       $('#lockStatus').textContent='✓ Full tournament prediction saved to Firebase predictions.';
@@ -2795,40 +2803,56 @@ const db = getFirestore(app);
 
 window.savePlayerEntryToFirebase = async function({name,email,league}){
   const cleanEmail = String(email||'').trim().toLowerCase();
-  const existingEntries = await getDocs(query(collection(db, "entries"), where("email", "==", cleanEmail), limit(1)));
-  const existingPredictions = await getDocs(query(collection(db, "predictions"), where("email", "==", cleanEmail), limit(1)));
-  if(!existingEntries.empty || !existingPredictions.empty){
-    throw new Error("This email has already entered the game. Please use your original entry or contact the organiser.");
+  if(!name || !cleanEmail){
+    throw new Error("Please enter your name and email before starting predictions.");
   }
-  const entry = {
+  const existingPredictions = await getDocs(query(collection(db, "predictions"), where("email", "==", cleanEmail), limit(1)));
+  if(!existingPredictions.empty){
+    throw new Error("This email has already locked an entry. Please use your original entry or contact the organiser.");
+  }
+  const user = {
     name,
     email: cleanEmail,
     league,
     createdAt: serverTimestamp(),
     source: "github-pages-production",
-    version: "v62-browse-mode"
+    version: "v63-locked-production",
+    registrationStatus: "started",
+    locked: false
   };
-  await addDoc(collection(db, "entries"), entry);
-  await addDoc(collection(db, "users"), entry);
+  // V63: save landing-page registrations to users only.
+  // Do not add to entries/leaderboards until the full prediction is locked.
+  await addDoc(collection(db, "users"), user);
 };
 
 window.saveFullPredictionToFirebase = async function(payload){
-  await addDoc(collection(db, "predictions"), {
+  if(!payload || !payload.user || !payload.user.name || !payload.user.email){
+    throw new Error("Registration Required. Please enter your name and email before submitting predictions.");
+  }
+  const cleanEmail = String(payload.user.email||'').trim().toLowerCase();
+  const lockedEntry = {
     name: payload.user.name,
-    email: payload.user.email,
+    email: cleanEmail,
     league: payload.user.league,
+    createdAt: serverTimestamp(),
+    source: "github-pages-production",
+    version: "v63-locked-production",
+    locked: true,
+    lockedAtLocal: payload.lockedAtLocal || null,
+    lockedAt: serverTimestamp(),
+    submissionStatus: payload.submissionStatus || "locked"
+  };
+  const prediction = {
+    ...lockedEntry,
     groupPredictions: payload.groupPredictions,
     knockoutPicks: payload.knockoutPicks,
     predictedWinner: payload.predictedWinner,
     submittedAtLocal: payload.submittedAtLocal,
-    submittedAt: serverTimestamp(),
-    source: "github-pages-production",
-    version: "v62-browse-mode",
-    locked: payload.locked === true,
-    lockedAtLocal: payload.lockedAtLocal || null,
-    lockedAt: serverTimestamp(),
-    submissionStatus: payload.submissionStatus || "locked"
-  });
+    submittedAt: serverTimestamp()
+  };
+  // V63: create the public entry and corresponding prediction at the same time only after lock-in.
+  await addDoc(collection(db, "entries"), lockedEntry);
+  await addDoc(collection(db, "predictions"), prediction);
 };
 
 function normaliseDoc(doc){
@@ -2843,14 +2867,19 @@ function refreshFirebaseViews(){
 window.firebaseSubmissions = [];
 window.firebaseEntries = [];
 window.firebasePredictions = [];
+function refreshLockedSubmissionCache(){
+  window.firebaseSubmissions = (window.firebasePredictions || [])
+    .filter(row => row && (row.locked === true || row.submissionStatus === 'locked'))
+    .sort((a,b)=>String(b.submittedAtLocal||b.createdAtLocal||'').localeCompare(String(a.submittedAtLocal||a.createdAtLocal||'')));
+}
 onSnapshot(collection(db, "entries"), (snapshot) => {
   window.firebaseEntries = snapshot.docs.map(normaliseDoc);
-  window.firebaseSubmissions = [...window.firebasePredictions, ...window.firebaseEntries].sort((a,b)=>String(b.submittedAtLocal||b.createdAtLocal||'').localeCompare(String(a.submittedAtLocal||a.createdAtLocal||'')));
+  refreshLockedSubmissionCache();
   refreshFirebaseViews();
 });
 onSnapshot(collection(db, "predictions"), (snapshot) => {
   window.firebasePredictions = snapshot.docs.map(normaliseDoc);
-  window.firebaseSubmissions = [...window.firebasePredictions, ...window.firebaseEntries].sort((a,b)=>String(b.submittedAtLocal||b.createdAtLocal||'').localeCompare(String(a.submittedAtLocal||a.createdAtLocal||'')));
+  refreshLockedSubmissionCache();
   refreshFirebaseViews();
 });
 
