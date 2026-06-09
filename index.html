@@ -2887,7 +2887,8 @@ function renderSubmissionDetail(entry){
   const champHtml = `<div class="champion-showcase">${champion==='Not selected yet'?'<span class="champion-team-name">Not selected yet</span>':teamLabel(champion)}<span class="champion-label">Champion Pick</span><div class="summary-line-v51">Correct Winner · Max 25 pts</div></div>`;
   rows.push(summaryRow(champHtml, 25));
   const currentPoints=Number(entry.totalPoints||0);
-  box.innerHTML=`<div class="player-result-strip"><div class="selected-player-name">⚽ ${(entry.name||'Selected player').toUpperCase()}</div><div class="points-total-card"><div class="total-points">${currentPoints} / ${runningMax}</div><small>Running points / max available</small></div></div><div class="results-grid-v51"><div class="results-grid-header"><div>Your Prediction</div><div>Actual Result</div><div>Points<small>Earned / Max</small></div></div>${rows.join('')}<div class="results-total-row"><div class="results-total-label">Total Running Points</div><div>${currentPoints} / ${runningMax}</div></div></div>`;
+  const championTopBubble = `<div class="champion-first-bubble"><div class="champion-first-kicker">Champion Pick</div><div class="champion-first-team">${champion==='Not selected yet'?'<span>Not selected yet</span>':teamLabel(champion)}</div><div class="champion-first-copy">Shown first so you can quickly see the player's predicted winner.</div></div>`;
+  box.innerHTML=`<div class="player-result-strip"><div class="selected-player-name">⚽ ${(entry.name||'Selected player').toUpperCase()}</div><div class="points-total-card"><div class="total-points">${currentPoints} / ${runningMax}</div><small>Running points / max available</small></div></div>${championTopBubble}<div class="results-grid-v51"><div class="results-grid-header"><div>Your Prediction</div><div>Actual Result</div><div>Points<small>Earned / Max</small></div></div>${rows.join('')}<div class="results-total-row"><div class="results-total-label">Total Running Points</div><div>${currentPoints} / ${runningMax}</div></div></div>`;
 }
 function summaryRow(prediction,maxPoints){return `<div class="results-grid-row"><div class="results-cell prediction-cell" data-label="Your Prediction">${prediction}</div><div class="results-cell actual-cell" data-label="Actual Result"><span class="actual-pending">Result Pending</span></div><div class="results-cell points-cell" data-label="Points">0 / ${maxPoints}</div></div>`}
 function initials(name){return name.split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
@@ -3496,4 +3497,154 @@ onSnapshot(collection(db, "predictions"), (snapshot) => {
 .stat-bubble-v64 .stat-copy,.stat-bubble .stat-copy{margin:0!important;max-width:230px!important;text-align:center!important;font-size:12.5px!important;line-height:1.25!important;}
 @media(max-width:900px){.fun-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.stat-bubble-v64,.stat-bubble{min-height:150px!important}}
 @media(max-width:560px){.fun-stats-grid{grid-template-columns:1fr!important}.stat-bubble-v64,.stat-bubble{min-height:132px!important;padding:14px 12px!important}.stat-bubble-v64 .stat-title,.stat-bubble .stat-title{min-height:auto!important}.stat-bubble-v64 .stat-value,.stat-bubble .stat-value{font-size:22px!important}}
+
+
+/* V67: global header centring, centred player selector and champion-first summary */
+.page-head.unified-final-head,
+.unified-final-head,
+.prediction-centre-head,
+.results-head,
+.live-table-head,
+.fun-head,
+.build-story-head{
+  width:100%!important;
+  max-width:100%!important;
+  margin:24px auto 24px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  padding-left:0!important;
+  padding-right:0!important;
+}
+.premium-page-title,
+.unified-final-head h2,
+.prediction-centre-head h2,
+.results-head h2,
+.live-table-head h2,
+.fun-head h2,
+.build-story-head h2,
+.live-results-submissions .page-head h2{
+  width:auto!important;
+  min-width:min(560px,92vw)!important;
+  max-width:min(1120px,92vw)!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:clamp(10px,2.2vw,26px)!important;
+  text-align:center!important;
+  padding:14px clamp(24px,4vw,58px)!important;
+  transform:none!important;
+  left:auto!important;
+  right:auto!important;
+}
+.live-results-submissions .page-head.unified-final-head{
+  width:100%!important;
+  max-width:100%!important;
+  margin:24px auto 22px!important;
+  padding:0!important;
+}
+.live-results-submissions .page-head.unified-final-head h2{
+  width:auto!important;
+  min-width:min(620px,92vw)!important;
+  max-width:min(1040px,92vw)!important;
+}
+.live-results-submissions .live-results-card{
+  max-width:min(1180px,96vw)!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+.live-results-submissions .submission-picker,
+.live-results-submissions .player-picker{
+  max-width:min(560px,92vw)!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  text-align:center!important;
+}
+.live-results-submissions .picker-label{
+  display:block!important;
+  text-align:center!important;
+  width:100%!important;
+}
+.live-results-submissions .player-select-wrap{
+  width:100%!important;
+  display:flex!important;
+  justify-content:center!important;
+}
+.live-results-submissions .player-dropdown,
+.live-results-submissions .submission-picker select,
+#playerDropdown{
+  text-align:center!important;
+  text-align-last:center!important;
+  -moz-text-align-last:center!important;
+  padding-left:44px!important;
+  padding-right:44px!important;
+}
+#playerDropdown option{
+  text-align:center!important;
+}
+.champion-first-bubble{
+  width:100%!important;
+  margin:0 auto 14px!important;
+  padding:16px!important;
+  border-radius:24px!important;
+  background:linear-gradient(135deg,rgba(248,200,74,.20),rgba(55,212,255,.08))!important;
+  border:1px solid rgba(248,200,74,.42)!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.10)!important;
+  display:grid!important;
+  place-items:center!important;
+  gap:9px!important;
+  text-align:center!important;
+}
+.champion-first-kicker{
+  color:#fff3a2!important;
+  font-size:12px!important;
+  letter-spacing:.12em!important;
+  text-transform:uppercase!important;
+  font-weight:1000!important;
+}
+.champion-first-team{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:10px!important;
+  color:#fff!important;
+  font-weight:1000!important;
+  font-size:clamp(22px,3vw,38px)!important;
+  line-height:1.05!important;
+}
+.champion-first-team .flag-img{
+  width:54px!important;
+  height:38px!important;
+  border-radius:8px!important;
+}
+.champion-first-copy{
+  color:#dce9ff!important;
+  font-size:13px!important;
+  font-weight:850!important;
+}
+@media(max-width:760px){
+  .premium-page-title,
+  .unified-final-head h2,
+  .prediction-centre-head h2,
+  .results-head h2,
+  .live-table-head h2,
+  .fun-head h2,
+  .build-story-head h2,
+  .live-results-submissions .page-head h2{
+    min-width:min(330px,92vw)!important;
+    max-width:92vw!important;
+    width:auto!important;
+    padding:12px 18px!important;
+    font-size:clamp(17px,5vw,25px)!important;
+    letter-spacing:.055em!important;
+    gap:10px!important;
+  }
+  .champion-first-bubble{padding:13px 10px!important;border-radius:20px!important;}
+  .champion-first-team{font-size:22px!important;gap:8px!important;}
+  .champion-first-team .flag-img{width:44px!important;height:31px!important;}
+}
 </style>
