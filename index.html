@@ -1799,6 +1799,316 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   }
 }
 .first-prompt-callout{margin:14px 0;padding:14px 16px;border-radius:18px;background:rgba(248,200,74,.12);border:1px solid rgba(248,200,74,.35);color:#fff3a2;font-weight:850;line-height:1.45}.journey-table td:nth-child(5){font-style:italic;color:#e7f1ff}.journey-table td:nth-child(4){text-align:center}
+
+/* ===== V56: Results Centre mobile parity with Predictions page + production polish ===== */
+.live-results-submissions .page-head.unified-final-head{
+  max-width:min(760px,94vw)!important;
+  margin:22px auto 18px!important;
+  padding:18px clamp(18px,4vw,34px)!important;
+  border-radius:999px!important;
+}
+.live-results-submissions .page-head h2{
+  white-space:nowrap!important;
+  font-size:clamp(28px,4.4vw,54px)!important;
+  letter-spacing:.08em!important;
+}
+.live-results-submissions .live-results-card{
+  max-width:min(1320px,96vw)!important;
+  padding:clamp(14px,2vw,22px)!important;
+  margin:0 auto 28px!important;
+}
+.live-results-submissions .submission-shell,
+.live-results-submissions .submission-shell.player-selector-mode{
+  display:block!important;
+}
+.live-results-submissions .submission-picker,
+.live-results-submissions .player-picker{
+  position:static!important;
+  width:100%!important;
+  max-width:560px!important;
+  margin:0 auto 18px!important;
+}
+.live-results-submissions .picker-card,
+.live-results-submissions .player-selector-card{
+  padding:12px!important;
+  border-radius:22px!important;
+}
+.live-results-submissions .picker-label{
+  text-align:center!important;
+  font-size:12px!important;
+  margin-bottom:8px!important;
+}
+.live-results-submissions .player-dropdown,
+.live-results-submissions .submission-picker select{
+  width:100%!important;
+  height:52px!important;
+  min-height:52px!important;
+  border-radius:18px!important;
+  font-size:clamp(15px,2.6vw,20px)!important;
+  padding:0 44px 0 18px!important;
+}
+.live-results-submissions .player-result-strip{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  margin:4px 0 16px!important;
+  padding:14px 16px!important;
+  border-radius:24px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.045))!important;
+  border:1px solid rgba(248,200,74,.28)!important;
+}
+.live-results-submissions .selected-player-name{
+  font-size:clamp(20px,4vw,34px)!important;
+  line-height:1!important;
+  white-space:normal!important;
+}
+.live-results-submissions .points-total-card{
+  min-width:140px!important;
+  padding:10px 12px!important;
+  border-radius:18px!important;
+  text-align:center!important;
+}
+.live-results-submissions .results-grid-v51{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(150px,190px) minmax(110px,140px)!important;
+  gap:10px!important;
+  align-items:stretch!important;
+  width:100%!important;
+}
+.live-results-submissions .results-grid-header{
+  grid-column:1/-1!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(150px,190px) minmax(110px,140px)!important;
+  gap:10px!important;
+}
+.live-results-submissions .results-grid-header > div{
+  min-height:42px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border-radius:16px!important;
+  background:rgba(5,18,45,.62)!important;
+  border:1px solid rgba(248,200,74,.22)!important;
+  color:#fff3a2!important;
+  font-size:12px!important;
+  letter-spacing:.12em!important;
+  text-transform:uppercase!important;
+  font-weight:1000!important;
+}
+.live-results-submissions .results-grid-header small{display:block!important;font-size:9px!important;letter-spacing:.08em!important;color:#cbdcf7!important;margin-left:4px!important;}
+.live-results-submissions .results-grid-row{
+  grid-column:1/-1!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(150px,190px) minmax(110px,140px)!important;
+  gap:10px!important;
+  align-items:stretch!important;
+}
+.live-results-submissions .results-cell{
+  min-width:0!important;
+  min-height:76px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border-radius:18px!important;
+  background:rgba(255,255,255,.07)!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  padding:8px!important;
+}
+.live-results-submissions .prediction-cell{justify-content:stretch!important;}
+.live-results-submissions .actual-cell,.live-results-submissions .points-cell{text-align:center!important;}
+.live-results-submissions .points-cell{font-size:20px!important;font-weight:1000!important;color:#fff3a2!important;white-space:nowrap!important;}
+.live-results-submissions .stage-divider-v51{
+  grid-column:1/-1!important;
+  width:100%!important;
+  min-height:52px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  margin:12px 0 4px!important;
+  padding:10px 18px!important;
+  border-radius:22px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.11),rgba(255,255,255,.045))!important;
+  border:1px solid rgba(248,200,74,.34)!important;
+  color:#fff3a2!important;
+  font-size:clamp(18px,2.6vw,30px)!important;
+  letter-spacing:.12em!important;
+  text-transform:uppercase!important;
+  font-weight:1000!important;
+}
+.live-results-submissions .fixture-card-v51{
+  width:100%!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(82px,110px) minmax(0,1fr)!important;
+  grid-template-areas:"home score away" "meta meta meta"!important;
+  gap:8px 12px!important;
+  align-items:center!important;
+  padding:12px!important;
+  border-radius:22px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.09),rgba(255,255,255,.04))!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+}
+.live-results-submissions .fixture-team-v51{
+  min-width:0!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  background:rgba(255,255,255,.09)!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+  border-radius:16px!important;
+  padding:8px 10px!important;
+  font-size:clamp(12px,1.6vw,16px)!important;
+  font-weight:1000!important;
+  line-height:1.05!important;
+  color:#fff!important;
+}
+.live-results-submissions .fixture-team-v51.home{grid-area:home;justify-content:flex-start!important;text-align:left!important;}
+.live-results-submissions .fixture-team-v51.away{grid-area:away;justify-content:flex-end!important;text-align:right!important;}
+.live-results-submissions .fixture-score-v51{
+  grid-area:score!important;
+  min-width:82px!important;
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  padding:9px 8px!important;
+  border-radius:16px!important;
+  background:#071633!important;
+  border:1px solid rgba(248,200,74,.25)!important;
+  color:#fff3a2!important;
+  font-size:clamp(15px,2vw,22px)!important;
+  font-weight:1000!important;
+  white-space:nowrap!important;
+}
+.live-results-submissions .fixture-meta-v51{
+  grid-area:meta!important;
+  display:flex!important;
+  flex-wrap:wrap!important;
+  justify-content:center!important;
+  gap:6px!important;
+  margin-top:2px!important;
+}
+.live-results-submissions .fixture-meta-v51 span{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:4px 8px!important;
+  border-radius:999px!important;
+  background:rgba(55,212,255,.10)!important;
+  border:1px solid rgba(55,212,255,.18)!important;
+  color:#dbe9ff!important;
+  font-size:11px!important;
+  font-weight:900!important;
+}
+.live-results-submissions .flag-img,
+.live-results-submissions .fixture-team-v51 img{
+  width:28px!important;height:22px!important;min-width:28px!important;border-radius:4px!important;object-fit:cover!important;
+}
+.live-results-submissions .actual-pending{
+  min-width:94px!important;
+  max-width:100%!important;
+  white-space:nowrap!important;
+  padding:7px 10px!important;
+  border-radius:999px!important;
+  font-size:11px!important;
+}
+.live-results-submissions .stage-summary-box-v51,
+.live-results-submissions .champion-showcase{
+  width:100%!important;
+  padding:12px!important;
+  border-radius:20px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,.035))!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  text-align:center!important;
+}
+.live-results-submissions .stage-picks-v51{display:flex!important;flex-wrap:wrap!important;gap:8px!important;justify-content:center!important;align-items:center!important;}
+.live-results-submissions .stage-team-pill{font-size:13px!important;padding:7px 9px!important;border-radius:14px!important;}
+.live-results-submissions .summary-line-v51{text-align:center!important;margin-top:10px!important;color:#dbe9ff!important;font-size:13px!important;font-weight:900!important;}
+.live-results-submissions .results-total-row{
+  grid-column:1/-1!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(130px,180px)!important;
+  gap:10px!important;
+  align-items:center!important;
+  margin-top:12px!important;
+  padding:16px!important;
+  border-radius:22px!important;
+  background:linear-gradient(135deg,rgba(248,200,74,.20),rgba(55,212,255,.08))!important;
+  border:1px solid rgba(248,200,74,.34)!important;
+  color:#fff3a2!important;
+  font-size:clamp(18px,3vw,30px)!important;
+  font-weight:1000!important;
+}
+@media(max-width:720px){
+  .live-results-submissions .page-head.unified-final-head{max-width:94vw!important;padding:14px 16px!important;margin:14px auto 12px!important;}
+  .live-results-submissions .page-head h2{font-size:clamp(22px,7vw,34px)!important;letter-spacing:.04em!important;}
+  .live-results-submissions .live-results-tagline{font-size:12px!important;line-height:1.25!important;margin:6px 0 0!important;}
+  .live-results-submissions .live-results-card{width:94vw!important;max-width:94vw!important;padding:12px!important;border-radius:24px!important;}
+  .live-results-submissions .submission-picker,.live-results-submissions .player-picker{max-width:100%!important;margin-bottom:12px!important;}
+  .live-results-submissions .picker-card{border-radius:18px!important;padding:10px!important;}
+  .live-results-submissions .player-dropdown{height:46px!important;min-height:46px!important;font-size:15px!important;border-radius:15px!important;}
+  .live-results-submissions .player-result-strip{border-radius:18px!important;padding:12px!important;display:block!important;text-align:center!important;}
+  .live-results-submissions .points-total-card{margin:10px auto 0!important;max-width:210px!important;}
+  .live-results-submissions .results-grid-v51,
+  .live-results-submissions .results-grid-row{
+    display:block!important;
+  }
+  .live-results-submissions .results-grid-header{display:none!important;}
+  .live-results-submissions .stage-divider-v51{font-size:18px!important;min-height:44px!important;margin:14px 0 8px!important;padding:8px 10px!important;border-radius:18px!important;}
+  .live-results-submissions .results-grid-row{
+    margin-bottom:12px!important;
+    padding:0!important;
+    border-radius:22px!important;
+    background:rgba(255,255,255,.05)!important;
+    border:1px solid rgba(255,255,255,.10)!important;
+    overflow:hidden!important;
+  }
+  .live-results-submissions .results-cell{
+    display:block!important;
+    min-height:auto!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    padding:8px 10px!important;
+  }
+  .live-results-submissions .results-cell::before{
+    content:attr(data-label)!important;
+    display:block!important;
+    text-align:center!important;
+    color:#fff3a2!important;
+    font-size:10px!important;
+    letter-spacing:.1em!important;
+    text-transform:uppercase!important;
+    font-weight:1000!important;
+    margin-bottom:6px!important;
+  }
+  .live-results-submissions .prediction-cell::before{display:none!important;}
+  .live-results-submissions .fixture-card-v51{
+    grid-template-columns:minmax(0,1fr) 78px minmax(0,1fr)!important;
+    gap:7px!important;
+    padding:10px!important;
+    border-radius:20px!important;
+  }
+  .live-results-submissions .fixture-team-v51{
+    min-height:50px!important;
+    padding:8px 7px!important;
+    font-size:12px!important;
+    border-radius:15px!important;
+  }
+  .live-results-submissions .fixture-team-v51.home{justify-content:flex-start!important;text-align:left!important;}
+  .live-results-submissions .fixture-team-v51.away{justify-content:flex-end!important;text-align:right!important;}
+  .live-results-submissions .fixture-score-v51{min-width:78px!important;font-size:15px!important;padding:10px 5px!important;border-radius:14px!important;}
+  .live-results-submissions .flag-img,.live-results-submissions .fixture-team-v51 img{width:25px!important;height:19px!important;min-width:25px!important;}
+  .live-results-submissions .fixture-meta-v51 span{font-size:10px!important;padding:4px 6px!important;}
+  .live-results-submissions .actual-cell,.live-results-submissions .points-cell{text-align:center!important;}
+  .live-results-submissions .actual-pending{font-size:10.5px!important;padding:7px 10px!important;}
+  .live-results-submissions .points-cell{font-size:18px!important;}
+  .live-results-submissions .stage-team-pill{font-size:12px!important;}
+  .live-results-submissions .summary-line-v51{font-size:12px!important;line-height:1.3!important;}
+  .live-results-submissions .results-total-row{display:block!important;text-align:center!important;font-size:22px!important;padding:14px!important;}
+  .live-results-submissions .results-total-row>div:last-child{margin-top:8px!important;font-size:26px!important;}
+}
+
 </style>
 </head>
 <body>
@@ -2222,10 +2532,10 @@ $('#lockBtn').addEventListener('click',async()=>{
   if(!validateFullPredictionBeforeLock()) return;
   if(!confirm('Are you sure you want to lock your predictions? You will not be able to change them after submitting.')) return;
   try{
-    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v53-validation' };
+    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v56-live' };
     if(window.saveFullPredictionToFirebase){
       await window.saveFullPredictionToFirebase(payload);
-      $('#lockStatus').textContent='✓ Full tournament prediction saved to Firebase test_predictions.';
+      $('#lockStatus').textContent='✓ Full tournament prediction saved to Firebase predictions.';
       showToast('✓ Full prediction saved to Firebase');
       setTimeout(()=>{setTab('submissions'); renderSubmissions(); window.scrollTo({top:0,behavior:'smooth'});},650);
     }else{
@@ -2264,8 +2574,8 @@ const db = getFirestore(app);
 
 window.savePlayerEntryToFirebase = async function({name,email,league}){
   const cleanEmail = String(email||'').trim().toLowerCase();
-  const existingEntries = await getDocs(query(collection(db, "test_entries"), where("email", "==", cleanEmail), limit(1)));
-  const existingPredictions = await getDocs(query(collection(db, "test_predictions"), where("email", "==", cleanEmail), limit(1)));
+  const existingEntries = await getDocs(query(collection(db, "entries"), where("email", "==", cleanEmail), limit(1)));
+  const existingPredictions = await getDocs(query(collection(db, "predictions"), where("email", "==", cleanEmail), limit(1)));
   if(!existingEntries.empty || !existingPredictions.empty){
     throw new Error("This email has already entered the game. Please use your original entry or contact the organiser.");
   }
@@ -2274,15 +2584,15 @@ window.savePlayerEntryToFirebase = async function({name,email,league}){
     email: cleanEmail,
     league,
     createdAt: serverTimestamp(),
-    source: "github-pages-test",
-    version: "v53-validation"
+    source: "github-pages-production",
+    version: "v56-live"
   };
-  await addDoc(collection(db, "test_entries"), entry);
-  await addDoc(collection(db, "test_users"), entry);
+  await addDoc(collection(db, "entries"), entry);
+  await addDoc(collection(db, "users"), entry);
 };
 
 window.saveFullPredictionToFirebase = async function(payload){
-  await addDoc(collection(db, "test_predictions"), {
+  await addDoc(collection(db, "predictions"), {
     name: payload.user.name,
     email: payload.user.email,
     league: payload.user.league,
@@ -2291,8 +2601,8 @@ window.saveFullPredictionToFirebase = async function(payload){
     predictedWinner: payload.predictedWinner,
     submittedAtLocal: payload.submittedAtLocal,
     submittedAt: serverTimestamp(),
-    source: "github-pages-test",
-    version: "v53-validation",
+    source: "github-pages-production",
+    version: "v56-live",
     locked: payload.locked === true,
     lockedAtLocal: payload.lockedAtLocal || null,
     lockedAt: serverTimestamp(),
@@ -2312,12 +2622,12 @@ function refreshFirebaseViews(){
 window.firebaseSubmissions = [];
 window.firebaseEntries = [];
 window.firebasePredictions = [];
-onSnapshot(collection(db, "test_entries"), (snapshot) => {
+onSnapshot(collection(db, "entries"), (snapshot) => {
   window.firebaseEntries = snapshot.docs.map(normaliseDoc);
   window.firebaseSubmissions = [...window.firebasePredictions, ...window.firebaseEntries].sort((a,b)=>String(b.submittedAtLocal||b.createdAtLocal||'').localeCompare(String(a.submittedAtLocal||a.createdAtLocal||'')));
   refreshFirebaseViews();
 });
-onSnapshot(collection(db, "test_predictions"), (snapshot) => {
+onSnapshot(collection(db, "predictions"), (snapshot) => {
   window.firebasePredictions = snapshot.docs.map(normaliseDoc);
   window.firebaseSubmissions = [...window.firebasePredictions, ...window.firebaseEntries].sort((a,b)=>String(b.submittedAtLocal||b.createdAtLocal||'').localeCompare(String(a.submittedAtLocal||a.createdAtLocal||'')));
   refreshFirebaseViews();
