@@ -1721,7 +1721,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   gap:24px;
   white-space:nowrap;
   will-change:transform;
-  animation:wcpTickerMove 84s linear infinite;
+  animation:wcpTickerMove 280s linear infinite;
   padding-left:100%;
 }
 .ticker-item{
@@ -1744,8 +1744,43 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   .world-cup-ticker{width:100%;grid-template-columns:1fr;border-radius:16px;margin:8px auto 12px;}
   .ticker-label{justify-content:center;padding:8px 10px;font-size:11px;}
   .ticker-track{min-height:36px;}
-  .ticker-marquee{animation-duration:72s;}
+  .ticker-marquee{animation-duration:280s;}
   .ticker-item{font-size:12px;}
+}
+
+
+/* V77: Fun Stats league slicers and slower readable ticker */
+.fun-league-controls{
+  margin:0 auto 18px!important;
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  gap:10px!important;
+  flex-wrap:wrap!important;
+}
+.fun-league-filter{
+  border:1px solid rgba(255,255,255,.18)!important;
+  background:rgba(255,255,255,.08)!important;
+  color:#fff!important;
+  border-radius:999px!important;
+  padding:10px 14px!important;
+  font-weight:1000!important;
+  cursor:pointer!important;
+  min-width:112px!important;
+  text-align:center!important;
+}
+.fun-league-filter.active{
+  background:linear-gradient(135deg,var(--gold),#fff3a2)!important;
+  color:#071633!important;
+  border-color:transparent!important;
+  box-shadow:0 12px 28px rgba(248,200,74,.22)!important;
+}
+.stat-bubble-v77 .stat-copy span{
+  display:block!important;
+}
+@media(max-width:640px){
+  .fun-league-controls{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}
+  .fun-league-filter{min-width:0!important;padding:9px 8px!important;font-size:12px!important;}
 }
 
 </style>
@@ -2788,7 +2823,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   </section>
   <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table 🏆</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div></div></section>
   <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">⚽ Results Centre ⚽</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="world-cup-ticker" id="worldCupNewsTicker" aria-label="World Cup 2026 news ticker"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest World Cup 2026 headlines…</span></div></div></div><div class="kickoff-countdown compact" data-countdown><div class="count-title">⚽ Countdown To Kick-Off ⚽</div><div class="countdown-units"><div class="count-unit"><b data-days>000</b><span>Days</span></div><div class="count-unit"><b data-hours>00</b><span>Hours</span></div><div class="count-unit"><b data-mins>00</b><span>Mins</span></div><div class="count-unit"><b data-secs>00</b><span>Secs</span></div></div><div class="count-sub">Live scoring begins when Mexico v South Africa kicks off.</div></div><div class="card live-results-card"><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
-  <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats 📊</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
+  <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats 📊</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="league-controls upgraded fun-league-controls" id="funLeagueControls"><button class="fun-league-filter active" data-fun-league-filter="All">🏆 All Leagues</button><button class="fun-league-filter" data-fun-league-filter="Main">🌍 Main</button><button class="fun-league-filter" data-fun-league-filter="LEGO">🧱 LEGO</button><button class="fun-league-filter" data-fun-league-filter="Family">🏡 Family</button></div><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
   <section id="how" class="panel how-built-page">
     <div class="page-head unified-final-head build-story-head v46-build-head"><h2 class="premium-page-title">🛠️ From Idea to Kick-Off 🛠️</h2><p>Inspired by Damien's AI lunch chats, I built this World Cup prediction game using mainly dictation to ChatGPT over a couple of evening sessions.</p></div>
     <div class="intro-story short-story v44-intro-story v46-intro-story">
@@ -2882,7 +2917,7 @@ function championPopularity(team){
   const pct=total?Math.round((count/total)*100):0;
   return total?`Picked by ${count} player${count===1?'':'s'} (${pct}%)`:'Popularity updates once entries are locked.';
 }
-const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb'];
+const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice'];
 const allLeagueNames = ['Blane McKie'];
 function normalisePersonName(name){return String(name||'').trim().toLowerCase().replace(/\s+/g,' ');}
 function isFamilyLeagueName(name){
@@ -3283,11 +3318,29 @@ function renderResults(){if(!$('#resultsList')) return; const all=[...fixtures,.
 window.renderLeaderboard = renderLeaderboard;
 window.renderSubmissions = renderSubmissions;
 window.renderFunStats = renderFunStats;
+
+let currentFunLeagueFilter='All';
 function renderFunStats(){
   const grid=$('#funStatsGrid');
   if(!grid) return;
-  const submissions=(window.firebaseSubmissions&&window.firebaseSubmissions.length)?window.firebaseSubmissions:[];
-  const withPred=submissions.filter(s=>s && (s.predictedWinner || s.groupPredictions || s.knockoutPicks));
+
+  const allRows = (typeof getEntryRows === 'function') ? getEntryRows() : ((window.firebaseSubmissions&&window.firebaseSubmissions.length)?window.firebaseSubmissions:[]);
+  const filteredRows = currentFunLeagueFilter === 'All'
+    ? allRows
+    : allRows.filter(r => r.allLeagues || normaliseLeague(r.league) === currentFunLeagueFilter);
+
+  $$('.fun-league-filter').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.funLeagueFilter === currentFunLeagueFilter);
+    if(!btn.dataset.boundFunStats){
+      btn.dataset.boundFunStats='true';
+      btn.addEventListener('click',()=>{
+        currentFunLeagueFilter = btn.dataset.funLeagueFilter || 'All';
+        renderFunStats();
+      });
+    }
+  });
+
+  const withPred=filteredRows.filter(s=>s && (s.predictedWinner || s.groupPredictions || s.knockoutPicks));
   const totalPlayers=withPred.length;
   const pct=(count,total=totalPlayers)=> total ? `${Math.round((count/total)*100)}%` : '0%';
 
@@ -3309,7 +3362,7 @@ function renderFunStats(){
     if(!avgPlayerGoals) return `<span>${goals} Total Goals Predicted</span>`;
     const diff=((goals-avgPlayerGoals)/avgPlayerGoals)*100;
     const sign=diff>=0?'+':'';
-    return `<span>${goals} Total Goals Predicted</span><span>${sign}${Math.round(diff)}% vs Player Average</span>`;
+    return `<span>${goals} Total Goals Predicted</span><span>${sign}${Math.round(diff)}% vs League Average</span>`;
   };
 
   const teamTotalsFor={};
@@ -3318,6 +3371,7 @@ function renderFunStats(){
   const teamSubmissionsAgainst={};
   const scorelines={};
   const matchTotals={};
+  const exactScoreGroups={};
   let predictionCount=0;
 
   withPred.forEach(s=>{
@@ -3332,6 +3386,9 @@ function renderFunStats(){
       predictionCount++;
       const scoreline=`${hs}-${as}`;
       scorelines[scoreline]=(scorelines[scoreline]||0)+1;
+      const matchId=p.matchId || `${home||'Team A'}-${away||'Team B'}`;
+      const exactKey=`${matchId}|${scoreline}`;
+      exactScoreGroups[exactKey]=(exactScoreGroups[exactKey]||0)+1;
       const matchKey=`${home||'Team A'} v ${away||'Team B'}`;
       matchTotals[matchKey]??={total:0,count:0,home,away};
       matchTotals[matchKey].total += hs + as;
@@ -3360,31 +3417,36 @@ function renderFunStats(){
   const topScoringTeam=topTeamByAverage(teamTotalsFor,teamSubmissionsFor);
   const topConcedingTeam=topTeamByAverage(teamTotalsAgainst,teamSubmissionsAgainst);
   const commonScoreline=Object.entries(scorelines).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0]))[0];
+  const exactMatchedCount=Object.values(exactScoreGroups).reduce((sum,count)=>sum+(count>1?count:0),0);
   const matchAverages=Object.values(matchTotals).map(m=>({...m,avg:m.count?m.total/m.count:0}));
-  const highestMatch=matchAverages.sort((a,b)=>b.avg-a.avg || a.home.localeCompare(b.home))[0];
-  const lowestMatch=[...matchAverages].sort((a,b)=>a.avg-b.avg || a.home.localeCompare(b.home))[0];
+  const highestMatch=matchAverages.sort((a,b)=>b.avg-a.avg || String(a.home).localeCompare(String(b.home)))[0];
+  const lowestMatch=[...matchAverages].sort((a,b)=>a.avg-b.avg || String(a.home).localeCompare(String(b.home)))[0];
   const darkHorse=Object.entries(championCounts).filter(([team,count])=>count>0).sort((a,b)=>a[1]-b[1] || a[0].localeCompare(b[0]))[0];
 
-  const teamAvgCopy=(row,type)=> row ? `<span>${Math.round(row.avg)} Average Total Group Goals ${type}</span>` : 'Updates from locked group-stage predictions';
+  const teamAvgCopy=(row,type)=> row ? `<span>${Math.round(row.avg)} Predicted Goals ${type}</span><span>Average Total Across Group Stage</span>` : 'Updates from locked group-stage predictions';
   const championCopy=topWinner ? `<span>${topWinner[1]} Champion Pick${topWinner[1]===1?'':'s'}</span><span>${pct(topWinner[1])} of Players</span>` : 'Submit predictions to unlock this stat';
-  const scorelineCopy=commonScoreline ? `<span>${commonScoreline[1]} Pick${commonScoreline[1]===1?'':'s'}</span><span>${pct(commonScoreline[1],predictionCount)} of All Score Predictions</span>` : 'Most frequent submitted group-stage score';
+  const scorelineCopy=commonScoreline ? `<span>${commonScoreline[1]} Pick${commonScoreline[1]===1?'':'s'}</span><span>${pct(commonScoreline[1],predictionCount)} of Score Predictions</span>` : 'Most frequent submitted group-stage score';
+  const exactScoreCopy=predictionCount ? `<span>${pct(exactMatchedCount,predictionCount)} of Score Predictions</span><span>Matched Another Player Exactly</span>` : 'Shows matching exact scores across the league';
   const matchValue=(match)=> match ? `${teamLabel(match.home)} <span class="score-sep">v</span> ${teamLabel(match.away)}` : 'Waiting';
   const highestMatchCopy=highestMatch ? `<span>${highestMatch.avg.toFixed(1)} Average Total Goals</span>` : 'Highest average goals across a fixture';
   const lowestMatchCopy=lowestMatch ? `<span>${lowestMatch.avg.toFixed(1)} Average Total Goals</span>` : 'Lowest average goals across a fixture';
+  const leagueName=currentFunLeagueFilter==='All'?'All Leagues':`${currentFunLeagueFilter} League`;
 
   const statCards=[
-    {icon:'🏆',title:'Most Popular Champion',desc:'The team backed by the most players to win the tournament.',value:topWinner?teamLabel(topWinner[0]):'Waiting',copy:championCopy},
-    {icon:'⚽',title:'Goal Machine',desc:'The team predicted to score the most total group-stage goals.',value:topScoringTeam?teamLabel(topScoringTeam.team):'Waiting',copy:teamAvgCopy(topScoringTeam,'Scored')},
-    {icon:'🧤',title:'Leaky Defence',desc:'The team predicted to concede the most total group-stage goals.',value:topConcedingTeam?teamLabel(topConcedingTeam.team):'Waiting',copy:teamAvgCopy(topConcedingTeam,'Conceded')},
-    {icon:'🎯',title:'Most Common Scoreline',desc:'The scoreline appearing most often across all group predictions.',value:commonScoreline?commonScoreline[0]:'Waiting',copy:scorelineCopy},
+    {icon:'🏆',title:'Most Popular Champion',desc:`The favourite winner pick in ${leagueName}.`,value:topWinner?teamLabel(topWinner[0]):'Waiting',copy:championCopy},
+    {icon:'⚽',title:'Goal Machine',desc:'The team expected to score the most total group-stage goals.',value:topScoringTeam?teamLabel(topScoringTeam.team):'Waiting',copy:teamAvgCopy(topScoringTeam,'Scored')},
+    {icon:'🧤',title:'Leaky Defence',desc:'The team expected to concede the most total group-stage goals.',value:topConcedingTeam?teamLabel(topConcedingTeam.team):'Waiting',copy:teamAvgCopy(topConcedingTeam,'Conceded')},
+    {icon:'🎯',title:'Most Common Scoreline',desc:'The scoreline appearing most often across group predictions.',value:commonScoreline?commonScoreline[0]:'Waiting',copy:scorelineCopy},
+    {icon:'🤝',title:'Exact Score Twins',desc:'How many predictions match another player on the same fixture and scoreline.',value:predictionCount?`${exactMatchedCount} of ${predictionCount}`:'Waiting',copy:exactScoreCopy},
     {icon:'🔥',title:'Highest Scoring Match',desc:'The fixture expected to deliver the biggest goal-fest.',value:matchValue(highestMatch),copy:highestMatchCopy},
     {icon:'😴',title:'Lowest Scoring Match',desc:'The fixture expected to be the tightest or cageiest.',value:matchValue(lowestMatch),copy:lowestMatchCopy},
     {icon:'🤠',title:'Dark Horse Champion',desc:'The least-backed team that at least one player thinks can win it all.',value:darkHorse?teamLabel(darkHorse[0]):'Waiting',copy:darkHorse?`<span>${darkHorse[1]} Player${darkHorse[1]===1?'':'s'} Backed Them</span><span>${pct(darkHorse[1])} of Players</span>`:'Lowest-backed champion pick'},
-    {icon:'😎',title:'Ultimate Optimist',desc:'The player predicting the most goals across the group stage.',value:goalRows[0]?goalRows[0].name:'Waiting',copy:goalRows[0]?goalsAndDiffCopy(goalRows[0].goals):'Believes we are in for a goal-fest'},
-    {icon:'🧘',title:'Cautious Conservative',desc:'The player predicting the fewest goals across the group stage.',value:lowGoalRows[0]?lowGoalRows[0].name:'Waiting',copy:lowGoalRows[0]?goalsAndDiffCopy(lowGoalRows[0].goals):'Expecting a lot of cagey football'}
+    {icon:'😎',title:'Ultimate Optimist',desc:'The player predicting the most group-stage goals.',value:goalRows[0]?goalRows[0].name:'Waiting',copy:goalRows[0]?goalsAndDiffCopy(goalRows[0].goals):'Believes we are in for a goal-fest'},
+    {icon:'🧘',title:'Cautious Conservative',desc:'The player predicting the fewest group-stage goals.',value:lowGoalRows[0]?lowGoalRows[0].name:'Waiting',copy:lowGoalRows[0]?goalsAndDiffCopy(lowGoalRows[0].goals):'Expecting a lot of cagey football'}
   ];
-  grid.innerHTML=statCards.map(c=>`<article class="stat-bubble stat-bubble-v69 stat-bubble-v71 ${c.title.includes('Optimist')?'optimist-stat':c.title.includes('Conservative')?'pessimist-stat':''}"><div class="stat-icon">${c.icon}</div><div class="stat-title">${c.title}</div><div class="stat-desc">${c.desc}</div><div class="stat-value">${c.value}</div><div class="stat-copy">${c.copy}</div></article>`).join('');
+  grid.innerHTML=statCards.map(c=>`<article class="stat-bubble stat-bubble-v69 stat-bubble-v71 stat-bubble-v77 ${c.title.includes('Optimist')?'optimist-stat':c.title.includes('Conservative')?'pessimist-stat':''}"><div class="stat-icon">${c.icon}</div><div class="stat-title">${c.title}</div><div class="stat-desc">${c.desc}</div><div class="stat-value">${c.value}</div><div class="stat-copy">${c.copy}</div></article>`).join('');
 }
+
 
 function updateWinnerReveal(){
   const winner=state.bracket['FINAL-1'];
