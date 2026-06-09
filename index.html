@@ -2634,6 +2634,49 @@ const state=JSON.parse(localStorage.getItem('wcp-v21')||'{}'); state.user??=null
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)]; function save(){localStorage.setItem('wcp-v21',JSON.stringify(state));}
 function flagFor(team){const code=flagCodes[team]; return code ? `https://flagcdn.com/w40/${code}.png` : null;}
 function teamLabel(team){const src=flagFor(team); const flag=src?`<img class="flag-img" src="${src}" alt="${team} flag" loading="lazy">`:`<span class="flag">⚽</span>`; return `${flag}<span class="team-name">${team}</span>`;}
+const championFacts={
+  "Brazil":"Brazil are the only nation to have played at every FIFA World Cup.",
+  "Germany":"Germany have reached more World Cup Finals than any European nation.",
+  "Argentina":"Argentina won the 2022 World Cup after a classic final against France.",
+  "England":"England lifted their only World Cup trophy at Wembley in 1966.",
+  "France":"France have won the World Cup twice, in 1998 and 2018.",
+  "Spain":"Spain won their first FIFA World Cup in 2010, beating the Netherlands 1-0 after extra time.",
+  "Netherlands":"The Netherlands have reached three World Cup Finals but are still chasing their first trophy.",
+  "Portugal":"Portugal's best World Cup finish was third place in 1966.",
+  "Mexico":"Mexico have hosted the World Cup twice before and will co-host again in 2026.",
+  "USA":"The USA reached the World Cup semi-finals in the first tournament in 1930.",
+  "Canada":"Canada scored their first men's World Cup goal at Qatar 2022.",
+  "Uruguay":"Uruguay won the first ever FIFA World Cup in 1930.",
+  "Belgium":"Belgium's best World Cup finish was third place in 2018.",
+  "Croatia":"Croatia reached the 2018 World Cup Final and finished third in 2022.",
+  "Morocco":"Morocco became the first African nation to reach a World Cup semi-final in 2022.",
+  "Japan":"Japan have reached the knockout rounds at four different World Cups.",
+  "South Korea":"South Korea reached the World Cup semi-finals as co-hosts in 2002.",
+  "Switzerland":"Switzerland have reached the World Cup quarter-finals three times.",
+  "Australia":"Australia reached the World Cup round of 16 in 2006 and 2022.",
+  "Scotland":"Scotland have qualified for eight World Cups and are still chasing a first knockout round.",
+  "Qatar":"Qatar hosted the first World Cup staged in the Middle East in 2022.",
+  "Senegal":"Senegal reached the World Cup quarter-finals on their debut in 2002.",
+  "Ghana":"Ghana reached the World Cup quarter-finals in 2010.",
+  "Colombia":"Colombia's best World Cup run came in 2014 when they reached the quarter-finals.",
+  "Sweden":"Sweden hosted the 1958 World Cup and finished as runners-up.",
+  "Tunisia":"Tunisia were the first African team to win a World Cup match, in 1978.",
+  "Egypt":"Egypt were the first African nation to play at a FIFA World Cup.",
+  "Iran":"Iran have qualified for six World Cups.",
+  "Saudi Arabia":"Saudi Arabia shocked Argentina with a famous World Cup win in 2022.",
+  "Ecuador":"Ecuador reached the World Cup round of 16 in 2006.",
+  "Paraguay":"Paraguay reached the World Cup quarter-finals in 2010.",
+  "Turkey":"Turkey finished third at the 2002 World Cup.",
+  "Czech Republic":"Czechoslovakia reached two World Cup Finals before the Czech Republic era."
+};
+function worldCupFact(team){return championFacts[team]||`${team} will be chasing a memorable World Cup story in 2026.`;}
+function championPopularity(team){
+  const subs=(window.firebaseSubmissions||[]).filter(s=>s&&s.predictedWinner);
+  const total=subs.length;
+  const count=team&&team!=='Not selected yet'?subs.filter(s=>s.predictedWinner===team).length:0;
+  const pct=total?Math.round((count/total)*100):0;
+  return total?`Picked by ${count} player${count===1?'':'s'} (${pct}%)`:'Popularity updates once entries are locked.';
+}
 function leagueFor(email){return email.toLowerCase().endsWith('@lego.com')?'LEGO':'Main'}
 function niceDate(date){return new Date(date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
 function ukToCet(date, uk){let s=String(uk).toLowerCase().replace('kick-off','').trim(), h=0,m=0;if(s.includes('.')){let p=s.replace('am','').replace('pm','').split('.');h=+p[0];m=+p[1];}else h=parseInt(s)||0;if(s.includes('pm')&&h!==12)h+=12;if(s.includes('am')&&h===12)h=0;h=(h+1)%24;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')} CET`;}
@@ -2887,7 +2930,9 @@ function renderSubmissionDetail(entry){
   const champHtml = `<div class="champion-showcase">${champion==='Not selected yet'?'<span class="champion-team-name">Not selected yet</span>':teamLabel(champion)}<span class="champion-label">Champion Pick</span><div class="summary-line-v51">Correct Winner · Max 25 pts</div></div>`;
   rows.push(summaryRow(champHtml, 25));
   const currentPoints=Number(entry.totalPoints||0);
-  const championTopBubble = `<div class="champion-first-bubble"><div class="champion-first-kicker">Champion Pick</div><div class="champion-first-team">${champion==='Not selected yet'?'<span>Not selected yet</span>':teamLabel(champion)}</div><div class="champion-first-copy">Shown first so you can quickly see the player's predicted winner.</div></div>`;
+  const championFactText = champion==='Not selected yet'?'Complete and lock a prediction to reveal this player’s champion story.':worldCupFact(champion);
+  const championPopularityText = champion==='Not selected yet'?'Waiting for champion picks.':championPopularity(champion);
+  const championTopBubble = `<div class="champion-first-bubble champion-reveal-v68"><div class="champion-stars">⭐ 🏆 ⭐</div><div class="champion-first-kicker">🏆 Champion Pick 🏆</div><div class="champion-player-line">👑 ${(entry.name||'This player').split(' ')[0]} thinks ${champion==='Not selected yet'?'their champion':'this team'} will lift the trophy 👑</div><div class="champion-first-team">${champion==='Not selected yet'?'<span>Not selected yet</span>':teamLabel(champion)}</div><div class="champion-fact-card"><strong>🌍 World Cup Fact</strong><span>${championFactText}</span></div><div class="champion-popularity">🏅 ${championPopularityText}</div></div>`;
   box.innerHTML=`<div class="player-result-strip"><div class="selected-player-name">⚽ ${(entry.name||'Selected player').toUpperCase()}</div><div class="points-total-card"><div class="total-points">${currentPoints} / ${runningMax}</div><small>Running points / max available</small></div></div>${championTopBubble}<div class="results-grid-v51"><div class="results-grid-header"><div>Your Prediction</div><div>Actual Result</div><div>Points<small>Earned / Max</small></div></div>${rows.join('')}<div class="results-total-row"><div class="results-total-label">Total Running Points</div><div>${currentPoints} / ${runningMax}</div></div></div>`;
 }
 function summaryRow(prediction,maxPoints){return `<div class="results-grid-row"><div class="results-cell prediction-cell" data-label="Your Prediction">${prediction}</div><div class="results-cell actual-cell" data-label="Actual Result"><span class="actual-pending">Result Pending</span></div><div class="results-cell points-cell" data-label="Points">0 / ${maxPoints}</div></div>`}
@@ -3647,4 +3692,24 @@ onSnapshot(collection(db, "predictions"), (snapshot) => {
   .champion-first-team{font-size:22px!important;gap:8px!important;}
   .champion-first-team .flag-img{width:44px!important;height:31px!important;}
 }
+
+
+/* V68: premium champion reveal card with country World Cup fact */
+.champion-reveal-v68{
+  position:relative!important;
+  overflow:hidden!important;
+  padding:22px 18px!important;
+  min-height:230px!important;
+  background:
+    radial-gradient(circle at 50% 18%,rgba(248,200,74,.30),transparent 34%),
+    linear-gradient(135deg,rgba(8,29,69,.98),rgba(14,54,126,.86))!important;
+  border:2px solid rgba(248,200,74,.70)!important;
+  box-shadow:0 0 34px rgba(248,200,74,.20),0 22px 58px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.14)!important;
+}
+.champion-reveal-v68:before,.champion-reveal-v68:after{
+  content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(248,200,74,.10);filter:blur(1px);pointer-events:none;
+}
+.champion-reveal-v68:before{left:-70px;top:-80px}.champion-reveal-v68:after{right:-70px;bottom:-85px;background:rgba(55,212,255,.10)}
+.champion-reveal-v68>*{position:relative;z-index:1}.champion-stars{font-size:22px;letter-spacing:.28em;filter:drop-shadow(0 8px 16px rgba(0,0,0,.28))}.champion-reveal-v68 .champion-first-kicker{font-size:15px!important;letter-spacing:.16em!important;color:#fff3a2!important}.champion-player-line{color:#eaf2ff;font-weight:1000;text-align:center;font-size:clamp(15px,2vw,20px);line-height:1.25}.champion-reveal-v68 .champion-first-team{font-size:clamp(34px,5vw,70px)!important;gap:18px!important;color:#fff!important;text-shadow:0 12px 28px rgba(0,0,0,.34)}.champion-reveal-v68 .champion-first-team .flag-img{width:86px!important;height:60px!important;border-radius:12px!important;box-shadow:0 16px 30px rgba(0,0,0,.34)}.champion-fact-card{width:min(760px,96%);margin:6px auto 0;padding:13px 16px;border-radius:18px;background:rgba(4,17,45,.54);border:1px solid rgba(255,255,255,.16);display:grid;gap:5px}.champion-fact-card strong{color:#fff3a2;font-weight:1000;text-transform:uppercase;letter-spacing:.08em;font-size:12px}.champion-fact-card span{color:#dce9ff;font-weight:850;line-height:1.35}.champion-popularity{display:inline-flex!important;align-items:center;justify-content:center;padding:8px 13px;border-radius:999px;background:rgba(248,200,74,.14);border:1px solid rgba(248,200,74,.34);color:#fff3a2;font-weight:1000;font-size:13px}
+@media(max-width:760px){.champion-reveal-v68{min-height:0!important;padding:18px 12px!important}.champion-stars{font-size:18px}.champion-reveal-v68 .champion-first-kicker{font-size:12px!important}.champion-player-line{font-size:14px}.champion-reveal-v68 .champion-first-team{font-size:30px!important;gap:10px!important;flex-direction:column!important}.champion-reveal-v68 .champion-first-team .flag-img{width:78px!important;height:54px!important}.champion-fact-card{padding:11px 12px}.champion-popularity{font-size:12px}}
 </style>

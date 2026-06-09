@@ -1,3 +1,3 @@
-# FIFA World Cup 2026 Prediction Challenge - V67
+# FIFA World Cup 2026 Prediction Challenge - V68
 
-V67 centres all page header bubbles consistently across desktop and mobile, centres the Results Centre player dropdown and dropdown names, and adds a champion-first summary bubble when viewing a selected player.
+V68 upgrades the Results Centre champion card into a premium winner reveal with trophy/crown styling, a country-specific World Cup fact, and champion-pick popularity insight.
