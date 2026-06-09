@@ -1,10 +1,12 @@
-# FIFA World Cup 2026 Prediction Challenge - V78
+# FIFA World Cup 2026 Prediction Challenge - V79
 
-V78 builds from the uploaded V77 base and includes:
-- Removed the landing-page LEGO trophy person icon.
-- Added legal-safe World Cup themed visual badges instead of using official FIFA logos.
-- Added Thomas Edwards and John M to the Family League override list.
-- Removed the Exact Score Twins Fun Stats badge.
-- Reworked the Results ticker into a Sky Sports-style broadcast mix: 25% World Cup headlines, 50% prediction-game insights, 25% latest-entry breaking news.
-- Slowed the ticker significantly again for readability on desktop and mobile.
-- Kept ticker pause on hover/touch.
+V79 focuses on Results Centre data integrity.
+
+Changes:
+- Rebuilt knockout-stage Results Centre mapping from the saved knockout path.
+- Removed unsafe fallback to local browser bracket state when displaying another player.
+- Champion is now taken from saved FINAL pick / saved predicted winner only.
+- Round of 16, Quarter-finals, Semi-finals, Finalists and Champion now follow the saved bracket path consistently.
+- Added a Results Centre integrity audit warning in the console for impossible combinations.
+- Future saved predictions now include a full `bracket` snapshot as well as `knockoutPicks`.
+- Version metadata updated to `v79-results-integrity`.

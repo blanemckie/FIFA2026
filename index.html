@@ -3224,57 +3224,94 @@ function roundOf32TeamsFromSubmission(groups){
   (ko||[]).forEach(m=>{teams.push(teamFromSlotForSubmission(m.homeSlot,tables,pool));teams.push(teamFromSlotForSubmission(m.awaySlot,tables,pool));});
   return uniqueTeams(teams).slice(0,32);
 }
+function pickValueFromSaved(k){
+  return k?.selectedTeam || k?.team || k?.winner || k?.value || k?.pick || k?.name || '';
+}
+function savedMatchId(k){
+  return String(k?.matchId || k?.id || '').trim();
+}
+function savedKnockoutMap(rawKnockouts, bracketSource){
+  const map={};
+  (rawKnockouts||[]).forEach(k=>{
+    const id=savedMatchId(k);
+    const team=pickValueFromSaved(k);
+    if(id && team) map[id]=team;
+  });
+  Object.entries(bracketSource||{}).forEach(([id,team])=>{
+    if(id && team && !map[id]) map[id]=team;
+  });
+  return map;
+}
+function teamsFromSavedIds(map, predicate, limit){
+  return uniqueTeams(Object.entries(map)
+    .filter(([id])=>predicate(String(id)))
+    .sort(([a],[b])=>String(a).localeCompare(String(b), undefined, {numeric:true, sensitivity:'base'}))
+    .map(([,team])=>team)
+  ).slice(0,limit);
+}
+function championFromSubmission(entry, rawKnockouts, bracketSource){
+  const map=savedKnockoutMap(rawKnockouts, bracketSource);
+  return map['FINAL-1'] || map['FINAL'] || entry.predictedWinner || entry.champion || entry.winner || '';
+}
 function stageTeamsFromSubmission(entry,groups,rawKnockouts,bracketSource,champion){
+  // V79 DATA INTEGRITY FIX:
+  // Results Centre must use the saved knockout path, not recalculate/fallback to local state.
+  // Saved match ids represent the team progressing into the next stage:
+  // M73-M88 -> Round of 16 teams, R16-* -> Quarter-final teams, QF-* -> Semi-final teams,
+  // SF-* -> Finalists, FINAL-* -> Champion.
+  const map=savedKnockoutMap(rawKnockouts, bracketSource);
   const stages={
     'Round of 32 Picks': roundOf32TeamsFromSubmission(groups),
-    'Round of 16 Picks': [],
-    'Quarter-final Picks': [],
-    'Semi-final Picks': [],
-    'Finalists': []
+    'Round of 16 Picks': teamsFromSavedIds(map, id=>/^M\d+$/i.test(id), 16),
+    'Quarter-final Picks': teamsFromSavedIds(map, id=>/^R16-/i.test(id), 8),
+    'Semi-final Picks': teamsFromSavedIds(map, id=>/^QF-/i.test(id), 4),
+    'Finalists': teamsFromSavedIds(map, id=>/^SF-/i.test(id), 2)
   };
-  const add=(label,team)=>{ if(team && stages[label]) stages[label].push(team); };
-  (rawKnockouts||[]).forEach(k=>{
-    const matchId=String(k.matchId||k.id||'');
-    const selectedTeam=k.selectedTeam||k.team||k.winner||k.value||k.pick;
-    add(roundLabelForPick({matchId, round:k.round}), selectedTeam);
-  });
-  Object.entries(bracketSource||{}).forEach(([matchId,selectedTeam])=>add(roundLabelForPick({matchId}), selectedTeam));
-  // Legacy fallback: if a saved entry contains already-grouped arrays, merge those too.
+
+  // Legacy fallback only if the authoritative saved path is genuinely absent.
   const direct={
-    'Round of 32 Picks': entry.roundOf32 || entry.r32 || entry.round32,
     'Round of 16 Picks': entry.roundOf16 || entry.r16 || entry.round16,
     'Quarter-final Picks': entry.quarterFinals || entry.qf || entry.quarterFinalists,
     'Semi-final Picks': entry.semiFinals || entry.sf || entry.semiFinalists,
     'Finalists': entry.finalists || entry.final || entry.finalPicks
   };
   Object.entries(direct).forEach(([label,value])=>{
-    if(Array.isArray(value)) value.forEach(v=>add(label, v.selectedTeam||v.team||v.name||v));
+    if((stages[label]||[]).length) return;
+    if(Array.isArray(value)) stages[label]=uniqueTeams(value.map(v=>v?.selectedTeam||v?.team||v?.name||v)).slice(0,maxTeamsForStage(label));
   });
-  Object.keys(stages).forEach(label=>{stages[label]=uniqueTeams(stages[label]).slice(0,maxTeamsForStage(label));});
-  // Derive later stages from earlier picks if needed, matching the scoring count.
-  if(stages['Round of 16 Picks'].length<16 && rawKnockouts?.length){
-    stages['Round of 16 Picks']=uniqueTeams(rawKnockouts.filter(k=>/^m\d+$/i.test(String(k.matchId||''))).map(k=>k.selectedTeam||k.team||k.winner||k.value||k.pick)).slice(0,16);
+
+  // Final integrity guard: impossible combinations should be reported and fixed only when the saved path allows it.
+  const champ=champion || championFromSubmission(entry, rawKnockouts, bracketSource);
+  const auditProblems=[];
+  if(champ && stages['Finalists'].length && !stages['Finalists'].some(t=>String(t).toLowerCase()===String(champ).toLowerCase())){
+    auditProblems.push(`Champion ${champ} is missing from finalists`);
   }
-  if(stages['Quarter-final Picks'].length<8 && rawKnockouts?.length){
-    stages['Quarter-final Picks']=uniqueTeams(rawKnockouts.filter(k=>String(k.matchId||'').toLowerCase().startsWith('r16')).map(k=>k.selectedTeam||k.team||k.winner||k.value||k.pick)).slice(0,8);
+  if(stages['Finalists'].length && stages['Semi-final Picks'].length){
+    stages['Finalists'].forEach(t=>{
+      if(!stages['Semi-final Picks'].some(x=>String(x).toLowerCase()===String(t).toLowerCase())) auditProblems.push(`Finalist ${t} is missing from semi-final picks`);
+    });
   }
-  if(stages['Semi-final Picks'].length<4 && rawKnockouts?.length){
-    stages['Semi-final Picks']=uniqueTeams(rawKnockouts.filter(k=>String(k.matchId||'').toLowerCase().startsWith('qf')).map(k=>k.selectedTeam||k.team||k.winner||k.value||k.pick)).slice(0,4);
+  if(stages['Semi-final Picks'].length && stages['Quarter-final Picks'].length){
+    stages['Semi-final Picks'].forEach(t=>{
+      if(!stages['Quarter-final Picks'].some(x=>String(x).toLowerCase()===String(t).toLowerCase())) auditProblems.push(`Semi-finalist ${t} is missing from quarter-final picks`);
+    });
   }
-  if(stages['Finalists'].length<2 && rawKnockouts?.length){
-    stages['Finalists']=uniqueTeams(rawKnockouts.filter(k=>String(k.matchId||'').toLowerCase().startsWith('sf')).map(k=>k.selectedTeam||k.team||k.winner||k.value||k.pick)).slice(0,2);
+  if(stages['Quarter-final Picks'].length && stages['Round of 16 Picks'].length){
+    stages['Quarter-final Picks'].forEach(t=>{
+      if(!stages['Round of 16 Picks'].some(x=>String(x).toLowerCase()===String(t).toLowerCase())) auditProblems.push(`Quarter-finalist ${t} is missing from round-of-16 picks`);
+    });
   }
-  if(stages['Finalists'].length<2 && stages['Semi-final Picks'].length>=2){
-    stages['Finalists']=stages['Semi-final Picks'].slice(0,2);
-  }
+  entry.__resultsAuditProblems=auditProblems;
+  if(auditProblems.length) console.warn('Results Centre integrity audit warning for', entry.name || entry.email || 'submission', auditProblems, {map, stages, champion:champ});
   return stages;
 }
+
 function renderSubmissionDetail(entry){
   const box=$('#submissionSummary');
   const groups=(entry.groupPredictions&&entry.groupPredictions.length?entry.groupPredictions:groupPredictionPayload()).slice(0,72);
   const rawKnockouts=(entry.knockoutPicks&&entry.knockoutPicks.length?entry.knockoutPicks:[]);
   const bracketSource=entry.bracket || entry.state?.bracket || {};
-  const champion=entry.predictedWinner||entry.champion||entry.winner||bracketSource['FINAL-1']||state.bracket['FINAL-1']||'Not selected yet';
+  const champion=championFromSubmission(entry, rawKnockouts, bracketSource) || 'Not selected yet';
   const stageTeams=stageTeamsFromSubmission(entry,groups,rawKnockouts,bracketSource,champion);
   let rows=[];
   let runningMax=0;
@@ -3527,7 +3564,7 @@ $('#lockBtn').addEventListener('click',async()=>{
   if(!validateFullPredictionBeforeLock()) return;
   if(!confirm('Are you sure you want to lock your predictions? You will not be able to change them after submitting.')) return;
   try{
-    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v78-broadcast-edition' };
+    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), bracket:{...state.bracket}, predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v79-results-integrity' };
     if(window.saveFullPredictionToFirebase){
       await window.saveFullPredictionToFirebase(payload);
       $('#lockStatus').textContent='✓ Full tournament prediction saved to Firebase predictions.';
