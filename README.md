@@ -1,3 +1,3 @@
-# FIFA World Cup 2026 Prediction Challenge - V70
+# FIFA World Cup 2026 Prediction Challenge - V71
 
-V70 polishes title-case consistency across pages and expands the Fun Stats page. Fun Stats cards now include short descriptions, clearer percentage placement, rounded total-goal logic, a Lowest Scoring Match card, and renamed the low-goals player stat to Cautious Conservative.
+V71 adds the Family League alongside Main and LEGO, with manual name-based overrides for Danielle, Hayley, George, Henry, Lorraine, Ted, Maeve and Lou/Louise. Live Table now includes All, Main, LEGO and Family league badges and filters.
