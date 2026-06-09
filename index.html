@@ -105,6 +105,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 .league-controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 0 16px}.league-filter{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:10px 14px;font-weight:1000;cursor:pointer}.league-filter.active{background:linear-gradient(135deg,var(--gold),#fff3a2);color:#071633;border-color:transparent}.league-table{width:100%;border-collapse:separate;border-spacing:0 10px}.league-table th{text-align:left;color:#fff3a2;text-transform:uppercase;font-size:12px;letter-spacing:.08em;padding:0 12px}.league-table th:last-child,.league-table td:last-child{text-align:right}.league-table td{background:rgba(255,255,255,.075);border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12);padding:14px 12px;font-weight:850}.league-table td:first-child{border-left:1px solid rgba(255,255,255,.12);border-radius:16px 0 0 16px;color:#fff3a2;font-weight:1000}.league-table td:last-child{border-right:1px solid rgba(255,255,255,.12);border-radius:0 16px 16px 0;font-weight:1000}.league-type{display:inline-flex;border-radius:999px;padding:7px 10px;background:rgba(55,212,255,.12);border:1px solid rgba(55,212,255,.26);color:#bdf3ff;font-size:12px;font-weight:1000}.league-type.lego{background:rgba(248,200,74,.14);border-color:rgba(248,200,74,.35);color:#fff3a2}
 /* V71: Family League support */
 .league-type.family{background:rgba(186,104,255,.16)!important;border-color:rgba(186,104,255,.38)!important;color:#ead5ff!important}
+.league-type.allleague{background:linear-gradient(135deg,rgba(248,200,74,.28),rgba(55,212,255,.15))!important;border-color:rgba(248,200,74,.55)!important;color:#fff3a2!important}
 .league-controls.upgraded .league-filter[data-league-filter="Family"]{border-color:rgba(186,104,255,.28)!important}
 .live-table-summary.v71-four{grid-template-columns:repeat(4,minmax(0,1fr))!important}
 @media(max-width:900px){.live-table-summary.v71-four{grid-template-columns:repeat(2,minmax(0,1fr))!important}.league-controls.upgraded{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
@@ -2739,7 +2740,8 @@ function championPopularity(team){
   const pct=total?Math.round((count/total)*100):0;
   return total?`Picked by ${count} player${count===1?'':'s'} (${pct}%)`:'Popularity updates once entries are locked.';
 }
-const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise'];
+const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh'];
+const allLeagueNames = ['Blane McKie'];
 function normalisePersonName(name){return String(name||'').trim().toLowerCase().replace(/\s+/g,' ');}
 function isFamilyLeagueName(name){
   const cleaned=normalisePersonName(name);
@@ -2749,17 +2751,23 @@ function isFamilyLeagueName(name){
     return cleaned===target || first===target;
   });
 }
+function isAllLeagueName(name){
+  const cleaned=normalisePersonName(name);
+  return allLeagueNames.some(n=>cleaned===normalisePersonName(n));
+}
 function leagueFor(email,name=''){
   if(isFamilyLeagueName(name)) return 'Family';
   return String(email||'').toLowerCase().endsWith('@lego.com')?'LEGO':'Main';
 }
-function leagueLabel(value){
+function leagueLabel(value, name=''){
+  if(isAllLeagueName(name)) return '👑 All Leagues';
   const l=normaliseLeague(value);
   if(l==='LEGO') return '🧱 LEGO Entry';
   if(l==='Family') return '🏡 Family Entry';
   return '🌍 Main Entry';
 }
-function leagueClass(value){
+function leagueClass(value, name=''){
+  if(isAllLeagueName(name)) return 'allleague';
   const l=normaliseLeague(value);
   if(l==='LEGO') return 'lego';
   if(l==='Family') return 'family';
@@ -2888,13 +2896,13 @@ function getEntryRows(){
   rows.forEach(r=>{
     const key=(r.email||r.name||Math.random()).toString().toLowerCase();
     const existing=byName.get(key)||{};
-    byName.set(key,{...existing,...r, league:normaliseLeague(isFamilyLeagueName(r.name||existing.name)?'Family':(r.league||existing.league)), totalPoints:r.totalPoints||existing.totalPoints||0});
+    byName.set(key,{...existing,...r, league:normaliseLeague(isFamilyLeagueName(r.name||existing.name)?'Family':(r.league||existing.league)), allLeagues:isAllLeagueName(r.name||existing.name), totalPoints:r.totalPoints||existing.totalPoints||0});
   });
   return [...byName.values()].filter(r=>r.name).sort((a,b)=>(b.totalPoints||0)-(a.totalPoints||0)||String(a.name).localeCompare(String(b.name)));
 }
 function renderLeaderboard(){
   const allRows=getEntryRows();
-  const filtered=currentLeagueFilter==='All'?allRows:allRows.filter(r=>normaliseLeague(r.league)===currentLeagueFilter);
+  const filtered=currentLeagueFilter==='All'?allRows:allRows.filter(r=>r.allLeagues || normaliseLeague(r.league)===currentLeagueFilter);
   $$('.league-filter').forEach(btn=>btn.classList.toggle('active',btn.dataset.leagueFilter===currentLeagueFilter));
   const total=allRows.length;
   const lego=allRows.filter(r=>normaliseLeague(r.league)==='LEGO').length;
@@ -2902,7 +2910,7 @@ function renderLeaderboard(){
   const main=allRows.filter(r=>normaliseLeague(r.league)==='Main').length;
   const summary=`<div class="live-summary live-table-summary v71-four"><div class="summary-tile"><b>${total}</b><span>🏆 All Leagues</span></div><div class="summary-tile"><b>${main}</b><span>🌍 Main League</span></div><div class="summary-tile"><b>${lego}</b><span>🧱 LEGO League</span></div><div class="summary-tile"><b>${family}</b><span>🏡 Family League</span></div></div>`;
   if(!filtered.length){$('#leaderboardList').innerHTML=summary+'<div class="empty-state">No entries for this league yet.</div>';return;}
-  const table=`<table class="league-table upgraded-table"><thead><tr><th>Rank</th><th>Player</th><th>Entry</th><th>Total Points</th></tr></thead><tbody>${filtered.map((r,i)=>`<tr><td data-label="Rank"><span class="rank-badge">${i+1}</span></td><td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span></td><td data-label="Entry"><span class="league-type ${leagueClass(r.league)}">${leagueLabel(r.league)}</span></td><td data-label="Total Points"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td></tr>`).join('')}</tbody></table>`;
+  const table=`<table class="league-table upgraded-table"><thead><tr><th>Rank</th><th>Player</th><th>Entry</th><th>Total Points</th></tr></thead><tbody>${filtered.map((r,i)=>`<tr><td data-label="Rank"><span class="rank-badge">${i+1}</span></td><td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span></td><td data-label="Entry"><span class="league-type ${leagueClass(r.league,r.name)}">${leagueLabel(r.league,r.name)}</span></td><td data-label="Total Points"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td></tr>`).join('')}</tbody></table>`;
   $('#leaderboardList').innerHTML=summary+table;
 }
 $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagueFilter=btn.dataset.leagueFilter;renderLeaderboard();}));
@@ -3210,7 +3218,7 @@ $('#lockBtn').addEventListener('click',async()=>{
   if(!validateFullPredictionBeforeLock()) return;
   if(!confirm('Are you sure you want to lock your predictions? You will not be able to change them after submitting.')) return;
   try{
-    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v71-family-leagues' };
+    const payload={user:state.user, groupPredictions:groupPredictionPayload(), knockoutPicks:knockoutPredictionPayload(), predictedWinner:state.bracket['FINAL-1']||null, submittedAtLocal:new Date().toISOString(), locked:true, lockedAtLocal:new Date().toISOString(), submissionStatus:'locked', version:'v72-family-organiser-leagues' };
     if(window.saveFullPredictionToFirebase){
       await window.saveFullPredictionToFirebase(payload);
       $('#lockStatus').textContent='✓ Full tournament prediction saved to Firebase predictions.';
@@ -3265,7 +3273,7 @@ window.savePlayerEntryToFirebase = async function({name,email,league}){
     league: leagueFor(cleanEmail, name),
     createdAt: serverTimestamp(),
     source: "github-pages-production",
-    version: "v71-family-leagues",
+    version: "v72-family-organiser-leagues",
     registrationStatus: "started",
     locked: false
   };
@@ -3285,7 +3293,7 @@ window.saveFullPredictionToFirebase = async function(payload){
     league: leagueFor(cleanEmail, payload.user.name),
     createdAt: serverTimestamp(),
     source: "github-pages-production",
-    version: "v71-family-leagues",
+    version: "v72-family-organiser-leagues",
     locked: true,
     lockedAtLocal: payload.lockedAtLocal || null,
     lockedAt: serverTimestamp(),

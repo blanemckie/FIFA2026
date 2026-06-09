@@ -1,3 +1,3 @@
-# FIFA World Cup 2026 Prediction Challenge - V71
+# FIFA World Cup 2026 Prediction Challenge - V72
 
-V71 adds the Family League alongside Main and LEGO, with manual name-based overrides for Danielle, Hayley, George, Henry, Lorraine, Ted, Maeve and Lou/Louise. Live Table now includes All, Main, LEGO and Family league badges and filters.
+V72 adds Family League overrides for Danielle, Hayley, George, Henry, Lorraine, Ted, Maeve, Lou, Ant and Patrick Kavanagh, plus an organiser override so Blane McKie appears across All, Main, LEGO and Family league views.
