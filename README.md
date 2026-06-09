@@ -1,3 +1,3 @@
-# FIFA World Cup 2026 Prediction Challenge - V69
+# FIFA World Cup 2026 Prediction Challenge - V70
 
-V69 fixes Champion Pick flag rendering, adds a subtle animated gold glow to the champion card, and expands the Fun Stats page with clearer percentage-based insights, total group-stage goals logic, Most Common Scoreline, Highest Scoring Match, Dark Horse Champion, Ultimate Optimist and Ultimate Pessimist.
+V70 polishes title-case consistency across pages and expands the Fun Stats page. Fun Stats cards now include short descriptions, clearer percentage placement, rounded total-goal logic, a Lowest Scoring Match card, and renamed the low-goals player stat to Cautious Conservative.

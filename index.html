@@ -3021,11 +3021,11 @@ function renderFunStats(){
   const goalRows=withPred.map(s=>({name:s.name||'Unknown', goals:totalGoals(s)})).filter(r=>Number.isFinite(r.goals)).sort((a,b)=>b.goals-a.goals);
   const lowGoalRows=[...goalRows].sort((a,b)=>a.goals-b.goals);
   const avgPlayerGoals = goalRows.length ? goalRows.reduce((a,b)=>a+b.goals,0)/goalRows.length : 0;
-  const diffCopy=(goals)=>{
-    if(!avgPlayerGoals) return `${goals} total group-stage goals predicted`;
+  const goalsAndDiffCopy=(goals)=>{
+    if(!avgPlayerGoals) return `<span>${goals} Total Goals Predicted</span>`;
     const diff=((goals-avgPlayerGoals)/avgPlayerGoals)*100;
     const sign=diff>=0?'+':'';
-    return `${goals} total goals · ${sign}${Math.round(diff)}% vs player average`;
+    return `<span>${goals} Total Goals Predicted</span><span>${sign}${Math.round(diff)}% vs Player Average</span>`;
   };
 
   const teamTotalsFor={};
@@ -3065,36 +3065,41 @@ function renderFunStats(){
     });
   });
 
-  function topTeamByAverage(totalObj,countObj){
+  function topTeamByAverage(totalObj,countObj,asc=false){
     return Object.keys(totalObj).map(team=>({
       team,
       avg: countObj[team] ? totalObj[team]/countObj[team] : 0,
       picked: countObj[team] || 0,
       total: totalObj[team] || 0
-    })).sort((a,b)=>b.avg-a.avg || b.picked-a.picked || a.team.localeCompare(b.team))[0];
+    })).sort((a,b)=> asc ? (a.avg-b.avg || b.picked-a.picked || a.team.localeCompare(b.team)) : (b.avg-a.avg || b.picked-a.picked || a.team.localeCompare(b.team)))[0];
   }
   const topScoringTeam=topTeamByAverage(teamTotalsFor,teamSubmissionsFor);
   const topConcedingTeam=topTeamByAverage(teamTotalsAgainst,teamSubmissionsAgainst);
   const commonScoreline=Object.entries(scorelines).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0]))[0];
-  const highestMatch=Object.values(matchTotals).map(m=>({...m,avg:m.count?m.total/m.count:0})).sort((a,b)=>b.avg-a.avg || a.home.localeCompare(b.home))[0];
+  const matchAverages=Object.values(matchTotals).map(m=>({...m,avg:m.count?m.total/m.count:0}));
+  const highestMatch=matchAverages.sort((a,b)=>b.avg-a.avg || a.home.localeCompare(b.home))[0];
+  const lowestMatch=[...matchAverages].sort((a,b)=>a.avg-b.avg || a.home.localeCompare(b.home))[0];
   const darkHorse=Object.entries(championCounts).filter(([team,count])=>count>0).sort((a,b)=>a[1]-b[1] || a[0].localeCompare(b[0]))[0];
 
-  const avgTeamCopy=(row,type)=> row ? `${row.avg.toFixed(1)} avg group-stage ${type} · ${pct(row.picked)} of players` : 'Updates from locked group-stage predictions';
-  const scorelineCopy=commonScoreline ? `${commonScoreline[1]} pick${commonScoreline[1]===1?'':'s'} · ${pct(commonScoreline[1],predictionCount)} of all score predictions` : 'Most frequent submitted group-stage score';
-  const highestMatchValue=highestMatch ? `${teamLabel(highestMatch.home)} <span class="score-sep">v</span> ${teamLabel(highestMatch.away)}` : 'Waiting';
-  const highestMatchCopy=highestMatch ? `${highestMatch.avg.toFixed(1)} average total goals predicted` : 'Highest average goals across a fixture';
+  const teamAvgCopy=(row,type)=> row ? `<span>${Math.round(row.avg)} Average Total Group Goals ${type}</span>` : 'Updates from locked group-stage predictions';
+  const championCopy=topWinner ? `<span>${topWinner[1]} Champion Pick${topWinner[1]===1?'':'s'}</span><span>${pct(topWinner[1])} of Players</span>` : 'Submit predictions to unlock this stat';
+  const scorelineCopy=commonScoreline ? `<span>${commonScoreline[1]} Pick${commonScoreline[1]===1?'':'s'}</span><span>${pct(commonScoreline[1],predictionCount)} of All Score Predictions</span>` : 'Most frequent submitted group-stage score';
+  const matchValue=(match)=> match ? `${teamLabel(match.home)} <span class="score-sep">v</span> ${teamLabel(match.away)}` : 'Waiting';
+  const highestMatchCopy=highestMatch ? `<span>${highestMatch.avg.toFixed(1)} Average Total Goals</span>` : 'Highest average goals across a fixture';
+  const lowestMatchCopy=lowestMatch ? `<span>${lowestMatch.avg.toFixed(1)} Average Total Goals</span>` : 'Lowest average goals across a fixture';
 
   const statCards=[
-    {icon:'🏆',title:'Most Popular Champion',value:topWinner?teamLabel(topWinner[0]):'Waiting',copy:topWinner?`${topWinner[1]} champion pick${topWinner[1]===1?'':'s'} · ${pct(topWinner[1])} of players`:'Submit predictions to unlock this stat'},
-    {icon:'⚽',title:'Goal Machine',value:topScoringTeam?teamLabel(topScoringTeam.team):'Waiting',copy:avgTeamCopy(topScoringTeam,'goals scored')},
-    {icon:'🧤',title:'Leaky Defence',value:topConcedingTeam?teamLabel(topConcedingTeam.team):'Waiting',copy:avgTeamCopy(topConcedingTeam,'goals conceded')},
-    {icon:'🎯',title:'Most Common Scoreline',value:commonScoreline?commonScoreline[0]:'Waiting',copy:scorelineCopy},
-    {icon:'🔥',title:'Highest Scoring Match',value:highestMatchValue,copy:highestMatchCopy},
-    {icon:'🤠',title:'Dark Horse Champion',value:darkHorse?teamLabel(darkHorse[0]):'Waiting',copy:darkHorse?`${darkHorse[1]} player${darkHorse[1]===1?'':'s'} backed them · ${pct(darkHorse[1])}`:'Lowest-backed champion pick'},
-    {icon:'😎',title:'Ultimate Optimist',value:goalRows[0]?goalRows[0].name:'Waiting',copy:goalRows[0]?diffCopy(goalRows[0].goals):'Believes we are in for a goal-fest'},
-    {icon:'😬',title:'Ultimate Pessimist',value:lowGoalRows[0]?lowGoalRows[0].name:'Waiting',copy:lowGoalRows[0]?diffCopy(lowGoalRows[0].goals):'Expecting a lot of cagey football'}
+    {icon:'🏆',title:'Most Popular Champion',desc:'The team backed by the most players to win the tournament.',value:topWinner?teamLabel(topWinner[0]):'Waiting',copy:championCopy},
+    {icon:'⚽',title:'Goal Machine',desc:'The team predicted to score the most total group-stage goals.',value:topScoringTeam?teamLabel(topScoringTeam.team):'Waiting',copy:teamAvgCopy(topScoringTeam,'Scored')},
+    {icon:'🧤',title:'Leaky Defence',desc:'The team predicted to concede the most total group-stage goals.',value:topConcedingTeam?teamLabel(topConcedingTeam.team):'Waiting',copy:teamAvgCopy(topConcedingTeam,'Conceded')},
+    {icon:'🎯',title:'Most Common Scoreline',desc:'The scoreline appearing most often across all group predictions.',value:commonScoreline?commonScoreline[0]:'Waiting',copy:scorelineCopy},
+    {icon:'🔥',title:'Highest Scoring Match',desc:'The fixture expected to deliver the biggest goal-fest.',value:matchValue(highestMatch),copy:highestMatchCopy},
+    {icon:'😴',title:'Lowest Scoring Match',desc:'The fixture expected to be the tightest or cageiest.',value:matchValue(lowestMatch),copy:lowestMatchCopy},
+    {icon:'🤠',title:'Dark Horse Champion',desc:'The least-backed team that at least one player thinks can win it all.',value:darkHorse?teamLabel(darkHorse[0]):'Waiting',copy:darkHorse?`<span>${darkHorse[1]} Player${darkHorse[1]===1?'':'s'} Backed Them</span><span>${pct(darkHorse[1])} of Players</span>`:'Lowest-backed champion pick'},
+    {icon:'😎',title:'Ultimate Optimist',desc:'The player predicting the most goals across the group stage.',value:goalRows[0]?goalRows[0].name:'Waiting',copy:goalRows[0]?goalsAndDiffCopy(goalRows[0].goals):'Believes we are in for a goal-fest'},
+    {icon:'🧘',title:'Cautious Conservative',desc:'The player predicting the fewest goals across the group stage.',value:lowGoalRows[0]?lowGoalRows[0].name:'Waiting',copy:lowGoalRows[0]?goalsAndDiffCopy(lowGoalRows[0].goals):'Expecting a lot of cagey football'}
   ];
-  grid.innerHTML=statCards.map(c=>`<article class="stat-bubble stat-bubble-v69 ${c.title.includes('Optimist')?'optimist-stat':c.title.includes('Pessimist')?'pessimist-stat':''}"><div class="stat-icon">${c.icon}</div><div class="stat-title">${c.title}</div><div class="stat-value">${c.value}</div><div class="stat-copy">${c.copy}</div></article>`).join('');
+  grid.innerHTML=statCards.map(c=>`<article class="stat-bubble stat-bubble-v69 stat-bubble-v70 ${c.title.includes('Optimist')?'optimist-stat':c.title.includes('Conservative')?'pessimist-stat':''}"><div class="stat-icon">${c.icon}</div><div class="stat-title">${c.title}</div><div class="stat-desc">${c.desc}</div><div class="stat-value">${c.value}</div><div class="stat-copy">${c.copy}</div></article>`).join('');
 }
 
 function updateWinnerReveal(){
@@ -3800,4 +3805,72 @@ onSnapshot(collection(db, "predictions"), (snapshot) => {
 .champion-reveal-v68:before{left:-70px;top:-80px}.champion-reveal-v68:after{right:-70px;bottom:-85px;background:rgba(55,212,255,.10)}
 .champion-reveal-v68>*{position:relative;z-index:1}.champion-stars{font-size:22px;letter-spacing:.28em;filter:drop-shadow(0 8px 16px rgba(0,0,0,.28))}.champion-reveal-v68 .champion-first-kicker{font-size:15px!important;letter-spacing:.16em!important;color:#fff3a2!important}.champion-player-line{color:#eaf2ff;font-weight:1000;text-align:center;font-size:clamp(15px,2vw,20px);line-height:1.25}.champion-reveal-v68 .champion-first-team{font-size:clamp(34px,5vw,70px)!important;gap:18px!important;color:#fff!important;text-shadow:0 12px 28px rgba(0,0,0,.34)}.champion-reveal-v68 .champion-first-team .flag-img{width:86px!important;height:60px!important;border-radius:12px!important;box-shadow:0 16px 30px rgba(0,0,0,.34)}.champion-fact-card{width:min(760px,96%);margin:6px auto 0;padding:13px 16px;border-radius:18px;background:rgba(4,17,45,.54);border:1px solid rgba(255,255,255,.16);display:grid;gap:5px}.champion-fact-card strong{color:#fff3a2;font-weight:1000;text-transform:uppercase;letter-spacing:.08em;font-size:12px}.champion-fact-card span{color:#dce9ff;font-weight:850;line-height:1.35}.champion-popularity{display:inline-flex!important;align-items:center;justify-content:center;padding:8px 13px;border-radius:999px;background:rgba(248,200,74,.14);border:1px solid rgba(248,200,74,.34);color:#fff3a2;font-weight:1000;font-size:13px}
 @media(max-width:760px){.champion-reveal-v68{min-height:0!important;padding:18px 12px!important}.champion-stars{font-size:18px}.champion-reveal-v68 .champion-first-kicker{font-size:12px!important}.champion-player-line{font-size:14px}.champion-reveal-v68 .champion-first-team{font-size:30px!important;gap:10px!important;flex-direction:column!important}.champion-reveal-v68 .champion-first-team .flag-img{width:78px!important;height:54px!important}.champion-fact-card{padding:11px 12px}.champion-popularity{font-size:12px}}
+</style>
+
+<style>
+/* V70: title-case consistency and expanded Fun Stats polish */
+.premium-page-title,
+.section-title,
+.stage-head h3,
+.stage-divider,
+.stage-divider-v51,
+.results-grid-header>div,
+.stat-title,
+.picker-label,
+.league-filter,
+.group-tag,
+.metric-pill,
+.build-table th,
+.prediction-table th,
+.league-table th{
+  text-transform:none!important;
+}
+.stat-bubble-v70{
+  text-align:center!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  min-height:210px!important;
+  padding:18px 14px!important;
+}
+.stat-bubble-v70 .stat-title{
+  min-height:auto!important;
+  font-size:16px!important;
+  letter-spacing:0!important;
+  line-height:1.16!important;
+  margin:0!important;
+  display:block!important;
+}
+.stat-bubble-v70 .stat-desc{
+  color:#cfe0ff!important;
+  font-size:12px!important;
+  line-height:1.25!important;
+  font-weight:800!important;
+  max-width:230px!important;
+  margin:0 auto!important;
+}
+.stat-bubble-v70 .stat-value{
+  margin-top:3px!important;
+  text-align:center!important;
+  justify-content:center!important;
+}
+.stat-bubble-v70 .stat-copy{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  gap:3px!important;
+  text-align:center!important;
+  font-size:12px!important;
+  line-height:1.22!important;
+  font-weight:900!important;
+}
+.stat-bubble-v70 .stat-copy span:first-child{color:#eaf2ff!important;}
+.stat-bubble-v70 .stat-copy span:last-child{color:#fff3a2!important;}
+@media(max-width:640px){
+  .stat-bubble-v70{min-height:178px!important;padding:15px 12px!important;}
+  .stat-bubble-v70 .stat-title{font-size:15px!important;}
+  .stat-bubble-v70 .stat-desc{font-size:11.5px!important;}
+}
 </style>
