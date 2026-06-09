@@ -1,3 +1,3 @@
-# FIFA World Cup 2026 Prediction Challenge - V68
+# FIFA World Cup 2026 Prediction Challenge - V69
 
-V68 upgrades the Results Centre champion card into a premium winner reveal with trophy/crown styling, a country-specific World Cup fact, and champion-pick popularity insight.
+V69 fixes Champion Pick flag rendering, adds a subtle animated gold glow to the champion card, and expands the Fun Stats page with clearer percentage-based insights, total group-stage goals logic, Most Common Scoreline, Highest Scoring Match, Dark Horse Champion, Ultimate Optimist and Ultimate Pessimist.

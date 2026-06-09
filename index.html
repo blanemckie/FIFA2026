@@ -1595,6 +1595,61 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   }
 }
 
+
+
+/* V69: champion flag integrity, animated glow and expanded fun facts */
+.champion-reveal-v68{
+  padding:18px 16px!important;
+  min-height:0!important;
+  animation:championGlowV69 3.2s ease-in-out infinite!important;
+}
+@keyframes championGlowV69{
+  0%,100%{box-shadow:0 0 24px rgba(248,200,74,.18),0 20px 48px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.14)}
+  50%{box-shadow:0 0 46px rgba(248,200,74,.42),0 24px 60px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.18)}
+}
+.champion-reveal-v68 .champion-first-team{
+  gap:14px!important;
+  flex-wrap:wrap!important;
+}
+.champion-reveal-v68 .champion-first-team .flag-img{
+  width:92px!important;
+  height:62px!important;
+  min-width:92px!important;
+  object-fit:contain!important;
+  background:rgba(255,255,255,.95)!important;
+  padding:3px!important;
+  border-radius:14px!important;
+}
+.champion-reveal-v68 .champion-fact-card{max-width:680px!important;}
+.stat-bubble-v69{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  gap:8px!important;
+  min-height:178px!important;
+}
+.stat-bubble-v69 .stat-value{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  text-align:center!important;
+}
+.stat-bubble-v69 .stat-value .team-name{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;}
+.stat-bubble-v69 .stat-value .flag-img{width:36px!important;height:25px!important;object-fit:cover!important;}
+.stat-bubble-v69 .score-sep{color:#fff3a2!important;font-weight:1000!important;margin:0 2px!important;}
+.optimist-stat{border-color:rgba(248,200,74,.42)!important;background:linear-gradient(180deg,rgba(248,200,74,.18),rgba(255,255,255,.07))!important;}
+.pessimist-stat{border-color:rgba(55,212,255,.36)!important;background:linear-gradient(180deg,rgba(55,212,255,.14),rgba(255,255,255,.06))!important;}
+@media(max-width:760px){
+  .champion-reveal-v68{padding:15px 12px!important;}
+  .champion-reveal-v68 .champion-first-team{font-size:32px!important;gap:8px!important;}
+  .champion-reveal-v68 .champion-first-team .flag-img{width:76px!important;height:52px!important;min-width:76px!important;}
+  .stat-bubble-v69{min-height:142px!important;}
+}
+
 </style>
 <!-- V49 emergency layout repair: restore fixture/result row alignment after header changes -->
 <style>
@@ -2948,65 +3003,98 @@ function renderFunStats(){
   const grid=$('#funStatsGrid');
   if(!grid) return;
   const submissions=(window.firebaseSubmissions&&window.firebaseSubmissions.length)?window.firebaseSubmissions:[];
-  const withPred=submissions.filter(s=>s.predictedWinner||s.groupPredictions||s.knockoutPicks);
+  const withPred=submissions.filter(s=>s && (s.predictedWinner || s.groupPredictions || s.knockoutPicks));
+  const totalPlayers=withPred.length;
+  const pct=(count,total=totalPlayers)=> total ? `${Math.round((count/total)*100)}%` : '0%';
 
   const championCounts={};
-  withPred.forEach(s=>{if(s.predictedWinner) championCounts[s.predictedWinner]=(championCounts[s.predictedWinner]||0)+1});
-  const topWinner=Object.entries(championCounts).sort((a,b)=>b[1]-a[1])[0];
+  withPred.forEach(s=>{ if(s.predictedWinner) championCounts[s.predictedWinner]=(championCounts[s.predictedWinner]||0)+1; });
+  const topWinner=Object.entries(championCounts).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0]))[0];
 
-  function totalGoals(s){return (s.groupPredictions||[]).reduce((sum,p)=>sum+(Number(p.homeScore)||0)+(Number(p.awayScore)||0),0)}
-  const goalRows=withPred.map(s=>({name:s.name||'Unknown', goals:totalGoals(s)})).sort((a,b)=>b.goals-a.goals);
+  function validScore(v){return v!==null && v!==undefined && v!=='' && !Number.isNaN(Number(v));}
+  function totalGoals(s){
+    return (s.groupPredictions||[]).reduce((sum,p)=>{
+      if(!validScore(p.homeScore)||!validScore(p.awayScore)) return sum;
+      return sum + Number(p.homeScore) + Number(p.awayScore);
+    },0);
+  }
+  const goalRows=withPred.map(s=>({name:s.name||'Unknown', goals:totalGoals(s)})).filter(r=>Number.isFinite(r.goals)).sort((a,b)=>b.goals-a.goals);
   const lowGoalRows=[...goalRows].sort((a,b)=>a.goals-b.goals);
+  const avgPlayerGoals = goalRows.length ? goalRows.reduce((a,b)=>a+b.goals,0)/goalRows.length : 0;
+  const diffCopy=(goals)=>{
+    if(!avgPlayerGoals) return `${goals} total group-stage goals predicted`;
+    const diff=((goals-avgPlayerGoals)/avgPlayerGoals)*100;
+    const sign=diff>=0?'+':'';
+    return `${goals} total goals · ${sign}${Math.round(diff)}% vs player average`;
+  };
 
-  const teamFor={};
-  const teamAgainst={};
+  const teamTotalsFor={};
+  const teamTotalsAgainst={};
+  const teamSubmissionsFor={};
+  const teamSubmissionsAgainst={};
   const scorelines={};
+  const matchTotals={};
   let predictionCount=0;
 
   withPred.forEach(s=>{
+    const perSubmissionFor={};
+    const perSubmissionAgainst={};
     (s.groupPredictions||[]).forEach(p=>{
       const home=p.homeTeam;
       const away=p.awayTeam;
-      if(p.homeScore===null||p.homeScore===undefined||p.homeScore===''||p.awayScore===null||p.awayScore===undefined||p.awayScore==='') return;
-      const hs=Number(p.homeScore)||0;
-      const as=Number(p.awayScore)||0;
+      if(!validScore(p.homeScore)||!validScore(p.awayScore)) return;
+      const hs=Number(p.homeScore);
+      const as=Number(p.awayScore);
       predictionCount++;
       const scoreline=`${hs}-${as}`;
       scorelines[scoreline]=(scorelines[scoreline]||0)+1;
-      if(home){
-        teamFor[home]??={goals:0,matches:0};
-        teamAgainst[home]??={goals:0,matches:0};
-        teamFor[home].goals+=hs; teamFor[home].matches+=1;
-        teamAgainst[home].goals+=as; teamAgainst[home].matches+=1;
-      }
-      if(away){
-        teamFor[away]??={goals:0,matches:0};
-        teamAgainst[away]??={goals:0,matches:0};
-        teamFor[away].goals+=as; teamFor[away].matches+=1;
-        teamAgainst[away].goals+=hs; teamAgainst[away].matches+=1;
-      }
+      const matchKey=`${home||'Team A'} v ${away||'Team B'}`;
+      matchTotals[matchKey]??={total:0,count:0,home,away};
+      matchTotals[matchKey].total += hs + as;
+      matchTotals[matchKey].count += 1;
+      if(home){perSubmissionFor[home]=(perSubmissionFor[home]||0)+hs; perSubmissionAgainst[home]=(perSubmissionAgainst[home]||0)+as;}
+      if(away){perSubmissionFor[away]=(perSubmissionFor[away]||0)+as; perSubmissionAgainst[away]=(perSubmissionAgainst[away]||0)+hs;}
+    });
+    Object.entries(perSubmissionFor).forEach(([team,goals])=>{
+      teamTotalsFor[team]=(teamTotalsFor[team]||0)+goals;
+      teamSubmissionsFor[team]=(teamSubmissionsFor[team]||0)+1;
+    });
+    Object.entries(perSubmissionAgainst).forEach(([team,goals])=>{
+      teamTotalsAgainst[team]=(teamTotalsAgainst[team]||0)+goals;
+      teamSubmissionsAgainst[team]=(teamSubmissionsAgainst[team]||0)+1;
     });
   });
 
-  function topAverage(obj){
-    return Object.entries(obj)
-      .map(([team,row])=>({team, avg: row.matches?row.goals/row.matches:0, total: row.goals, matches: row.matches}))
-      .sort((a,b)=>b.avg-a.avg || b.total-a.total || a.team.localeCompare(b.team))[0];
+  function topTeamByAverage(totalObj,countObj){
+    return Object.keys(totalObj).map(team=>({
+      team,
+      avg: countObj[team] ? totalObj[team]/countObj[team] : 0,
+      picked: countObj[team] || 0,
+      total: totalObj[team] || 0
+    })).sort((a,b)=>b.avg-a.avg || b.picked-a.picked || a.team.localeCompare(b.team))[0];
   }
-  const topScoringTeam=topAverage(teamFor);
-  const topConcedingTeam=topAverage(teamAgainst);
+  const topScoringTeam=topTeamByAverage(teamTotalsFor,teamSubmissionsFor);
+  const topConcedingTeam=topTeamByAverage(teamTotalsAgainst,teamSubmissionsAgainst);
   const commonScoreline=Object.entries(scorelines).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0]))[0];
+  const highestMatch=Object.values(matchTotals).map(m=>({...m,avg:m.count?m.total/m.count:0})).sort((a,b)=>b.avg-a.avg || a.home.localeCompare(b.home))[0];
+  const darkHorse=Object.entries(championCounts).filter(([team,count])=>count>0).sort((a,b)=>a[1]-b[1] || a[0].localeCompare(b[0]))[0];
 
-  const avgCopy = row => row ? `${row.avg.toFixed(1)} avg goals per group game` : 'Average across submitted group predictions';
+  const avgTeamCopy=(row,type)=> row ? `${row.avg.toFixed(1)} avg group-stage ${type} · ${pct(row.picked)} of players` : 'Updates from locked group-stage predictions';
+  const scorelineCopy=commonScoreline ? `${commonScoreline[1]} pick${commonScoreline[1]===1?'':'s'} · ${pct(commonScoreline[1],predictionCount)} of all score predictions` : 'Most frequent submitted group-stage score';
+  const highestMatchValue=highestMatch ? `${teamLabel(highestMatch.home)} <span class="score-sep">v</span> ${teamLabel(highestMatch.away)}` : 'Waiting';
+  const highestMatchCopy=highestMatch ? `${highestMatch.avg.toFixed(1)} average total goals predicted` : 'Highest average goals across a fixture';
+
   const statCards=[
-    {icon:'🏆',title:'Team Most Predicted To Be Champions',value:topWinner?teamLabel(topWinner[0]):'Waiting',copy:topWinner?`${topWinner[1]} champion pick${topWinner[1]===1?'':'s'} so far`:'Submit predictions to unlock this stat'},
-    {icon:'⚽',title:'Team Expected To Score Most Group Goals',value:topScoringTeam?teamLabel(topScoringTeam.team):'Waiting',copy:topScoringTeam?avgCopy(topScoringTeam):'Average across all group-stage submissions'},
-    {icon:'🥅',title:'Team Expected To Concede Most Group Goals',value:topConcedingTeam?teamLabel(topConcedingTeam.team):'Waiting',copy:topConcedingTeam?avgCopy(topConcedingTeam):'Average across all group-stage submissions'},
-    {icon:'🔥',title:'Player Predicting The Most Goals',value:goalRows[0]?goalRows[0].name:'Waiting',copy:goalRows[0]?`${goalRows[0].goals} total group-stage goals predicted`:'Highest total goals predicted'},
-    {icon:'🧱',title:'Player Predicting The Fewest Goals',value:lowGoalRows[0]?lowGoalRows[0].name:'Waiting',copy:lowGoalRows[0]?`${lowGoalRows[0].goals} total group-stage goals predicted`:'Lowest total goals predicted'},
-    {icon:'🎯',title:'Most Common Scoreline',value:commonScoreline?commonScoreline[0]:'Waiting',copy:commonScoreline?`${commonScoreline[1]} time${commonScoreline[1]===1?'':'s'} across group predictions`:'Most frequent submitted group-stage score'}
+    {icon:'🏆',title:'Most Popular Champion',value:topWinner?teamLabel(topWinner[0]):'Waiting',copy:topWinner?`${topWinner[1]} champion pick${topWinner[1]===1?'':'s'} · ${pct(topWinner[1])} of players`:'Submit predictions to unlock this stat'},
+    {icon:'⚽',title:'Goal Machine',value:topScoringTeam?teamLabel(topScoringTeam.team):'Waiting',copy:avgTeamCopy(topScoringTeam,'goals scored')},
+    {icon:'🧤',title:'Leaky Defence',value:topConcedingTeam?teamLabel(topConcedingTeam.team):'Waiting',copy:avgTeamCopy(topConcedingTeam,'goals conceded')},
+    {icon:'🎯',title:'Most Common Scoreline',value:commonScoreline?commonScoreline[0]:'Waiting',copy:scorelineCopy},
+    {icon:'🔥',title:'Highest Scoring Match',value:highestMatchValue,copy:highestMatchCopy},
+    {icon:'🤠',title:'Dark Horse Champion',value:darkHorse?teamLabel(darkHorse[0]):'Waiting',copy:darkHorse?`${darkHorse[1]} player${darkHorse[1]===1?'':'s'} backed them · ${pct(darkHorse[1])}`:'Lowest-backed champion pick'},
+    {icon:'😎',title:'Ultimate Optimist',value:goalRows[0]?goalRows[0].name:'Waiting',copy:goalRows[0]?diffCopy(goalRows[0].goals):'Believes we are in for a goal-fest'},
+    {icon:'😬',title:'Ultimate Pessimist',value:lowGoalRows[0]?lowGoalRows[0].name:'Waiting',copy:lowGoalRows[0]?diffCopy(lowGoalRows[0].goals):'Expecting a lot of cagey football'}
   ];
-  grid.innerHTML=statCards.map(c=>`<article class="stat-bubble stat-bubble-v64"><div class="stat-icon">${c.icon}</div><div class="stat-title">${c.title}</div><div class="stat-value">${c.value}</div><div class="stat-copy">${c.copy}</div></article>`).join('');
+  grid.innerHTML=statCards.map(c=>`<article class="stat-bubble stat-bubble-v69 ${c.title.includes('Optimist')?'optimist-stat':c.title.includes('Pessimist')?'pessimist-stat':''}"><div class="stat-icon">${c.icon}</div><div class="stat-title">${c.title}</div><div class="stat-value">${c.value}</div><div class="stat-copy">${c.copy}</div></article>`).join('');
 }
 
 function updateWinnerReveal(){
