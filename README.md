@@ -1,11 +1,12 @@
-# FIFA World Cup 2026 Prediction Challenge - V85
+# FIFA World Cup 2026 Prediction Challenge - V82
 
-V85 builds from the uploaded V84 bundle and focuses on the How I Built This page:
-- Reworked the intro to explain Damien's AI lunch chats, voice dictation and the challenge clearly.
-- Removed the separate working prototype badge and jumps straight into Build Snapshot.
-- Kept the four evening timeline and added rough time spent per session.
-- Expanded each day into 2-3 clear build steps.
-- Moved example prompts into each day card and styled them as quoted prompts.
-- Upgraded the date badges to a more professional format.
-- Removed the separate Example Prompts section and reduced repeated messaging.
-- Kept the voice-dictation learning and "Even this page was created using AI."
+V82 builds from the uploaded V80 base and focuses on the How I Built This page:
+- Rewrote the intro to be sharper and less repetitive.
+- Kept the Damien lunch-chat inspiration.
+- Framed the build as four evening sessions from Thursday 4 June to Tuesday 9 June.
+- Highlighted that the first working prototype took around one hour.
+- Kept total development time under three hours.
+- Made voice-first prompting/dictation the key learning.
+- Added: “Even this page was created using AI.”
+- Added concise session breakdowns with techy terminal-style example prompt cards.
+- Retained V80 landing page, Family League, HFC League and Results Centre integrity audit changes.
