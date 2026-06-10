@@ -1,17 +1,12 @@
-# FIFA World Cup 2026 Prediction Challenge - V84
+# FIFA World Cup 2026 Prediction Challenge - V85
 
-V84 builds directly from the provided V83 base.
+V85 builds directly from the supplied V84 base and only updates the league override lists.
 
-Changes included:
-- Added Tony and Lauren to the Family League override list.
-- Tony and Lauren appear in All Leagues and Family League, and are excluded from Main League.
-- Kept Blane McKie as the organiser override appearing in All Leagues, Main, LEGO, Family and HFC.
-- Added an animated “Entries Closing Soon” warning on the landing page beneath the kick-off countdown and above the entry form.
-- Updated the How I Built This page only:
-  - Full-height date badges on each session card.
-  - Full-height build-time badges on each session card.
-  - Changed prompt labels to “Real Prompt Example”.
-  - Updated the Biggest Learning section with stronger voice-dictation wording.
-  - Kept the page as a premium FIFA-style case study layout.
-- No other pages or core prediction/results logic intentionally changed.
-- Results Centre integrity audit remains a standing release check for future builds.
+Changes:
+- Added Brett, Luke Williamson, MichelleJ, Tommy and Chelsey to the Family League.
+- Added Theo McKie to both Family League and HFC League.
+- Added Theo Mills and Theodore Smith to HFC League.
+- Retained Tony and Lauren in Family League.
+- Retained Blane McKie as organiser override appearing in All, Main, LEGO, Family and HFC league views.
+- Retained V84 landing-page Entries Closing Soon banner and How I Built This page enhancements.
+- No other page structure or core logic intentionally changed.
