@@ -1790,6 +1790,26 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 .world-cup-brand-strip span{display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:999px;background:linear-gradient(135deg,rgba(248,200,74,.16),rgba(55,212,255,.10));border:1px solid rgba(248,200,74,.28);color:#eaf2ff;font-size:12px;font-weight:950;letter-spacing:.04em;box-shadow:inset 0 1px 0 rgba(255,255,255,.10)}
 @media(max-width:640px){.world-cup-brand-strip{gap:7px;margin-top:10px}.world-cup-brand-strip span{font-size:10.5px;padding:7px 9px}}
 
+/* V80: compact landing page refresh + HFC League */
+.hero-shell > .trophy{display:none!important;}
+.hero-card{padding-top:34px!important;}
+.hero-card h1{font-size:clamp(38px,7.2vw,82px)!important;line-height:.92!important;margin-top:12px!important;}
+.sub-title{font-size:clamp(24px,3.8vw,42px)!important;margin-top:12px!important;}
+.football-pass-scene{position:relative;z-index:2;width:min(430px,86vw);height:76px;margin:12px auto 8px;border-radius:28px;background:linear-gradient(135deg,rgba(55,212,255,.10),rgba(248,200,74,.09));border:1px solid rgba(255,255,255,.14);overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.10)}
+.football-pass-scene:before{content:"";position:absolute;left:8%;right:8%;bottom:14px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent)}
+.mini-player{position:absolute;bottom:14px;width:50px;height:52px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.35))}.player-left{left:42px}.player-right{right:42px;transform:scaleX(-1)}
+.player-head{position:absolute;left:16px;top:0;width:18px;height:18px;border-radius:50%;background:#ffd45f;border:2px solid rgba(255,255,255,.45)}
+.player-body{position:absolute;left:12px;top:18px;width:26px;height:24px;border-radius:9px 9px 6px 6px;background:linear-gradient(180deg,#37d4ff,#0d3a91);border:1px solid rgba(255,255,255,.30)}
+.player-leg{position:absolute;left:24px;top:40px;width:28px;height:6px;border-radius:999px;background:#fff0a8;transform-origin:left center;animation:kickLeg 1.7s ease-in-out infinite}.player-right .player-leg{animation-delay:.85s}
+.passing-ball{position:absolute;left:58px;top:32px;font-size:24px;animation:passBall 1.7s ease-in-out infinite;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}
+@keyframes passBall{0%,100%{transform:translate(0,8px) scale(.92)}50%{transform:translate(292px,-12px) scale(1.08)}}
+@keyframes kickLeg{0%,45%,100%{transform:rotate(18deg)}55%,70%{transform:rotate(-24deg)}}
+.tournament-mini-strip{position:relative;z-index:2;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px auto 12px}.tournament-mini-strip span{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(248,200,74,.24);color:#eaf2ff;font-size:12px;font-weight:950;white-space:nowrap}
+.world-cup-brand-strip{display:none!important}.gold-rule{margin:14px auto!important}.promise{font-size:clamp(16px,2.4vw,25px)!important;margin-bottom:12px!important}.description{margin-bottom:14px!important}.entry-card{margin-top:18px!important}
+.league-type.hfc{background:rgba(72,209,204,.16)!important;border-color:rgba(72,209,204,.42)!important;color:#c9fffb!important}.league-controls.upgraded .league-filter[data-league-filter="HFC"]{border-color:rgba(72,209,204,.36)!important}.live-table-summary.v80-five{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+@media(max-width:900px){.live-table-summary.v80-five{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:560px){.hero{padding:14px 10px 28px!important}.hero-card{padding:22px 12px 18px!important;border-radius:28px!important}.football-pass-scene{height:62px;margin:8px auto 6px}.mini-player{transform:scale(.82);bottom:8px}.player-right{transform:scaleX(-1) scale(.82)}.player-left{left:22px}.player-right{right:22px}.passing-ball{font-size:20px;left:42px;top:25px}@keyframes passBall{0%,100%{transform:translate(0,7px) scale(.9)}50%{transform:translate(calc(min(86vw,430px) - 90px),-9px) scale(1.05)}}.tournament-mini-strip span{font-size:10.5px;padding:6px 8px}.promise{gap:5px!important}.entry-card{padding:18px!important}}
+
 </style>
 <!-- V49 emergency layout repair: restore fixture/result row alignment after header changes -->
 <style>
@@ -2261,6 +2281,26 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 @keyframes countdownGlow{to{transform:rotate(360deg)}}
 @media(max-width:560px){.kickoff-countdown{width:100%;border-radius:20px;padding:12px 10px}.countdown-units{gap:6px}.count-unit{border-radius:13px;padding:8px 4px}.count-unit b{font-size:22px}.count-unit span{font-size:9px}.count-sub{font-size:11px;line-height:1.35}.kickoff-countdown .count-title{font-size:14px;letter-spacing:.06em}}
 .stage-summary-box-v51.results-audit-v74 .stage-picks-v51{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(118px,1fr))!important;gap:8px!important;align-items:stretch!important}.stage-summary-box-v51.results-audit-v74 .stage-team-pill{min-height:40px!important}.stage-summary-box-v51.results-audit-v74 .summary-line-v51{text-align:center!important;}
+
+/* V80: compact landing page refresh + HFC League */
+.hero-shell > .trophy{display:none!important;}
+.hero-card{padding-top:34px!important;}
+.hero-card h1{font-size:clamp(38px,7.2vw,82px)!important;line-height:.92!important;margin-top:12px!important;}
+.sub-title{font-size:clamp(24px,3.8vw,42px)!important;margin-top:12px!important;}
+.football-pass-scene{position:relative;z-index:2;width:min(430px,86vw);height:76px;margin:12px auto 8px;border-radius:28px;background:linear-gradient(135deg,rgba(55,212,255,.10),rgba(248,200,74,.09));border:1px solid rgba(255,255,255,.14);overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.10)}
+.football-pass-scene:before{content:"";position:absolute;left:8%;right:8%;bottom:14px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent)}
+.mini-player{position:absolute;bottom:14px;width:50px;height:52px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.35))}.player-left{left:42px}.player-right{right:42px;transform:scaleX(-1)}
+.player-head{position:absolute;left:16px;top:0;width:18px;height:18px;border-radius:50%;background:#ffd45f;border:2px solid rgba(255,255,255,.45)}
+.player-body{position:absolute;left:12px;top:18px;width:26px;height:24px;border-radius:9px 9px 6px 6px;background:linear-gradient(180deg,#37d4ff,#0d3a91);border:1px solid rgba(255,255,255,.30)}
+.player-leg{position:absolute;left:24px;top:40px;width:28px;height:6px;border-radius:999px;background:#fff0a8;transform-origin:left center;animation:kickLeg 1.7s ease-in-out infinite}.player-right .player-leg{animation-delay:.85s}
+.passing-ball{position:absolute;left:58px;top:32px;font-size:24px;animation:passBall 1.7s ease-in-out infinite;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}
+@keyframes passBall{0%,100%{transform:translate(0,8px) scale(.92)}50%{transform:translate(292px,-12px) scale(1.08)}}
+@keyframes kickLeg{0%,45%,100%{transform:rotate(18deg)}55%,70%{transform:rotate(-24deg)}}
+.tournament-mini-strip{position:relative;z-index:2;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px auto 12px}.tournament-mini-strip span{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(248,200,74,.24);color:#eaf2ff;font-size:12px;font-weight:950;white-space:nowrap}
+.world-cup-brand-strip{display:none!important}.gold-rule{margin:14px auto!important}.promise{font-size:clamp(16px,2.4vw,25px)!important;margin-bottom:12px!important}.description{margin-bottom:14px!important}.entry-card{margin-top:18px!important}
+.league-type.hfc{background:rgba(72,209,204,.16)!important;border-color:rgba(72,209,204,.42)!important;color:#c9fffb!important}.league-controls.upgraded .league-filter[data-league-filter="HFC"]{border-color:rgba(72,209,204,.36)!important}.live-table-summary.v80-five{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+@media(max-width:900px){.live-table-summary.v80-five{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:560px){.hero{padding:14px 10px 28px!important}.hero-card{padding:22px 12px 18px!important;border-radius:28px!important}.football-pass-scene{height:62px;margin:8px auto 6px}.mini-player{transform:scale(.82);bottom:8px}.player-right{transform:scaleX(-1) scale(.82)}.player-left{left:22px}.player-right{right:22px}.passing-ball{font-size:20px;left:42px;top:25px}@keyframes passBall{0%,100%{transform:translate(0,7px) scale(.9)}50%{transform:translate(calc(min(86vw,430px) - 90px),-9px) scale(1.05)}}.tournament-mini-strip span{font-size:10.5px;padding:6px 8px}.promise{gap:5px!important}.entry-card{padding:18px!important}}
 
 </style>
 
@@ -2753,6 +2793,26 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 @media(max-width:560px){.kickoff-countdown{width:100%;border-radius:20px;padding:12px 10px}.countdown-units{gap:6px}.count-unit{border-radius:13px;padding:8px 4px}.count-unit b{font-size:22px}.count-unit span{font-size:9px}.count-sub{font-size:11px;line-height:1.35}.kickoff-countdown .count-title{font-size:14px;letter-spacing:.06em}}
 .stage-summary-box-v51.results-audit-v74 .stage-picks-v51{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(118px,1fr))!important;gap:8px!important;align-items:stretch!important}.stage-summary-box-v51.results-audit-v74 .stage-team-pill{min-height:40px!important}.stage-summary-box-v51.results-audit-v74 .summary-line-v51{text-align:center!important;}
 
+/* V80: compact landing page refresh + HFC League */
+.hero-shell > .trophy{display:none!important;}
+.hero-card{padding-top:34px!important;}
+.hero-card h1{font-size:clamp(38px,7.2vw,82px)!important;line-height:.92!important;margin-top:12px!important;}
+.sub-title{font-size:clamp(24px,3.8vw,42px)!important;margin-top:12px!important;}
+.football-pass-scene{position:relative;z-index:2;width:min(430px,86vw);height:76px;margin:12px auto 8px;border-radius:28px;background:linear-gradient(135deg,rgba(55,212,255,.10),rgba(248,200,74,.09));border:1px solid rgba(255,255,255,.14);overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.10)}
+.football-pass-scene:before{content:"";position:absolute;left:8%;right:8%;bottom:14px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent)}
+.mini-player{position:absolute;bottom:14px;width:50px;height:52px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.35))}.player-left{left:42px}.player-right{right:42px;transform:scaleX(-1)}
+.player-head{position:absolute;left:16px;top:0;width:18px;height:18px;border-radius:50%;background:#ffd45f;border:2px solid rgba(255,255,255,.45)}
+.player-body{position:absolute;left:12px;top:18px;width:26px;height:24px;border-radius:9px 9px 6px 6px;background:linear-gradient(180deg,#37d4ff,#0d3a91);border:1px solid rgba(255,255,255,.30)}
+.player-leg{position:absolute;left:24px;top:40px;width:28px;height:6px;border-radius:999px;background:#fff0a8;transform-origin:left center;animation:kickLeg 1.7s ease-in-out infinite}.player-right .player-leg{animation-delay:.85s}
+.passing-ball{position:absolute;left:58px;top:32px;font-size:24px;animation:passBall 1.7s ease-in-out infinite;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}
+@keyframes passBall{0%,100%{transform:translate(0,8px) scale(.92)}50%{transform:translate(292px,-12px) scale(1.08)}}
+@keyframes kickLeg{0%,45%,100%{transform:rotate(18deg)}55%,70%{transform:rotate(-24deg)}}
+.tournament-mini-strip{position:relative;z-index:2;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px auto 12px}.tournament-mini-strip span{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(248,200,74,.24);color:#eaf2ff;font-size:12px;font-weight:950;white-space:nowrap}
+.world-cup-brand-strip{display:none!important}.gold-rule{margin:14px auto!important}.promise{font-size:clamp(16px,2.4vw,25px)!important;margin-bottom:12px!important}.description{margin-bottom:14px!important}.entry-card{margin-top:18px!important}
+.league-type.hfc{background:rgba(72,209,204,.16)!important;border-color:rgba(72,209,204,.42)!important;color:#c9fffb!important}.league-controls.upgraded .league-filter[data-league-filter="HFC"]{border-color:rgba(72,209,204,.36)!important}.live-table-summary.v80-five{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+@media(max-width:900px){.live-table-summary.v80-five{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:560px){.hero{padding:14px 10px 28px!important}.hero-card{padding:22px 12px 18px!important;border-radius:28px!important}.football-pass-scene{height:62px;margin:8px auto 6px}.mini-player{transform:scale(.82);bottom:8px}.player-right{transform:scaleX(-1) scale(.82)}.player-left{left:22px}.player-right{right:22px}.passing-ball{font-size:20px;left:42px;top:25px}@keyframes passBall{0%,100%{transform:translate(0,7px) scale(.9)}50%{transform:translate(calc(min(86vw,430px) - 90px),-9px) scale(1.05)}}.tournament-mini-strip span{font-size:10.5px;padding:6px 8px}.promise{gap:5px!important}.entry-card{padding:18px!important}}
+
 </style>
 </head>
 <body>
@@ -2764,7 +2824,12 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
       <div class="kicker">Tournament predictor</div>
       <h1>FIFA World Cup 2026</h1>
       <div class="sub-title">Prediction Challenge</div>
-      <div class="world-cup-brand-strip" aria-label="World Cup themed icons"><span>🏟️ Host Stadiums</span><span>🏆 Trophy Dreams</span><span>🌎 USA • Canada • Mexico</span></div>
+      <div class="football-pass-scene" aria-label="Animated football passing scene">
+        <div class="mini-player player-left"><span class="player-head"></span><span class="player-body"></span><span class="player-leg"></span></div>
+        <div class="passing-ball">⚽</div>
+        <div class="mini-player player-right"><span class="player-head"></span><span class="player-body"></span><span class="player-leg"></span></div>
+      </div>
+      <div class="tournament-mini-strip" aria-label="Tournament facts"><span>⚽ 48 Teams</span><span>🏟️ 16 Host Cities</span><span>🏆 1 Champion</span></div>
       <div class="gold-rule"></div>
       <div class="promise"><span class="main">⚽ Pick the Scores</span><span>🏆 Build Your Bracket</span><span>🔒 Lock It In Once</span><span>📈 Watch The Tournament Unfold</span></div>
       <p class="description">Predict every match. Build your tournament bracket. Compete for bragging rights. Follow the action live.</p>
@@ -2828,9 +2893,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     <section class="winner-reveal" id="winnerReveal"><div class="winner-kicker">Your predicted World Cup winner is</div><div class="winner-name" id="winnerName">—</div><div class="winner-sub">Once this is set, lock in your full tournament prediction below.</div></section>
     <section class="card lock-card"><button class="primary" id="lockBtn">Lock In Full Tournament Prediction</button><div class="note">You must complete every group score, knockout pick and champion selection before locking. Once locked, your entry is saved and cannot be changed.</div><div id="lockStatus" class="lock-status"></div></section>
   </section>
-  <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table 🏆</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div></div></section>
+  <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table 🏆</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button><button class="league-filter" data-league-filter="HFC">⚽ HFC League</button></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div></div></section>
   <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">⚽ Results Centre ⚽</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="world-cup-ticker" id="worldCupNewsTicker" aria-label="World Cup 2026 news ticker"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest World Cup 2026 headlines…</span></div></div></div><div class="kickoff-countdown compact" data-countdown><div class="count-title">⚽ Countdown To Kick-Off ⚽</div><div class="countdown-units"><div class="count-unit"><b data-days>000</b><span>Days</span></div><div class="count-unit"><b data-hours>00</b><span>Hours</span></div><div class="count-unit"><b data-mins>00</b><span>Mins</span></div><div class="count-unit"><b data-secs>00</b><span>Secs</span></div></div><div class="count-sub">Live scoring begins when Mexico v South Africa kicks off.</div></div><div class="card live-results-card"><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
-  <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats 📊</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="league-controls upgraded fun-league-controls" id="funLeagueControls"><button class="fun-league-filter active" data-fun-league-filter="All">🏆 All Leagues</button><button class="fun-league-filter" data-fun-league-filter="Main">🌍 Main</button><button class="fun-league-filter" data-fun-league-filter="LEGO">🧱 LEGO</button><button class="fun-league-filter" data-fun-league-filter="Family">🏡 Family</button></div><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
+  <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats 📊</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="league-controls upgraded fun-league-controls" id="funLeagueControls"><button class="fun-league-filter active" data-fun-league-filter="All">🏆 All Leagues</button><button class="fun-league-filter" data-fun-league-filter="Main">🌍 Main</button><button class="fun-league-filter" data-fun-league-filter="LEGO">🧱 LEGO</button><button class="fun-league-filter" data-fun-league-filter="Family">🏡 Family</button><button class="fun-league-filter" data-fun-league-filter="HFC">⚽ HFC</button></div><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
   <section id="how" class="panel how-built-page">
     <div class="page-head unified-final-head build-story-head v46-build-head"><h2 class="premium-page-title">🛠️ From Idea to Kick-Off 🛠️</h2><p>Inspired by Damien's AI lunch chats, I built this World Cup prediction game using mainly dictation to ChatGPT over a couple of evening sessions.</p></div>
     <div class="intro-story short-story v44-intro-story v46-intro-story">
@@ -2924,8 +2989,9 @@ function championPopularity(team){
   const pct=total?Math.round((count/total)*100):0;
   return total?`Picked by ${count} player${count===1?'':'s'} (${pct}%)`:'Popularity updates once entries are locked.';
 }
-const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice','Thomas Edwards','John M'];
+const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice','Thomas Edwards','John M','Callum','Darragh','Mich','Ray','Mike D','Rosie'];
 const allLeagueNames = ['Blane McKie'];
+const hfcLeagueNames = ['Blane McKie'];
 function normalisePersonName(name){return String(name||'').trim().toLowerCase().replace(/\s+/g,' ');}
 function isFamilyLeagueName(name){
   const cleaned=normalisePersonName(name);
@@ -2939,6 +3005,10 @@ function isAllLeagueName(name){
   const cleaned=normalisePersonName(name);
   return allLeagueNames.some(n=>cleaned===normalisePersonName(n));
 }
+function isHfcLeagueName(name){
+  const cleaned=normalisePersonName(name);
+  return hfcLeagueNames.some(n=>cleaned===normalisePersonName(n));
+}
 function leagueFor(email,name=''){
   if(isFamilyLeagueName(name)) return 'Family';
   return String(email||'').toLowerCase().endsWith('@lego.com')?'LEGO':'Main';
@@ -2948,6 +3018,7 @@ function leagueLabel(value, name=''){
   const l=normaliseLeague(value);
   if(l==='LEGO') return '🧱 LEGO Entry';
   if(l==='Family') return '🏡 Family Entry';
+  if(l==='HFC') return '⚽ HFC Entry';
   return '🌍 Main Entry';
 }
 function leagueClass(value, name=''){
@@ -2955,6 +3026,7 @@ function leagueClass(value, name=''){
   const l=normaliseLeague(value);
   if(l==='LEGO') return 'lego';
   if(l==='Family') return 'family';
+  if(l==='HFC') return 'hfc';
   return '';
 }
 
@@ -3086,6 +3158,7 @@ function normaliseLeague(value){
   const v=String(value||'').toLowerCase();
   if(v.includes('lego')) return 'LEGO';
   if(v.includes('family')) return 'Family';
+  if(v.includes('hfc')) return 'HFC';
   return 'Main';
 }
 function isLockedPrediction(row){
@@ -3104,19 +3177,20 @@ function getEntryRows(){
   rows.forEach(r=>{
     const key=(r.email||r.name||Math.random()).toString().toLowerCase();
     const existing=byName.get(key)||{};
-    byName.set(key,{...existing,...r, league:normaliseLeague(isFamilyLeagueName(r.name||existing.name)?'Family':(r.league||existing.league)), allLeagues:isAllLeagueName(r.name||existing.name), totalPoints:r.totalPoints||existing.totalPoints||0});
+    byName.set(key,{...existing,...r, league:normaliseLeague(isFamilyLeagueName(r.name||existing.name)?'Family':(r.league||existing.league)), allLeagues:isAllLeagueName(r.name||existing.name), hfcLeague:isHfcLeagueName(r.name||existing.name), totalPoints:r.totalPoints||existing.totalPoints||0});
   });
   return [...byName.values()].filter(r=>r.name).sort((a,b)=>(b.totalPoints||0)-(a.totalPoints||0)||String(a.name).localeCompare(String(b.name)));
 }
 function renderLeaderboard(){
   const allRows=getEntryRows();
-  const filtered=currentLeagueFilter==='All'?allRows:allRows.filter(r=>r.allLeagues || normaliseLeague(r.league)===currentLeagueFilter);
+  const filtered=currentLeagueFilter==='All'?allRows:allRows.filter(r=>r.allLeagues || (currentLeagueFilter==='HFC' && r.hfcLeague) || normaliseLeague(r.league)===currentLeagueFilter);
   $$('.league-filter').forEach(btn=>btn.classList.toggle('active',btn.dataset.leagueFilter===currentLeagueFilter));
   const total=allRows.length;
-  const lego=allRows.filter(r=>normaliseLeague(r.league)==='LEGO').length;
-  const family=allRows.filter(r=>normaliseLeague(r.league)==='Family').length;
-  const main=allRows.filter(r=>normaliseLeague(r.league)==='Main').length;
-  const summary=`<div class="live-summary live-table-summary v71-four"><div class="summary-tile"><b>${total}</b><span>🏆 All Leagues</span></div><div class="summary-tile"><b>${main}</b><span>🌍 Main League</span></div><div class="summary-tile"><b>${lego}</b><span>🧱 LEGO League</span></div><div class="summary-tile"><b>${family}</b><span>🏡 Family League</span></div></div>`;
+  const lego=allRows.filter(r=>normaliseLeague(r.league)==='LEGO' || r.allLeagues).length;
+  const family=allRows.filter(r=>normaliseLeague(r.league)==='Family' || r.allLeagues).length;
+  const hfc=allRows.filter(r=>r.hfcLeague || r.allLeagues || normaliseLeague(r.league)==='HFC').length;
+  const main=allRows.filter(r=>normaliseLeague(r.league)==='Main' || r.allLeagues).length;
+  const summary=`<div class="live-summary live-table-summary v80-five"><div class="summary-tile"><b>${total}</b><span>🏆 All Leagues</span></div><div class="summary-tile"><b>${main}</b><span>🌍 Main League</span></div><div class="summary-tile"><b>${lego}</b><span>🧱 LEGO League</span></div><div class="summary-tile"><b>${family}</b><span>🏡 Family League</span></div><div class="summary-tile"><b>${hfc}</b><span>⚽ HFC League</span></div></div>`;
   if(!filtered.length){$('#leaderboardList').innerHTML=summary+'<div class="empty-state">No entries for this league yet.</div>';return;}
   const table=`<table class="league-table upgraded-table"><thead><tr><th>Rank</th><th>Player</th><th>Entry</th><th>Total Points</th></tr></thead><tbody>${filtered.map((r,i)=>`<tr><td data-label="Rank"><span class="rank-badge">${i+1}</span></td><td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span></td><td data-label="Entry"><span class="league-type ${leagueClass(r.league,r.name)}">${leagueLabel(r.league,r.name)}</span></td><td data-label="Total Points"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td></tr>`).join('')}</tbody></table>`;
   $('#leaderboardList').innerHTML=summary+table;
@@ -3371,7 +3445,7 @@ function renderFunStats(){
   const allRows = (typeof getEntryRows === 'function') ? getEntryRows() : ((window.firebaseSubmissions&&window.firebaseSubmissions.length)?window.firebaseSubmissions:[]);
   const filteredRows = currentFunLeagueFilter === 'All'
     ? allRows
-    : allRows.filter(r => r.allLeagues || normaliseLeague(r.league) === currentFunLeagueFilter);
+    : allRows.filter(r => r.allLeagues || (currentFunLeagueFilter==='HFC' && r.hfcLeague) || normaliseLeague(r.league) === currentFunLeagueFilter);
 
   $$('.fun-league-filter').forEach(btn=>{
     btn.classList.toggle('active', btn.dataset.funLeagueFilter === currentFunLeagueFilter);
@@ -4320,6 +4394,26 @@ onSnapshot(collection(db, "predictions"), (snapshot) => {
 @media(max-width:560px){.kickoff-countdown{width:100%;border-radius:20px;padding:12px 10px}.countdown-units{gap:6px}.count-unit{border-radius:13px;padding:8px 4px}.count-unit b{font-size:22px}.count-unit span{font-size:9px}.count-sub{font-size:11px;line-height:1.35}.kickoff-countdown .count-title{font-size:14px;letter-spacing:.06em}}
 .stage-summary-box-v51.results-audit-v74 .stage-picks-v51{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(118px,1fr))!important;gap:8px!important;align-items:stretch!important}.stage-summary-box-v51.results-audit-v74 .stage-team-pill{min-height:40px!important}.stage-summary-box-v51.results-audit-v74 .summary-line-v51{text-align:center!important;}
 
+/* V80: compact landing page refresh + HFC League */
+.hero-shell > .trophy{display:none!important;}
+.hero-card{padding-top:34px!important;}
+.hero-card h1{font-size:clamp(38px,7.2vw,82px)!important;line-height:.92!important;margin-top:12px!important;}
+.sub-title{font-size:clamp(24px,3.8vw,42px)!important;margin-top:12px!important;}
+.football-pass-scene{position:relative;z-index:2;width:min(430px,86vw);height:76px;margin:12px auto 8px;border-radius:28px;background:linear-gradient(135deg,rgba(55,212,255,.10),rgba(248,200,74,.09));border:1px solid rgba(255,255,255,.14);overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.10)}
+.football-pass-scene:before{content:"";position:absolute;left:8%;right:8%;bottom:14px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent)}
+.mini-player{position:absolute;bottom:14px;width:50px;height:52px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.35))}.player-left{left:42px}.player-right{right:42px;transform:scaleX(-1)}
+.player-head{position:absolute;left:16px;top:0;width:18px;height:18px;border-radius:50%;background:#ffd45f;border:2px solid rgba(255,255,255,.45)}
+.player-body{position:absolute;left:12px;top:18px;width:26px;height:24px;border-radius:9px 9px 6px 6px;background:linear-gradient(180deg,#37d4ff,#0d3a91);border:1px solid rgba(255,255,255,.30)}
+.player-leg{position:absolute;left:24px;top:40px;width:28px;height:6px;border-radius:999px;background:#fff0a8;transform-origin:left center;animation:kickLeg 1.7s ease-in-out infinite}.player-right .player-leg{animation-delay:.85s}
+.passing-ball{position:absolute;left:58px;top:32px;font-size:24px;animation:passBall 1.7s ease-in-out infinite;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}
+@keyframes passBall{0%,100%{transform:translate(0,8px) scale(.92)}50%{transform:translate(292px,-12px) scale(1.08)}}
+@keyframes kickLeg{0%,45%,100%{transform:rotate(18deg)}55%,70%{transform:rotate(-24deg)}}
+.tournament-mini-strip{position:relative;z-index:2;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px auto 12px}.tournament-mini-strip span{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(248,200,74,.24);color:#eaf2ff;font-size:12px;font-weight:950;white-space:nowrap}
+.world-cup-brand-strip{display:none!important}.gold-rule{margin:14px auto!important}.promise{font-size:clamp(16px,2.4vw,25px)!important;margin-bottom:12px!important}.description{margin-bottom:14px!important}.entry-card{margin-top:18px!important}
+.league-type.hfc{background:rgba(72,209,204,.16)!important;border-color:rgba(72,209,204,.42)!important;color:#c9fffb!important}.league-controls.upgraded .league-filter[data-league-filter="HFC"]{border-color:rgba(72,209,204,.36)!important}.live-table-summary.v80-five{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+@media(max-width:900px){.live-table-summary.v80-five{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:560px){.hero{padding:14px 10px 28px!important}.hero-card{padding:22px 12px 18px!important;border-radius:28px!important}.football-pass-scene{height:62px;margin:8px auto 6px}.mini-player{transform:scale(.82);bottom:8px}.player-right{transform:scaleX(-1) scale(.82)}.player-left{left:22px}.player-right{right:22px}.passing-ball{font-size:20px;left:42px;top:25px}@keyframes passBall{0%,100%{transform:translate(0,7px) scale(.9)}50%{transform:translate(calc(min(86vw,430px) - 90px),-9px) scale(1.05)}}.tournament-mini-strip span{font-size:10.5px;padding:6px 8px}.promise{gap:5px!important}.entry-card{padding:18px!important}}
+
 </style>
 
 <style>
@@ -4408,5 +4502,25 @@ onSnapshot(collection(db, "predictions"), (snapshot) => {
 @keyframes countdownGlow{to{transform:rotate(360deg)}}
 @media(max-width:560px){.kickoff-countdown{width:100%;border-radius:20px;padding:12px 10px}.countdown-units{gap:6px}.count-unit{border-radius:13px;padding:8px 4px}.count-unit b{font-size:22px}.count-unit span{font-size:9px}.count-sub{font-size:11px;line-height:1.35}.kickoff-countdown .count-title{font-size:14px;letter-spacing:.06em}}
 .stage-summary-box-v51.results-audit-v74 .stage-picks-v51{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(118px,1fr))!important;gap:8px!important;align-items:stretch!important}.stage-summary-box-v51.results-audit-v74 .stage-team-pill{min-height:40px!important}.stage-summary-box-v51.results-audit-v74 .summary-line-v51{text-align:center!important;}
+
+/* V80: compact landing page refresh + HFC League */
+.hero-shell > .trophy{display:none!important;}
+.hero-card{padding-top:34px!important;}
+.hero-card h1{font-size:clamp(38px,7.2vw,82px)!important;line-height:.92!important;margin-top:12px!important;}
+.sub-title{font-size:clamp(24px,3.8vw,42px)!important;margin-top:12px!important;}
+.football-pass-scene{position:relative;z-index:2;width:min(430px,86vw);height:76px;margin:12px auto 8px;border-radius:28px;background:linear-gradient(135deg,rgba(55,212,255,.10),rgba(248,200,74,.09));border:1px solid rgba(255,255,255,.14);overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.10)}
+.football-pass-scene:before{content:"";position:absolute;left:8%;right:8%;bottom:14px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent)}
+.mini-player{position:absolute;bottom:14px;width:50px;height:52px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.35))}.player-left{left:42px}.player-right{right:42px;transform:scaleX(-1)}
+.player-head{position:absolute;left:16px;top:0;width:18px;height:18px;border-radius:50%;background:#ffd45f;border:2px solid rgba(255,255,255,.45)}
+.player-body{position:absolute;left:12px;top:18px;width:26px;height:24px;border-radius:9px 9px 6px 6px;background:linear-gradient(180deg,#37d4ff,#0d3a91);border:1px solid rgba(255,255,255,.30)}
+.player-leg{position:absolute;left:24px;top:40px;width:28px;height:6px;border-radius:999px;background:#fff0a8;transform-origin:left center;animation:kickLeg 1.7s ease-in-out infinite}.player-right .player-leg{animation-delay:.85s}
+.passing-ball{position:absolute;left:58px;top:32px;font-size:24px;animation:passBall 1.7s ease-in-out infinite;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}
+@keyframes passBall{0%,100%{transform:translate(0,8px) scale(.92)}50%{transform:translate(292px,-12px) scale(1.08)}}
+@keyframes kickLeg{0%,45%,100%{transform:rotate(18deg)}55%,70%{transform:rotate(-24deg)}}
+.tournament-mini-strip{position:relative;z-index:2;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px auto 12px}.tournament-mini-strip span{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(248,200,74,.24);color:#eaf2ff;font-size:12px;font-weight:950;white-space:nowrap}
+.world-cup-brand-strip{display:none!important}.gold-rule{margin:14px auto!important}.promise{font-size:clamp(16px,2.4vw,25px)!important;margin-bottom:12px!important}.description{margin-bottom:14px!important}.entry-card{margin-top:18px!important}
+.league-type.hfc{background:rgba(72,209,204,.16)!important;border-color:rgba(72,209,204,.42)!important;color:#c9fffb!important}.league-controls.upgraded .league-filter[data-league-filter="HFC"]{border-color:rgba(72,209,204,.36)!important}.live-table-summary.v80-five{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+@media(max-width:900px){.live-table-summary.v80-five{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:560px){.hero{padding:14px 10px 28px!important}.hero-card{padding:22px 12px 18px!important;border-radius:28px!important}.football-pass-scene{height:62px;margin:8px auto 6px}.mini-player{transform:scale(.82);bottom:8px}.player-right{transform:scaleX(-1) scale(.82)}.player-left{left:22px}.player-right{right:22px}.passing-ball{font-size:20px;left:42px;top:25px}@keyframes passBall{0%,100%{transform:translate(0,7px) scale(.9)}50%{transform:translate(calc(min(86vw,430px) - 90px),-9px) scale(1.05)}}.tournament-mini-strip span{font-size:10.5px;padding:6px 8px}.promise{gap:5px!important}.entry-card{padding:18px!important}}
 
 </style>

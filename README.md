@@ -1,12 +1,11 @@
-# FIFA World Cup 2026 Prediction Challenge - V79
+# FIFA World Cup 2026 Prediction Challenge - V80
 
-V79 focuses on Results Centre data integrity.
-
-Changes:
-- Rebuilt knockout-stage Results Centre mapping from the saved knockout path.
-- Removed unsafe fallback to local browser bracket state when displaying another player.
-- Champion is now taken from saved FINAL pick / saved predicted winner only.
-- Round of 16, Quarter-finals, Semi-finals, Finalists and Champion now follow the saved bracket path consistently.
-- Added a Results Centre integrity audit warning in the console for impossible combinations.
-- Future saved predictions now include a full `bracket` snapshot as well as `knockoutPicks`.
-- Version metadata updated to `v79-results-integrity`.
+V80 focuses on the landing page and league structure:
+- Removed overlapping trophy icons from the landing page.
+- Removed the Host Stadiums / Trophy Dreams / USA Canada Mexico bubbles.
+- Added a compact animated two-player football passing scene beneath Prediction Challenge.
+- Added a compact tournament facts strip: 48 Teams, 16 Host Cities, 1 Champion.
+- Added Callum, Darragh, Mich, Ray, Mike D and Rosie to the Family League override list.
+- Added a new HFC League, initially with Blane McKie included via the organiser override.
+- Added HFC filters/badges to Live Table and Fun Stats.
+- Retained the Results Centre knockout integrity audit from V79.
