@@ -1,11 +1,11 @@
-# FIFA World Cup 2026 Prediction Challenge - V80
+# FIFA World Cup 2026 Prediction Challenge - V85
 
-V80 focuses on the landing page and league structure:
-- Removed overlapping trophy icons from the landing page.
-- Removed the Host Stadiums / Trophy Dreams / USA Canada Mexico bubbles.
-- Added a compact animated two-player football passing scene beneath Prediction Challenge.
-- Added a compact tournament facts strip: 48 Teams, 16 Host Cities, 1 Champion.
-- Added Callum, Darragh, Mich, Ray, Mike D and Rosie to the Family League override list.
-- Added a new HFC League, initially with Blane McKie included via the organiser override.
-- Added HFC filters/badges to Live Table and Fun Stats.
-- Retained the Results Centre knockout integrity audit from V79.
+V85 builds from the uploaded V84 bundle and focuses on the How I Built This page:
+- Reworked the intro to explain Damien's AI lunch chats, voice dictation and the challenge clearly.
+- Removed the separate working prototype badge and jumps straight into Build Snapshot.
+- Kept the four evening timeline and added rough time spent per session.
+- Expanded each day into 2-3 clear build steps.
+- Moved example prompts into each day card and styled them as quoted prompts.
+- Upgraded the date badges to a more professional format.
+- Removed the separate Example Prompts section and reduced repeated messaging.
+- Kept the voice-dictation learning and "Even this page was created using AI."
