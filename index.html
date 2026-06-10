@@ -1806,7 +1806,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 @keyframes kickLeg{0%,45%,100%{transform:rotate(18deg)}55%,70%{transform:rotate(-24deg)}}
 .tournament-mini-strip{position:relative;z-index:2;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px auto 12px}.tournament-mini-strip span{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(248,200,74,.24);color:#eaf2ff;font-size:12px;font-weight:950;white-space:nowrap}
 .world-cup-brand-strip{display:none!important}.gold-rule{margin:14px auto!important}.promise{font-size:clamp(16px,2.4vw,25px)!important;margin-bottom:12px!important}.description{margin-bottom:14px!important}.entry-card{margin-top:18px!important}
-.league-type.hfc{background:rgba(72,209,204,.16)!important;border-color:rgba(72,209,204,.42)!important;color:#c9fffb!important}.league-controls.upgraded .league-filter[data-league-filter="HFC"]{border-color:rgba(72,209,204,.36)!important}.live-table-summary.v80-five{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+.entry-badge-stack{display:inline-flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-start}.league-type.hfc{background:rgba(72,209,204,.16)!important;border-color:rgba(72,209,204,.42)!important;color:#c9fffb!important}.league-controls.upgraded .league-filter[data-league-filter="HFC"]{border-color:rgba(72,209,204,.36)!important}.live-table-summary.v80-five{grid-template-columns:repeat(5,minmax(0,1fr))!important}
 @media(max-width:900px){.live-table-summary.v80-five{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:560px){.hero{padding:14px 10px 28px!important}.hero-card{padding:22px 12px 18px!important;border-radius:28px!important}.football-pass-scene{height:62px;margin:8px auto 6px}.mini-player{transform:scale(.82);bottom:8px}.player-right{transform:scaleX(-1) scale(.82)}.player-left{left:22px}.player-right{right:22px}.passing-ball{font-size:20px;left:42px;top:25px}@keyframes passBall{0%,100%{transform:translate(0,7px) scale(.9)}50%{transform:translate(calc(min(86vw,430px) - 90px),-9px) scale(1.05)}}.tournament-mini-strip span{font-size:10.5px;padding:6px 8px}.promise{gap:5px!important}.entry-card{padding:18px!important}}
 
@@ -3190,7 +3190,7 @@ function championPopularity(team){
 }
 const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice','Thomas Edwards','John M','Callum','Darragh','Mich','Ray','Mike D','Rosie','Tony','Lauren','Brett','Luke Williamson','MichelleJ','Tommy','Chelsey','Theo McKie'];
 const allLeagueNames = ['Blane McKie'];
-const hfcLeagueNames = ['Blane McKie','Theo Mills','Theodore Smith','Theo McKie'];
+const hfcLeagueNames = ['Alfie Lawrence','Bobby Boggans','Marshall','Ryan Doyle','Teddy K','Theo G','Theo Mills','Theodore Smith','Theo McKie'];
 function normalisePersonName(name){return String(name||'').trim().toLowerCase().replace(/\s+/g,' ');}
 function isFamilyLeagueName(name){
   const cleaned=normalisePersonName(name);
@@ -3210,6 +3210,7 @@ function isHfcLeagueName(name){
 }
 function leagueFor(email,name=''){
   if(isFamilyLeagueName(name)) return 'Family';
+  if(isHfcLeagueName(name)) return 'HFC';
   return String(email||'').toLowerCase().endsWith('@lego.com')?'LEGO':'Main';
 }
 function leagueLabel(value, name=''){
@@ -3227,6 +3228,16 @@ function leagueClass(value, name=''){
   if(l==='Family') return 'family';
   if(l==='HFC') return 'hfc';
   return '';
+}
+function entryBadgesHtml(value, name=''){
+  if(isAllLeagueName(name)) return `<span class="league-type allleague">👑 All Leagues</span>`;
+  const badges=[];
+  const l=normaliseLeague(value);
+  if(l==='LEGO') badges.push(`<span class="league-type lego">🧱 LEGO Entry</span>`);
+  if(isFamilyLeagueName(name) || l==='Family') badges.push(`<span class="league-type family">🏡 Family Entry</span>`);
+  if(isHfcLeagueName(name) || l==='HFC') badges.push(`<span class="league-type hfc">⚽ HFC Entry</span>`);
+  if(!badges.length) badges.push(`<span class="league-type">🌍 Main Entry</span>`);
+  return `<span class="entry-badge-stack">${badges.join('')}</span>`;
 }
 
 function niceDate(date){return new Date(date+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
@@ -3391,7 +3402,7 @@ function renderLeaderboard(){
   const main=allRows.filter(r=>normaliseLeague(r.league)==='Main' || r.allLeagues).length;
   const summary=`<div class="live-summary live-table-summary v80-five"><div class="summary-tile"><b>${total}</b><span>🏆 All Leagues</span></div><div class="summary-tile"><b>${main}</b><span>🌍 Main League</span></div><div class="summary-tile"><b>${lego}</b><span>🧱 LEGO League</span></div><div class="summary-tile"><b>${family}</b><span>🏡 Family League</span></div><div class="summary-tile"><b>${hfc}</b><span>⚽ HFC League</span></div></div>`;
   if(!filtered.length){$('#leaderboardList').innerHTML=summary+'<div class="empty-state">No entries for this league yet.</div>';return;}
-  const table=`<table class="league-table upgraded-table"><thead><tr><th>Rank</th><th>Player</th><th>Entry</th><th>Total Points</th></tr></thead><tbody>${filtered.map((r,i)=>`<tr><td data-label="Rank"><span class="rank-badge">${i+1}</span></td><td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span></td><td data-label="Entry"><span class="league-type ${leagueClass(r.league,r.name)}">${leagueLabel(r.league,r.name)}</span></td><td data-label="Total Points"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td></tr>`).join('')}</tbody></table>`;
+  const table=`<table class="league-table upgraded-table"><thead><tr><th>Rank</th><th>Player</th><th>Entry</th><th>Total Points</th></tr></thead><tbody>${filtered.map((r,i)=>`<tr><td data-label="Rank"><span class="rank-badge">${i+1}</span></td><td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span></td><td data-label="Entry">${entryBadgesHtml(r.league,r.name)}</td><td data-label="Total Points"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td></tr>`).join('')}</tbody></table>`;
   $('#leaderboardList').innerHTML=summary+table;
 }
 $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagueFilter=btn.dataset.leagueFilter;renderLeaderboard();}));
