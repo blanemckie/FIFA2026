@@ -3188,9 +3188,9 @@ function championPopularity(team){
   const pct=total?Math.round((count/total)*100):0;
   return total?`Picked by ${count} player${count===1?'':'s'} (${pct}%)`:'Popularity updates once entries are locked.';
 }
-const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice','Thomas Edwards','John M','Callum','Darragh','Mich','Ray','Mike D','Rosie','Tony','Lauren','Brett','Luke Williamson','MichelleJ','Tommy','Chelsey','Theo McKie'];
+const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice','Thomas Edwards','John M','Callum','Darragh','Mich','Ray','Mike D','Rosie','Tony','Lauren','Brett','Luke Williamson','MichelleJ','Tommy','Chelsey','Theo McKie','Cian'];
 const allLeagueNames = ['Blane McKie'];
-const hfcLeagueNames = ['Alfie Lawrence','Bobby Boggans','Marshall','Ryan Doyle','Teddy K','Theo G','Theo Mills','Theodore Smith','Theo McKie'];
+const hfcLeagueNames = ['Alfie Lawrence','Bobby Boggans','Marshall','Ryan Doyle','Teddy K','Theo G','Theo Mills','Theodore Smith','Rafferty Harnett','Theo McKie'];
 function normalisePersonName(name){return String(name||'').trim().toLowerCase().replace(/\s+/g,' ');}
 function isFamilyLeagueName(name){
   const cleaned=normalisePersonName(name);
@@ -3387,7 +3387,11 @@ function getEntryRows(){
   rows.forEach(r=>{
     const key=(r.email||r.name||Math.random()).toString().toLowerCase();
     const existing=byName.get(key)||{};
-    byName.set(key,{...existing,...r, league:normaliseLeague(isFamilyLeagueName(r.name||existing.name)?'Family':(r.league||existing.league)), allLeagues:isAllLeagueName(r.name||existing.name), hfcLeague:isHfcLeagueName(r.name||existing.name), totalPoints:r.totalPoints||existing.totalPoints||0});
+    const entryName = r.name || existing.name;
+    const assignedLeague = isFamilyLeagueName(entryName)
+      ? 'Family'
+      : (isHfcLeagueName(entryName) ? 'HFC' : (r.league || existing.league));
+    byName.set(key,{...existing,...r, league:normaliseLeague(assignedLeague), allLeagues:isAllLeagueName(entryName), hfcLeague:isHfcLeagueName(entryName), totalPoints:r.totalPoints||existing.totalPoints||0});
   });
   return [...byName.values()].filter(r=>r.name).sort((a,b)=>(b.totalPoints||0)-(a.totalPoints||0)||String(a.name).localeCompare(String(b.name)));
 }

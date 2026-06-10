@@ -15,3 +15,10 @@ Changes included:
   - Kept the page as a premium FIFA-style case study layout.
 - No other pages or core prediction/results logic intentionally changed.
 - Results Centre integrity audit remains a standing release check for future builds.
+
+
+## v86b update
+- Built from uploaded v85a baseline.
+- Added Cian to Family league names.
+- Added Rafferty Harnett to HFC league names.
+- Updated locked-entry league assignment so named HFC entries are HFC rather than Main; Theo McKie remains Family + HFC via dual badges/filter membership.
