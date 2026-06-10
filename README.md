@@ -1,12 +1,17 @@
-# FIFA World Cup 2026 Prediction Challenge - V82
+# FIFA World Cup 2026 Prediction Challenge - V84
 
-V82 builds from the uploaded V80 base and focuses on the How I Built This page:
-- Rewrote the intro to be sharper and less repetitive.
-- Kept the Damien lunch-chat inspiration.
-- Framed the build as four evening sessions from Thursday 4 June to Tuesday 9 June.
-- Highlighted that the first working prototype took around one hour.
-- Kept total development time under three hours.
-- Made voice-first prompting/dictation the key learning.
-- Added: “Even this page was created using AI.”
-- Added concise session breakdowns with techy terminal-style example prompt cards.
-- Retained V80 landing page, Family League, HFC League and Results Centre integrity audit changes.
+V84 builds directly from the provided V83 base.
+
+Changes included:
+- Added Tony and Lauren to the Family League override list.
+- Tony and Lauren appear in All Leagues and Family League, and are excluded from Main League.
+- Kept Blane McKie as the organiser override appearing in All Leagues, Main, LEGO, Family and HFC.
+- Added an animated “Entries Closing Soon” warning on the landing page beneath the kick-off countdown and above the entry form.
+- Updated the How I Built This page only:
+  - Full-height date badges on each session card.
+  - Full-height build-time badges on each session card.
+  - Changed prompt labels to “Real Prompt Example”.
+  - Updated the Biggest Learning section with stronger voice-dictation wording.
+  - Kept the page as a premium FIFA-style case study layout.
+- No other pages or core prediction/results logic intentionally changed.
+- Results Centre integrity audit remains a standing release check for future builds.

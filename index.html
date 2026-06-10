@@ -2919,6 +2919,53 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 @media(max-width:900px){.live-table-summary.v80-five{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:560px){.hero{padding:14px 10px 28px!important}.hero-card{padding:22px 12px 18px!important;border-radius:28px!important}.football-pass-scene{height:62px;margin:8px auto 6px}.mini-player{transform:scale(.82);bottom:8px}.player-right{transform:scaleX(-1) scale(.82)}.player-left{left:22px}.player-right{right:22px}.passing-ball{font-size:20px;left:42px;top:25px}@keyframes passBall{0%,100%{transform:translate(0,7px) scale(.9)}50%{transform:translate(calc(min(86vw,430px) - 90px),-9px) scale(1.05)}}.tournament-mini-strip span{font-size:10.5px;padding:6px 8px}.promise{gap:5px!important}.entry-card{padding:18px!important}}
 
+
+
+/* V84: Entries closing soon alert + premium How I Built This refinements */
+.entries-closing-alert{
+  position:relative;
+  z-index:2;
+  width:min(680px,100%);
+  margin:14px auto 16px;
+  padding:13px 16px;
+  border-radius:22px;
+  background:linear-gradient(135deg,rgba(255,59,92,.20),rgba(248,200,74,.16),rgba(255,255,255,.06));
+  border:1.8px solid rgba(248,200,74,.58);
+  color:#fff;
+  box-shadow:0 18px 42px rgba(0,0,0,.24),0 0 24px rgba(255,59,92,.14),inset 0 1px 0 rgba(255,255,255,.12);
+  overflow:hidden;
+  text-align:center;
+  animation:entriesPulse 2.8s ease-in-out infinite;
+}
+.entries-closing-alert:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent,rgba(255,255,255,.20),transparent);transform:translateX(-110%);animation:entriesShine 4.8s ease-in-out infinite;pointer-events:none;}
+.entries-closing-alert strong{position:relative;z-index:1;display:block;color:#fff3a2;font-size:clamp(15px,2.3vw,21px);font-weight:1000;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.entries-closing-alert span{position:relative;z-index:1;display:block;color:#ffe9ef;font-size:13px;font-weight:900;line-height:1.35;}
+@keyframes entriesPulse{0%,100%{box-shadow:0 18px 42px rgba(0,0,0,.24),0 0 18px rgba(248,200,74,.13)}50%{box-shadow:0 18px 42px rgba(0,0,0,.24),0 0 34px rgba(255,59,92,.25)}}
+@keyframes entriesShine{0%,62%{transform:translateX(-110%)}100%{transform:translateX(110%)}}
+@media(max-width:560px){.entries-closing-alert{margin:10px auto 12px;padding:11px 12px;border-radius:18px}.entries-closing-alert strong{font-size:13px}.entries-closing-alert span{font-size:11.5px}}
+.v83-session-card.v84-session-card{grid-template-columns:92px minmax(0,1fr) 86px!important;align-items:stretch!important;padding:0!important;gap:0!important;overflow:hidden!important;border-radius:28px!important;}
+.v84-session-card .v83-date-badge,.v84-time-badge{align-self:stretch!important;border-radius:0!important;min-height:100%!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;padding:16px 8px!important;}
+.v84-session-card .v83-date-badge{background:linear-gradient(180deg,#fff7bd,#f8c84a)!important;border-right:1px solid rgba(255,255,255,.22)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.66),0 16px 34px rgba(0,0,0,.18)!important;}
+.v84-time-badge{background:linear-gradient(180deg,rgba(55,212,255,.18),rgba(5,18,45,.72))!important;border-left:1px solid rgba(55,212,255,.28)!important;color:#b9f3ff!important;}
+.v84-time-badge span{font-size:10px;font-weight:1000;letter-spacing:.12em;text-transform:uppercase;color:#d8f7ff;line-height:1.1;}
+.v84-time-badge strong{font-size:30px;line-height:.95;font-weight:1000;color:#fff3a2;}
+.v84-time-badge small{font-size:12px;font-weight:1000;text-transform:uppercase;color:#b9f3ff;}
+.v84-session-card .v83-session-body{padding:18px 20px!important;}
+.v84-session-card .v83-session-top{justify-content:center!important;text-align:center!important;margin-bottom:8px!important;}
+.v84-session-card .v83-session-top h3{width:100%;font-size:clamp(23px,3vw,31px)!important;}
+.v84-session-card .v83-session-body ul{margin:10px auto 14px!important;max-width:620px!important;}
+.v84-session-card .v83-prompt{max-width:690px!important;margin:0 auto!important;background:linear-gradient(135deg,rgba(5,18,45,.78),rgba(13,49,118,.42))!important;border:1px solid rgba(248,200,74,.32)!important;border-left:5px solid var(--gold)!important;}
+.v84-session-card .v83-prompt b{font-size:11px!important;letter-spacing:.12em!important;}
+.v84-session-card .v83-prompt p{font-style:italic!important;color:#f2f7ff!important;}
+.v83-learning-card.v84-learning-card p{font-size:clamp(15px,2vw,18px)!important;line-height:1.56!important;}
+.v83-learning-card.v84-learning-card p:first-of-type{font-weight:950!important;color:#fff!important;}
+@media(max-width:700px){
+  .v83-session-card.v84-session-card{grid-template-columns:1fr!important;}
+  .v84-session-card .v83-date-badge,.v84-time-badge{min-height:auto!important;border-radius:0!important;padding:12px 10px!important;}
+  .v84-time-badge{border-left:0!important;border-top:1px solid rgba(55,212,255,.28)!important;}
+  .v84-time-badge strong{font-size:24px;}
+  .v84-session-card .v83-session-body{padding:16px 14px!important;}
+}
 </style>
 </head>
 <body>
@@ -2943,6 +2990,10 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
         <div class="count-title">⚽ Countdown To Kick-Off ⚽</div>
         <div class="countdown-units"><div class="count-unit"><b data-days>000</b><span>Days</span></div><div class="count-unit"><b data-hours>00</b><span>Hours</span></div><div class="count-unit"><b data-mins>00</b><span>Mins</span></div><div class="count-unit"><b data-secs>00</b><span>Secs</span></div></div>
         <div class="count-sub">Mexico v South Africa · Thu, 11 Jun 2026 · 21:00 CET</div>
+      </div>
+      <div class="entries-closing-alert" role="status" aria-live="polite">
+        <strong>⚠️ Entries Closing Soon ⚠️</strong>
+        <span>Lock in your predictions before kick-off. Once the tournament starts, entries are closed.</span>
       </div>
       <form class="entry-card" id="entryForm">
         <h2>Enter Your Game</h2>
@@ -3024,60 +3075,64 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 
     <h3 class="v83-section-title">Four Evening Build Timeline</h3>
     <div class="v83-timeline">
-      <article class="v83-session-card">
+      <article class="v83-session-card v84-session-card">
         <div class="v83-date-badge"><span>Thu</span><strong>04</strong><small>Jun</small></div>
         <div class="v83-session-body">
-          <div class="v83-session-top"><h3>Foundation Build</h3><em>~60 mins</em></div>
+          <div class="v83-session-top"><h3>Foundation Build</h3></div>
           <ul>
             <li>Created the first landing page and site structure.</li>
             <li>Built the group-stage fixture framework.</li>
             <li>Produced the first working prediction game prototype.</li>
           </ul>
-          <div class="v83-prompt"><b>Example Prompt</b><p>“Build a FIFA World Cup 2026 prediction game that works on both mobile and desktop devices.”</p></div>
+          <div class="v83-prompt"><b>Real Prompt Example</b><p>“Build a FIFA World Cup 2026 prediction game that works on both mobile and desktop devices.”</p></div>
         </div>
+        <div class="v84-time-badge"><span>Build<br>Time</span><strong>60</strong><small>Min</small></div>
       </article>
-      <article class="v83-session-card">
+      <article class="v83-session-card v84-session-card">
         <div class="v83-date-badge"><span>Sun</span><strong>07</strong><small>Jun</small></div>
         <div class="v83-session-body">
-          <div class="v83-session-top"><h3>Tournament Logic</h3><em>~30 mins</em></div>
+          <div class="v83-session-top"><h3>Tournament Logic</h3></div>
           <ul>
             <li>Added knockout-stage progression.</li>
             <li>Introduced champion selection.</li>
             <li>Built the scoring framework and validation rules.</li>
           </ul>
-          <div class="v83-prompt"><b>Example Prompt</b><p>“Automatically populate the knockout stages from the group winners and runners-up.”</p></div>
+          <div class="v83-prompt"><b>Real Prompt Example</b><p>“Automatically populate the knockout stages from the group winners and runners-up.”</p></div>
         </div>
+        <div class="v84-time-badge"><span>Build<br>Time</span><strong>30</strong><small>Min</small></div>
       </article>
-      <article class="v83-session-card">
+      <article class="v83-session-card v84-session-card">
         <div class="v83-date-badge"><span>Mon</span><strong>08</strong><small>Jun</small></div>
         <div class="v83-session-body">
-          <div class="v83-session-top"><h3>Competition Features</h3><em>~35 mins</em></div>
+          <div class="v83-session-top"><h3>Competition Features</h3></div>
           <ul>
             <li>Added Firebase data storage.</li>
             <li>Built registration and submission logic.</li>
             <li>Introduced LEGO, Family, Main and HFC leagues.</li>
           </ul>
-          <div class="v83-prompt"><b>Example Prompt</b><p>“Create separate LEGO, Family and HFC leagues using the same prediction data.”</p></div>
+          <div class="v83-prompt"><b>Real Prompt Example</b><p>“Create separate LEGO, Family and HFC leagues using the same prediction data.”</p></div>
         </div>
+        <div class="v84-time-badge"><span>Build<br>Time</span><strong>35</strong><small>Min</small></div>
       </article>
-      <article class="v83-session-card">
+      <article class="v83-session-card v84-session-card">
         <div class="v83-date-badge"><span>Tue</span><strong>09</strong><small>Jun</small></div>
         <div class="v83-session-body">
-          <div class="v83-session-top"><h3>Launch Preparation</h3><em>~45 mins</em></div>
+          <div class="v83-session-top"><h3>Launch Preparation</h3></div>
           <ul>
             <li>Created the Results Centre and Fun Stats page.</li>
             <li>Added countdown, ticker and league filters.</li>
             <li>Optimised the experience for mobile users.</li>
           </ul>
-          <div class="v83-prompt"><b>Example Prompt</b><p>“Optimise the entire experience for iPhone users without impacting the desktop layout.”</p></div>
+          <div class="v83-prompt"><b>Real Prompt Example</b><p>“Optimise the entire experience for iPhone users without impacting the desktop layout.”</p></div>
         </div>
+        <div class="v84-time-badge"><span>Build<br>Time</span><strong>45</strong><small>Min</small></div>
       </article>
     </div>
 
-    <div class="v83-learning-card">
+    <div class="v83-learning-card v84-learning-card">
       <h3>💡 Biggest Learning</h3>
-      <p>The biggest surprise wasn't how quickly the website was built. It was how effective <strong>voice dictation</strong> became.</p>
-      <p>Most features were created by speaking naturally rather than typing detailed specifications. Explaining an idea verbally for 20 seconds was often enough to generate a working solution.</p>
+      <p>Whilst I was surprised at how quickly something like this could be turned into a working product, the biggest learning was how effective voice dictation became.</p>
+      <p>Being able to describe changes naturally rather than typing detailed specifications sped up the development process exponentially.</p>
       <p class="v83-ai-line">Even this page was created using AI.</p>
     </div>
   </section>
@@ -3133,7 +3188,7 @@ function championPopularity(team){
   const pct=total?Math.round((count/total)*100):0;
   return total?`Picked by ${count} player${count===1?'':'s'} (${pct}%)`:'Popularity updates once entries are locked.';
 }
-const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice','Thomas Edwards','John M','Callum','Darragh','Mich','Ray','Mike D','Rosie'];
+const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice','Thomas Edwards','John M','Callum','Darragh','Mich','Ray','Mike D','Rosie','Tony','Lauren'];
 const allLeagueNames = ['Blane McKie'];
 const hfcLeagueNames = ['Blane McKie'];
 function normalisePersonName(name){return String(name||'').trim().toLowerCase().replace(/\s+/g,' ');}
