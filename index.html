@@ -3069,6 +3069,16 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   .fun-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
 }
 
+
+/* V91: Status bar for Live Table and Results Centre */
+.score-status-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:0 0 14px;padding:10px 16px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font-size:13px;font-weight:900;}
+.score-status-bar .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:6px;}
+.score-status-bar .status-dot.live{background:#32d17f;box-shadow:0 0 6px rgba(50,209,127,.7);animation:statusPulse 2s ease-in-out infinite;}
+.score-status-bar .status-dot.waiting{background:#f8c84a;box-shadow:0 0 6px rgba(248,200,74,.5);}
+@keyframes statusPulse{0%,100%{opacity:1}50%{opacity:.4}}
+.score-status-bar .status-left{display:flex;align-items:center;color:#dce9ff;}
+.score-status-bar .status-right{color:#b8c9e8;font-size:12px;}
+
 /* V87: Live results wiring — actual scores + points in Results Centre */
 .actual-result-v87{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
 .actual-score-v87{font-size:clamp(15px,1.3vw,20px);font-weight:1000;color:#fff;letter-spacing:.04em}
@@ -3210,8 +3220,8 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     <section class="winner-reveal" id="winnerReveal"><div class="winner-kicker">Your predicted World Cup winner is</div><div class="winner-name" id="winnerName">—</div><div class="winner-sub">Once this is set, lock in your full tournament prediction below.</div></section>
     <section class="card lock-card"><button class="primary" id="lockBtn">Lock In Full Tournament Prediction</button><div class="note">You must complete every group score, knockout pick and champion selection before locking. Once locked, your entry is saved and cannot be changed.</div><div id="lockStatus" class="lock-status"></div></section>
   </section>
-  <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button><button class="league-filter" data-league-filter="HFC">⚽ HFC League</button></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div><p class="scores-updated-note" id="scoresUpdatedNote"></p><div style="text-align:center;margin-top:12px"><button id="fbRefreshBtn" style="background:rgba(55,212,255,.14);border:1px solid rgba(55,212,255,.32);color:#b9f3ff;border-radius:999px;padding:10px 20px;font-weight:1000;font-size:13px;cursor:pointer;">🔄 Refresh</button></div></div></section>
-  <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">⚽ Results Centre</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="world-cup-ticker" id="worldCupNewsTicker" aria-label="World Cup 2026 news ticker"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest World Cup 2026 headlines…</span></div></div></div><div class="card live-results-card"><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
+  <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button><button class="league-filter" data-league-filter="HFC">⚽ HFC League</button></div><div id="lbStatusBar" class="score-status-bar"><span class="status-left"><span class="status-dot waiting"></span><span id="lbStatusText">Awaiting first results</span></span><span id="lbStatusRight" class="status-right">Auto-refresh every 30 mins</span></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div><p class="scores-updated-note" id="scoresUpdatedNote"></p><div style="text-align:center;margin-top:12px"><button id="fbRefreshBtn" style="background:rgba(55,212,255,.14);border:1px solid rgba(55,212,255,.32);color:#b9f3ff;border-radius:999px;padding:10px 20px;font-weight:1000;font-size:13px;cursor:pointer;">🔄 Refresh</button></div></div></section>
+  <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">⚽ Results Centre</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="world-cup-ticker" id="worldCupNewsTicker" aria-label="World Cup 2026 news ticker"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest World Cup 2026 headlines…</span></div></div></div><div class="card live-results-card"><div id="rcStatusBar" class="score-status-bar"><span class="status-left"><span class="status-dot waiting"></span><span id="rcStatusText">Awaiting first results</span></span><span id="rcStatusRight" class="status-right">Auto-refresh every 30 mins</span></div><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
   <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="league-controls upgraded fun-league-controls" id="funLeagueControls"><button class="fun-league-filter active" data-fun-league-filter="All">🏆 All Leagues</button><button class="fun-league-filter" data-fun-league-filter="Main">🌍 Main</button><button class="fun-league-filter" data-fun-league-filter="LEGO">🧱 LEGO</button><button class="fun-league-filter" data-fun-league-filter="Family">🏡 Family</button><button class="fun-league-filter" data-fun-league-filter="HFC">⚽ HFC</button></div><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
   <section id="how" class="panel how-built-page v83-how-built-page">
     <div class="page-head unified-final-head build-story-head v83-build-head">
@@ -3538,7 +3548,7 @@ function updateKickoffCountdown(){
 }
 updateKickoffCountdown();
 
-function renderAll(){renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();updateProgress();updateKickoffCountdown(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);}
+function renderAll(){renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();updateProgress();updateKickoffCountdown();if(window.updateStatusBars)window.updateStatusBars(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);}
 
 /* V61: auto-advance between group-stage score boxes after typing */
 const scoreAdvanceTimers = new WeakMap();
@@ -4311,11 +4321,47 @@ function normaliseDoc(doc){
 }
 function refreshFirebaseViews(){
   if(window.renderLeaderboard) window.renderLeaderboard();
+    if(window.updateStatusBars) window.updateStatusBars();
   if(window.renderFunStats) window.renderFunStats();
   if(window.renderSubmissions) window.renderSubmissions();
 }
 window.firebaseSubmissions = [];
 window.firebaseEntries = [];
+
+// V91: Status bars
+function updateStatusBars(){
+  var rows=(typeof getEntryRows==='function')?getEntryRows():[];
+  var latestUpdate=null;
+  for(var i=0;i<rows.length;i++){
+    var ts=rows[i].scoresLastUpdated;
+    if(ts&&ts.toDate){var d=ts.toDate();if(!latestUpdate||d>latestUpdate)latestUpdate=d;}
+  }
+  var now=new Date();
+  var minsToNext=30-(now.getMinutes()%30);
+  var minsAway=Math.max(1,minsToNext);
+  var hasResults=latestUpdate!==null;
+  var timeStr=hasResults?latestUpdate.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+' on '+latestUpdate.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):null;
+  ['lb','rc'].forEach(function(p){
+    var bar=document.getElementById(p+'StatusBar');
+    var dot=bar&&bar.querySelector('.status-dot');
+    var txt=document.getElementById(p+'StatusText');
+    var rgt=document.getElementById(p+'StatusRight');
+    if(!bar)return;
+    if(hasResults){
+      if(dot){dot.classList.remove('waiting');dot.classList.add('live');}
+      if(txt)txt.textContent='Scores last updated: '+timeStr;
+      if(rgt)rgt.textContent='Next auto-refresh in ~'+minsAway+' min'+(minsAway!==1?'s':'');
+    }else{
+      if(dot){dot.classList.remove('live');dot.classList.add('waiting');}
+      if(txt)txt.textContent='Awaiting first results — scores update automatically after each match';
+      if(rgt)rgt.textContent='Auto-refresh every 30 mins';
+    }
+  });
+  var old=document.getElementById('scoresUpdatedNote');
+  if(old)old.textContent='';
+}
+window.updateStatusBars=updateStatusBars;
+
 window.firebasePredictions = [];
 window.firebaseLastFetched = null;
 function refreshLockedSubmissionCache(){
