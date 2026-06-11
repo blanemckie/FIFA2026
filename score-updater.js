@@ -10,16 +10,15 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-const API_KEY  = process.env.FOOTBALL_DATA_TOKEN;
-const API_HOST = 'v3.football.api-sports.io';
-const WC_LEAGUE_ID = 1; // FIFA World Cup on api-football
+const API_KEY      = process.env.FOOTBALL_DATA_TOKEN;
+const API_HOST     = 'v3.football.api-sports.io';
+const WC_LEAGUE_ID = 1;
 const WC_SEASON    = 2026;
 
 const TEAM_ALIASES = {
   'Korea Republic':               'South Korea',
   'Republic of Korea':            'South Korea',
   'Czechia':                      'Czech Republic',
-  'Czech Republic':               'Czech Republic',
   'Bosnia and Herzegovina':       'Bosnia & Herzegovina',
   'Bosnia-Herzegovina':           'Bosnia & Herzegovina',
   "Côte d'Ivoire":                'Ivory Coast',
@@ -114,7 +113,6 @@ const WCP_FIXTURES = [
   {id:71, home:'Algeria',              away:'Austria'},
   {id:72, home:'Jordan',               away:'Argentina'},
 ];
-
 async function fetchCompletedMatches() {
   const url = `https://${API_HOST}/fixtures?league=${WC_LEAGUE_ID}&season=${WC_SEASON}&status=FT`;
   console.log(`Fetching: ${url}`);
@@ -181,4 +179,48 @@ function calcPlayerPoints(groupPredictions, resolvedResults) {
   let total = 0;
   const matchBreakdown = {};
   for (const pick of (groupPredictions || [])) {
-    const actu
+    const actual = resolvedResults[pick.matchId];
+    if (!actual) { matchBreakdown[pick.matchId] = { points:0, reason:'pending' }; continue; }
+    const { points, reason } = scoreMatch(actual.homeGoals, actual.awayGoals, pick.homeScore, pick.awayScore);
+    total += points;
+    matchBreakdown[pick.matchId] = { points, reason, actualHome:actual.homeGoals, actualAway:actual.awayGoals };
+  }
+  return { total, matchBreakdown };
+}
+
+async function main() {
+  console.log('─── WCP Score Updater ───');
+  console.log(`Time: ${new Date().toISOString()}`);
+  const fixtures        = await fetchCompletedMatches();
+  const resultsMap      = buildResultsMap(fixtures);
+  const resolvedResults = resolveResults(resultsMap);
+  const completedCount  = Object.values(resolvedResults).filter(Boolean).length;
+  console.log(`📊 Matched ${completedCount} of 72 group fixtures`);
+  for (const fx of WCP_FIXTURES) {
+    const r = resolvedResults[fx.id];
+    if (r) console.log(`  ✓ Match ${fx.id}: ${fx.home} ${r.homeGoals}-${r.awayGoals} ${fx.away}`);
+  }
+  if (completedCount === 0) { console.log('ℹ️  No completed fixtures yet.'); return; }
+  const snapshot = await db.collection('predictions').where('locked','==',true).get();
+  console.log(`\n👥 ${snapshot.size} locked predictions to score`);
+  if (snapshot.empty) return;
+  const batch = db.batch();
+  let updated = 0;
+  for (const doc of snapshot.docs) {
+    const data = doc.data();
+    const { total, matchBreakdown } = calcPlayerPoints(data.groupPredictions||[], resolvedResults);
+    if (data.totalPoints === total) continue;
+    batch.update(doc.ref, {
+      totalPoints:         total,
+      groupMatchBreakdown: matchBreakdown,
+      scoresLastUpdated:   admin.firestore.FieldValue.serverTimestamp(),
+    });
+    console.log(`  📝 ${data.name}: ${data.totalPoints ?? 'unset'} → ${total} pts`);
+    updated++;
+  }
+  if (updated === 0) { console.log('✅ All scores already up to date.'); return; }
+  await batch.commit();
+  console.log(`\n✅ Updated ${updated} player scores in Firestore.`);
+}
+
+main().catch(err => { console.error('❌ Fatal error:', err); process.exit(1); });
