@@ -2922,7 +2922,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 
 
 
-/* V89: 105 entries locked; HFC tags for Fraser/Laura Lennon/Lee/Michael/Sam; Family tags for Charlotte/Freddie Ellis/Gordon Ellis/Jon Shaw/Matthew Ellis/Mila McKie/Victoria */
+/* V90: Replace onSnapshot real-time listeners with getDocs one-time fetch to fix Firestore quota burn. Auto-refresh every 10 mins + manual refresh button. */
 
 /* ── Global: consistent page header size across all tabs ── */
 .premium-page-title,
@@ -3210,7 +3210,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     <section class="winner-reveal" id="winnerReveal"><div class="winner-kicker">Your predicted World Cup winner is</div><div class="winner-name" id="winnerName">—</div><div class="winner-sub">Once this is set, lock in your full tournament prediction below.</div></section>
     <section class="card lock-card"><button class="primary" id="lockBtn">Lock In Full Tournament Prediction</button><div class="note">You must complete every group score, knockout pick and champion selection before locking. Once locked, your entry is saved and cannot be changed.</div><div id="lockStatus" class="lock-status"></div></section>
   </section>
-  <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button><button class="league-filter" data-league-filter="HFC">⚽ HFC League</button></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div><p class="scores-updated-note" id="scoresUpdatedNote"></p></div></section>
+  <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button><button class="league-filter" data-league-filter="HFC">⚽ HFC League</button></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div><p class="scores-updated-note" id="scoresUpdatedNote"></p><div style="text-align:center;margin-top:12px"><button id="fbRefreshBtn" style="background:rgba(55,212,255,.14);border:1px solid rgba(55,212,255,.32);color:#b9f3ff;border-radius:999px;padding:10px 20px;font-weight:1000;font-size:13px;cursor:pointer;">🔄 Refresh</button></div></div></section>
   <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">⚽ Results Centre</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="world-cup-ticker" id="worldCupNewsTicker" aria-label="World Cup 2026 news ticker"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest World Cup 2026 headlines…</span></div></div></div><div class="card live-results-card"><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
   <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="league-controls upgraded fun-league-controls" id="funLeagueControls"><button class="fun-league-filter active" data-fun-league-filter="All">🏆 All Leagues</button><button class="fun-league-filter" data-fun-league-filter="Main">🌍 Main</button><button class="fun-league-filter" data-fun-league-filter="LEGO">🧱 LEGO</button><button class="fun-league-filter" data-fun-league-filter="Family">🏡 Family</button><button class="fun-league-filter" data-fun-league-filter="HFC">⚽ HFC</button></div><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
   <section id="how" class="panel how-built-page v83-how-built-page">
@@ -3348,13 +3348,16 @@ function championPopularity(team){
   const pct=total?Math.round((count/total)*100):0;
   return total?`Picked by ${count} player${count===1?'':'s'} (${pct}%)`:'Popularity updates once entries are locked.';
 }
-const familyLeagueNames = ['Danielle','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice','Thomas Edwards','John M','Callum','Darragh','Mich','Ray','Mike D','Rosie','Tony','Lauren','Brett','Luke Williamson','MichelleJ','Tommy','Chelsey','Theo McKie','Cian','Deborah','Charlotte','Freddie Ellis','Gordon Ellis','Jon Shaw','Matthew Ellis','Mila McKie','Victoria'];
+const familyLeagueNames = ['Danielle','Hayley B','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice','Thomas Edwards','John M','Callum','Darragh','Mich','Ray','Mike D','Rosie','Tony','Lauren','Brett','Luke Williamson','MichelleJ','Tommy','Chelsey','Theo McKie','Cian','Deborah','Charlotte','Freddie Ellis','Gordon Ellis','Jon Shaw','Matthew Ellis','Mila McKie','Victoria'];
 const allLeagueNames = ['Blane McKie'];
-const hfcLeagueNames = ['Alfie Lawrence','Bobby Boggans','Marshall','Ryan Doyle','Teddy K','Theo G','Theo Mills','Theodore Smith','Rafferty Harnett','Theo McKie','Hector Humphrey','Jude Lennon','Matt Nimmo','Sean','Fraser','Laura Lennon','Lee','Michael','Sam','Hayley'];
+const hfcLeagueNames = ['Alfie Lawrence','Bobby Boggans','Marshall','Ryan Doyle','Teddy K','Theo G','Theo Mills','Theodore Smith','Rafferty Harnett','Theo McKie','Hector Humphrey','Jude Lennon','Matt Nimmo','Sean','Fraser','Laura Lennon','Lee','Michael','Sam','Hayley O'];
 function normalisePersonName(name){return String(name||'').trim().toLowerCase().replace(/\s+/g,' ');}
-function isFamilyLeagueName(name){
+function isFamilyLeagueName(name, email){
   const cleaned=normalisePersonName(name);
   const first=cleaned.split(' ')[0]||'';
+  const em=String(email||'').trim().toLowerCase();
+  // Email-based disambiguation for names that share a first name
+  if(first==='hayley') return em.includes('bailey');
   return familyLeagueNames.some(n=>{
     const target=normalisePersonName(n);
     return cleaned===target || first===target;
@@ -3364,16 +3367,19 @@ function isAllLeagueName(name){
   const cleaned=normalisePersonName(name);
   return allLeagueNames.some(n=>cleaned===normalisePersonName(n));
 }
-function isHfcLeagueName(name){
+function isHfcLeagueName(name, email){
   const cleaned=normalisePersonName(name);
+  const em=String(email||'').trim().toLowerCase();
+  // Email-based disambiguation for names that share a first name
+  if(cleaned.split(' ')[0]==='hayley') return em.includes('oates');
   return hfcLeagueNames.some(n=>cleaned===normalisePersonName(n));
 }
 function leagueFor(email,name=''){
-  if(isFamilyLeagueName(name)) return 'Family';
-  if(isHfcLeagueName(name)) return 'HFC';
+  if(isFamilyLeagueName(name,email)) return 'Family';
+  if(isHfcLeagueName(name,email)) return 'HFC';
   return String(email||'').toLowerCase().endsWith('@lego.com')?'LEGO':'Main';
 }
-function leagueLabel(value, name=''){
+function leagueLabel(value, name='', email=''){
   if(isAllLeagueName(name)) return '👑 All Leagues';
   const l=normaliseLeague(value);
   if(l==='LEGO') return '🧱 LEGO Entry';
@@ -3381,7 +3387,7 @@ function leagueLabel(value, name=''){
   if(l==='HFC') return '⚽ HFC Entry';
   return '🌍 Main Entry';
 }
-function leagueClass(value, name=''){
+function leagueClass(value, name='', email=''){
   if(isAllLeagueName(name)) return 'allleague';
   const l=normaliseLeague(value);
   if(l==='LEGO') return 'lego';
@@ -3389,13 +3395,13 @@ function leagueClass(value, name=''){
   if(l==='HFC') return 'hfc';
   return '';
 }
-function entryBadgesHtml(value, name=''){
+function entryBadgesHtml(value, name='', email=''){
   if(isAllLeagueName(name)) return `<span class="league-type allleague">👑 All Leagues</span>`;
   const badges=[];
   const l=normaliseLeague(value);
   if(l==='LEGO') badges.push(`<span class="league-type lego">🧱 LEGO Entry</span>`);
-  if(isFamilyLeagueName(name) || l==='Family') badges.push(`<span class="league-type family">🏡 Family Entry</span>`);
-  if(isHfcLeagueName(name) || l==='HFC') badges.push(`<span class="league-type hfc">⚽ HFC Entry</span>`);
+  if(isFamilyLeagueName(name,email) || l==='Family') badges.push(`<span class="league-type family">🏡 Family Entry</span>`);
+  if(isHfcLeagueName(name,email) || l==='HFC') badges.push(`<span class="league-type hfc">⚽ HFC Entry</span>`);
   if(!badges.length) badges.push(`<span class="league-type">🌍 Main Entry</span>`);
   return `<span class="entry-badge-stack">${badges.join('')}</span>`;
 }
@@ -3503,10 +3509,12 @@ function updateEntriesCountdown(){
     if(countdownBlock) countdownBlock.classList.add('hidden');
     if(closedBanner) closedBanner.classList.remove('hidden');
     if(entryForm) entryForm.classList.add('hidden');
-    // Update entry count from Firebase
-    const rows = window.firebasePredictions ? window.firebasePredictions.filter(r=>r.locked===true).length : 0;
+    // Update entry count — use same source as leaderboard so numbers always match
     const countEl=document.getElementById('closedEntryCount');
-    if(countEl) countEl.textContent=rows>0?rows:105;
+    if(countEl){
+      const rows = (typeof getEntryRows==='function') ? getEntryRows().length : (window.firebasePredictions ? window.firebasePredictions.filter(r=>r.locked===true).length : 0);
+      if(rows>0) countEl.textContent=rows;
+    }
   } else {
     if(countdownBlock) countdownBlock.classList.remove('hidden');
     if(closedBanner) closedBanner.classList.add('hidden');
@@ -3586,10 +3594,11 @@ function getEntryRows(){
     const key=(r.email||r.name||Math.random()).toString().toLowerCase();
     const existing=byName.get(key)||{};
     const entryName = r.name || existing.name;
-    const assignedLeague = isFamilyLeagueName(entryName)
+    const entryEmail = r.email || existing.email || '';
+    const assignedLeague = isFamilyLeagueName(entryName, entryEmail)
       ? 'Family'
-      : (isHfcLeagueName(entryName) ? 'HFC' : (r.league || existing.league));
-    byName.set(key,{...existing,...r, league:normaliseLeague(assignedLeague), allLeagues:isAllLeagueName(entryName), hfcLeague:isHfcLeagueName(entryName), totalPoints:r.totalPoints||existing.totalPoints||0});
+      : (isHfcLeagueName(entryName, entryEmail) ? 'HFC' : (r.league || existing.league));
+    byName.set(key,{...existing,...r, league:normaliseLeague(assignedLeague), allLeagues:isAllLeagueName(entryName), hfcLeague:isHfcLeagueName(entryName, entryEmail), totalPoints:r.totalPoints||existing.totalPoints||0});
   });
   return [...byName.values()].filter(r=>r.name).sort((a,b)=>(b.totalPoints||0)-(a.totalPoints||0)||String(a.name).localeCompare(String(b.name)));
 }
@@ -4228,7 +4237,7 @@ if(state.user){
 </script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDgiFVKBAXtxQPSTygPfC2PR8Zjb4n_vZE",
@@ -4308,20 +4317,65 @@ function refreshFirebaseViews(){
 window.firebaseSubmissions = [];
 window.firebaseEntries = [];
 window.firebasePredictions = [];
+window.firebaseLastFetched = null;
 function refreshLockedSubmissionCache(){
   window.firebaseSubmissions = (window.firebasePredictions || [])
     .filter(row => row && (row.locked === true || row.submissionStatus === 'locked'))
     .sort((a,b)=>String(b.submittedAtLocal||b.createdAtLocal||'').localeCompare(String(a.submittedAtLocal||a.createdAtLocal||'')));
 }
-onSnapshot(collection(db, "entries"), (snapshot) => {
-  window.firebaseEntries = snapshot.docs.map(normaliseDoc);
-  refreshLockedSubmissionCache();
-  refreshFirebaseViews();
-});
-onSnapshot(collection(db, "predictions"), (snapshot) => {
-  window.firebasePredictions = snapshot.docs.map(normaliseDoc);
-  refreshLockedSubmissionCache();
-  refreshFirebaseViews();
+
+// V90: replaced onSnapshot (real-time, re-reads full collection on every change)
+// with a single getDocs fetch to slash Firestore read usage.
+// Auto-refreshes every 10 minutes; manual refresh button available in UI.
+async function fetchFirebaseData(showIndicator){
+  try {
+    if(showIndicator) window._fbRefreshing = true;
+    updateRefreshBtn(true);
+    const [entriesSnap, predictionsSnap] = await Promise.all([
+      getDocs(collection(db, "entries")),
+      getDocs(collection(db, "predictions"))
+    ]);
+    window.firebaseEntries = entriesSnap.docs.map(normaliseDoc);
+    window.firebasePredictions = predictionsSnap.docs.map(normaliseDoc);
+    window.firebaseLastFetched = Date.now();
+    refreshLockedSubmissionCache();
+    refreshFirebaseViews();
+    updateEntriesCountdown();
+  } catch(e) {
+    console.warn('Firebase fetch error:', e);
+  } finally {
+    window._fbRefreshing = false;
+    updateRefreshBtn(false);
+  }
+}
+
+function updateRefreshBtn(loading){
+  const btn = document.getElementById('fbRefreshBtn');
+  if(!btn) return;
+  if(loading){
+    btn.textContent = '⏳ Refreshing…';
+    btn.disabled = true;
+  } else {
+    const ago = window.firebaseLastFetched
+      ? Math.round((Date.now()-window.firebaseLastFetched)/60000)
+      : null;
+    btn.textContent = ago !== null ? `🔄 Refresh${ago > 0 ? ` (${ago}m ago)` : ''}` : '🔄 Refresh';
+    btn.disabled = false;
+  }
+}
+
+// Initial load
+fetchFirebaseData(true);
+// Auto-refresh every 10 minutes
+setInterval(()=>fetchFirebaseData(false), 10*60*1000);
+// Keep the "X min ago" label ticking every minute
+setInterval(updateRefreshBtn, 60*1000);
+
+// Manual refresh button
+document.addEventListener('click', function(e){
+  if(e.target && e.target.id==='fbRefreshBtn' && !e.target.disabled){
+    fetchFirebaseData(true);
+  }
 });
 
 </script>
