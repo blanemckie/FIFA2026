@@ -150,6 +150,7 @@ function buildResultsMap(matches) {
   for (const m of matches) {
     const home = normalise(m.homeTeam?.name || m.homeTeam?.shortName);
     const away = normalise(m.awayTeam?.name || m.awayTeam?.shortName);
+    console.log(`API returned: "${m.homeTeam?.name}" vs "${m.awayTeam?.name}"`);
     const homeGoals = m.score?.fullTime?.home;
     const awayGoals = m.score?.fullTime?.away;
     if (home && away && homeGoals !== null && homeGoals !== undefined
