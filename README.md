@@ -22,3 +22,9 @@ Changes included:
 - Added Cian to Family league names.
 - Added Rafferty Harnett to HFC league names.
 - Updated locked-entry league assignment so named HFC entries are HFC rather than Main; Theo McKie remains Family + HFC via dual badges/filter membership.
+
+
+## v86d update
+- Deborah added as a Family entry.
+- Hector Humphrey, Jude Lennon, Matt Nimmo and Sean added as HFC entries.
+- Theo McKie intentionally remains both Family and HFC via badge logic and HFC filter inclusion.
