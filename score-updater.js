@@ -112,7 +112,7 @@ const WCP_FIXTURES = [
 
 async function fetchCompletedMatches() {
   // season=2026 ensures we get WC 2026 not a previous tournament
-  const url = `${FD_BASE}/competitions/WC/matches?season=2026&status=FINISHED`;
+  const url = `${FD_BASE}/competitions/WC/matches?season=2026`;
   console.log(`Fetching: ${url}`);
   const res = await fetch(url, { headers: { 'X-Auth-Token': FD_TOKEN } });
   if (!res.ok) {
