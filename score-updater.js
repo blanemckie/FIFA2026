@@ -127,6 +127,8 @@ async function fetchCompletedMatches() {
     throw new Error(`api-football responded ${res.status}: ${body}`);
   }
   const data = await res.json();
+  console.log('API errors:', JSON.stringify(data.errors));
+  console.log('API results count:', data.results);
   if (!data.response || !Array.isArray(data.response)) {
     console.log('Raw response:', JSON.stringify(data).slice(0, 300));
     throw new Error('Unexpected response structure from api-football');
