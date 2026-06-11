@@ -2921,7 +2921,159 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 
 
 
-/* V84: Entries closing soon alert + premium How I Built This refinements */
+
+/* V88: Sky Sports polish — compact rows, consistent headers, entries countdown/closed */
+
+/* ── Global: consistent page header size across all tabs ── */
+.premium-page-title,
+.unified-final-head h2,
+.prediction-centre-head h2,
+.live-table-head h2,
+.results-head h2,
+.fun-head h2,
+.build-story-head h2,
+.live-results-submissions .page-head h2{
+  font-size:clamp(20px,2.8vw,34px)!important;
+  min-height:64px!important;
+  padding:12px clamp(14px,2.5vw,36px)!important;
+}
+
+/* ── Global: tighter card padding ── */
+.card{padding:14px 16px!important;}
+.live-table-card{padding:14px 16px!important;}
+.live-results-card{padding:14px 16px!important;}
+
+/* ── Global: tab nav bar bigger touch targets ── */
+.tabs button{padding:13px 16px!important;font-size:13px!important;}
+
+/* ── Predictions: compact fixture rows ── */
+.fixture-list{gap:8px!important;}
+.fixture-bar{padding:10px 14px!important;}
+.team{min-height:28px!important;}
+.score-inputs input{width:40px!important;padding:8px 2px!important;}
+
+/* ── Predictions: single emoji in headers ── */
+
+/* ── Leaderboard: tighter table rows ── */
+.upgraded-table{border-spacing:0 6px!important;}
+.upgraded-table td{padding:12px 14px!important;}
+.live-table-summary .summary-tile{min-height:80px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;}
+
+/* ── Fun Stats: tighter bubbles ── */
+.fun-stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
+.stat-bubble,.stat-bubble-v64,.stat-bubble-v69,.stat-bubble-v71,.stat-bubble-v77{min-height:130px!important;padding:14px 12px!important;}
+
+/* ── League filters unified across pages ── */
+.fun-league-filter{border:1px solid rgba(255,255,255,.18)!important;background:rgba(255,255,255,.08)!important;color:#fff!important;border-radius:999px!important;padding:10px 14px!important;font-weight:1000!important;cursor:pointer!important;font-size:13px!important;}
+.fun-league-filter.active{background:linear-gradient(135deg,var(--gold),#fff3a2)!important;color:#071633!important;border-color:transparent!important;}
+
+/* ── Results Centre: tighter grid rows ── */
+#submissions .results-cell{min-height:52px!important;}
+#submissions .results-grid-row{margin-bottom:5px!important;}
+
+/* ── Entries closing countdown ── */
+.entries-closing-countdown{
+  position:relative;
+  width:min(600px,100%);
+  margin:14px auto 16px;
+  padding:14px 18px;
+  border-radius:22px;
+  background:linear-gradient(135deg,rgba(255,59,92,.18),rgba(248,200,74,.14),rgba(255,255,255,.05));
+  border:1.8px solid rgba(248,200,74,.58);
+  box-shadow:0 18px 42px rgba(0,0,0,.24),0 0 24px rgba(255,59,92,.12),inset 0 1px 0 rgba(255,255,255,.10);
+  overflow:hidden;
+  text-align:center;
+  animation:ectPulse 2.8s ease-in-out infinite;
+}
+.entries-closing-countdown:before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.18),transparent);
+  transform:translateX(-110%);
+  animation:ectShine 4.8s ease-in-out infinite;pointer-events:none;
+}
+@keyframes ectPulse{
+  0%,100%{box-shadow:0 18px 42px rgba(0,0,0,.24),0 0 18px rgba(248,200,74,.10)}
+  50%{box-shadow:0 18px 42px rgba(0,0,0,.24),0 0 32px rgba(255,59,92,.22)}
+}
+@keyframes ectShine{0%,62%{transform:translateX(-110%)}100%{transform:translateX(110%)}}
+.ect-title{
+  position:relative;z-index:1;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  color:#fff3a2;font-weight:1000;text-transform:uppercase;
+  letter-spacing:.10em;font-size:clamp(13px,1.8vw,17px);margin-bottom:10px;
+}
+.ect-units{
+  position:relative;z-index:1;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:8px;max-width:280px;margin:0 auto 10px;
+}
+.ect-unit{
+  border-radius:14px;background:rgba(5,18,45,.55);
+  border:1px solid rgba(255,255,255,.14);padding:8px 6px;text-align:center;
+}
+.ect-unit b{
+  display:block;color:#fff3a2;
+  font-size:clamp(24px,4vw,38px);line-height:1;font-weight:1000;
+}
+.ect-unit span{
+  display:block;margin-top:3px;color:#dce9ff;
+  font-size:10px;font-weight:1000;letter-spacing:.08em;text-transform:uppercase;
+}
+.ect-sub{position:relative;z-index:1;color:#ffe9ef;font-size:12px;font-weight:900;line-height:1.35;}
+
+/* ── Entries closed banner ── */
+.entries-closed-banner{
+  position:relative;z-index:2;
+  width:min(560px,100%);margin:14px auto 0;
+  text-align:center;padding:28px 24px;
+  border-radius:26px;
+  background:linear-gradient(135deg,rgba(255,59,92,.14),rgba(8,25,62,.96));
+  border:2px solid rgba(255,59,92,.45);
+  box-shadow:0 24px 60px rgba(0,0,0,.32),0 0 28px rgba(255,59,92,.14),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.closed-icon{font-size:44px;margin-bottom:10px;display:block;}
+.closed-title{
+  font-size:clamp(20px,3.5vw,28px);font-weight:1000;color:#fff;
+  letter-spacing:-.03em;margin-bottom:6px;text-transform:uppercase;
+}
+.closed-sub{color:#ff8fa3;font-weight:900;font-size:14px;margin-bottom:16px;line-height:1.4;}
+.closed-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,59,92,.4),transparent);margin:14px 0;}
+.closed-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.closed-stat{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;padding:12px 8px;text-align:center;
+}
+.closed-stat b{display:block;font-size:24px;font-weight:1000;color:#fff3a2;}
+.closed-stat span{font-size:11px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.06em;}
+.browse-closed-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 24px;border-radius:999px;cursor:pointer;border:0;font:inherit;font-weight:1000;font-size:14px;
+  background:linear-gradient(135deg,rgba(55,212,255,.18),rgba(255,255,255,.10));
+  border:1px solid rgba(55,212,255,.38);color:#b9f3ff;
+}
+.browse-closed-btn:hover{background:linear-gradient(135deg,rgba(55,212,255,.28),rgba(255,255,255,.14));}
+
+/* ── Leaderboard: last updated note ── */
+.scores-updated-note{text-align:center;color:#b8c9e8;font-size:12px;font-weight:800;margin-top:10px;}
+
+/* ── Results Centre: player dropdown shows points ── */
+.player-dropdown option{font-weight:900;}
+
+@media(max-width:560px){
+  .entries-closing-countdown{padding:12px 12px;border-radius:18px;}
+  .ect-units{max-width:220px;gap:6px;}
+  .ect-unit b{font-size:22px;}
+  .ect-title{font-size:13px;}
+  .entries-closed-banner{padding:20px 16px;border-radius:22px;}
+  .closed-title{font-size:20px;}
+  .fun-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+}
+
+/* V87: Live results wiring — actual scores + points in Results Centre */
+.actual-result-v87{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.actual-score-v87{font-size:clamp(15px,1.3vw,20px);font-weight:1000;color:#fff;letter-spacing:.04em}
+.actual-reason-v87{font-size:11px;font-weight:1000;text-transform:uppercase;letter-spacing:.08em}
+
 .entries-closing-alert{
   position:relative;
   z-index:2;
@@ -2986,14 +3138,26 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
       <div class="gold-rule"></div>
       <div class="promise"><span class="main">⚽ Pick the Scores</span><span>🏆 Build Your Bracket</span><span>🔒 Lock It In Once</span><span>📈 Watch The Tournament Unfold</span></div>
       <p class="description">Predict every match. Build your tournament bracket. Compete for bragging rights. Follow the action live.</p>
-      <div class="kickoff-countdown" data-countdown>
-        <div class="count-title">⚽ Countdown To Kick-Off ⚽</div>
-        <div class="countdown-units"><div class="count-unit"><b data-days>000</b><span>Days</span></div><div class="count-unit"><b data-hours>00</b><span>Hours</span></div><div class="count-unit"><b data-mins>00</b><span>Mins</span></div><div class="count-unit"><b data-secs>00</b><span>Secs</span></div></div>
-        <div class="count-sub">Mexico v South Africa · Thu, 11 Jun 2026 · 21:00 CET</div>
+      <div class="entries-closing-countdown" id="entriesCountdownBlock" role="status" aria-live="polite">
+        <div class="ect-title">⚠️ Entries Closing Soon ⚠️</div>
+        <div class="ect-units">
+          <div class="ect-unit"><b id="ect-h">00</b><span>Hours</span></div>
+          <div class="ect-unit"><b id="ect-m">00</b><span>Mins</span></div>
+          <div class="ect-unit"><b id="ect-s">00</b><span>Secs</span></div>
+        </div>
+        <div class="ect-sub">Entries close at kick-off · Mexico v South Africa · 21:00 CET · 11 Jun 2026</div>
       </div>
-      <div class="entries-closing-alert" role="status" aria-live="polite">
-        <strong>⚠️ Entries Closing Soon ⚠️</strong>
-        <span>Lock in your predictions before kick-off. Once the tournament starts, entries are closed.</span>
+      <div class="entries-closed-banner hidden" id="entriesClosedBanner">
+        <span class="closed-icon">🔒</span>
+        <div class="closed-title">Entries Are Now Closed</div>
+        <div class="closed-sub">The FIFA World Cup 2026 has kicked off.<br>Predictions are locked — follow the scores live below.</div>
+        <div class="closed-divider"></div>
+        <div class="closed-stats">
+          <div class="closed-stat"><b id="closedEntryCount">—</b><span>Entries</span></div>
+          <div class="closed-stat"><b>4</b><span>Leagues</span></div>
+          <div class="closed-stat"><b>64</b><span>Days of Action</span></div>
+        </div>
+        <button class="browse-closed-btn" id="closedBrowseBtn">👀 View Live Table &amp; Results →</button>
       </div>
       <form class="entry-card" id="entryForm">
         <h2>Enter Your Game</h2>
@@ -3010,13 +3174,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 <nav class="tabs hidden" id="tabs"><button data-tab="predictions" class="active">Predictions</button><button data-tab="submissions">Live Results</button><button data-tab="leaderboard">Live Table</button><button data-tab="fun">Fun Stats</button><button data-tab="how">How I Built This</button></nav>
 <main class="app hidden" id="app">
   <section id="predictions" class="panel active">
-    <div class="page-head unified-final-head prediction-centre-head"><h2 id="welcomeTitle" class="premium-page-title">🎯 Prediction Centre 🎯</h2><p id="welcomeSubtitle" class="personal-subtitle"></p></div>
+    <div class="page-head unified-final-head prediction-centre-head"><h2 id="welcomeTitle" class="premium-page-title">🎯 Prediction Centre</h2><p id="welcomeSubtitle" class="personal-subtitle"></p></div>
     <div id="browseBanner" class="browse-banner hidden"><b>👀 Browse Mode</b>You are viewing the game as a guest. Predictions cannot be saved until you register.<br><button id="registerNowBtn" type="button">Register Now</button></div>
-    <div class="kickoff-countdown compact" data-countdown>
-      <div class="count-title">⚽ Countdown To Kick-Off ⚽</div>
-      <div class="countdown-units"><div class="count-unit"><b data-days>000</b><span>Days</span></div><div class="count-unit"><b data-hours>00</b><span>Hours</span></div><div class="count-unit"><b data-mins>00</b><span>Mins</span></div><div class="count-unit"><b data-secs>00</b><span>Secs</span></div></div>
-      <div class="count-sub">First match: Mexico v South Africa · 21:00 CET</div>
-    </div>
+
     <section class="card how-play-card">
       <h3>⚽ How to Play</h3>
       <p>The concept is simple. Pick the scores for each group game. Based on your picks, the knockout fixtures below automatically populate so you can build your full tournament path.</p>
@@ -3050,12 +3210,12 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     <section class="winner-reveal" id="winnerReveal"><div class="winner-kicker">Your predicted World Cup winner is</div><div class="winner-name" id="winnerName">—</div><div class="winner-sub">Once this is set, lock in your full tournament prediction below.</div></section>
     <section class="card lock-card"><button class="primary" id="lockBtn">Lock In Full Tournament Prediction</button><div class="note">You must complete every group score, knockout pick and champion selection before locking. Once locked, your entry is saved and cannot be changed.</div><div id="lockStatus" class="lock-status"></div></section>
   </section>
-  <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table 🏆</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button><button class="league-filter" data-league-filter="HFC">⚽ HFC League</button></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div></div></section>
-  <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">⚽ Results Centre ⚽</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="world-cup-ticker" id="worldCupNewsTicker" aria-label="World Cup 2026 news ticker"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest World Cup 2026 headlines…</span></div></div></div><div class="kickoff-countdown compact" data-countdown><div class="count-title">⚽ Countdown To Kick-Off ⚽</div><div class="countdown-units"><div class="count-unit"><b data-days>000</b><span>Days</span></div><div class="count-unit"><b data-hours>00</b><span>Hours</span></div><div class="count-unit"><b data-mins>00</b><span>Mins</span></div><div class="count-unit"><b data-secs>00</b><span>Secs</span></div></div><div class="count-sub">Live scoring begins when Mexico v South Africa kicks off.</div></div><div class="card live-results-card"><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
-  <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats 📊</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="league-controls upgraded fun-league-controls" id="funLeagueControls"><button class="fun-league-filter active" data-fun-league-filter="All">🏆 All Leagues</button><button class="fun-league-filter" data-fun-league-filter="Main">🌍 Main</button><button class="fun-league-filter" data-fun-league-filter="LEGO">🧱 LEGO</button><button class="fun-league-filter" data-fun-league-filter="Family">🏡 Family</button><button class="fun-league-filter" data-fun-league-filter="HFC">⚽ HFC</button></div><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
+  <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button><button class="league-filter" data-league-filter="HFC">⚽ HFC League</button></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div><p class="scores-updated-note" id="scoresUpdatedNote"></p></div></section>
+  <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">⚽ Results Centre</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="world-cup-ticker" id="worldCupNewsTicker" aria-label="World Cup 2026 news ticker"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest World Cup 2026 headlines…</span></div></div></div><div class="card live-results-card"><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
+  <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="league-controls upgraded fun-league-controls" id="funLeagueControls"><button class="fun-league-filter active" data-fun-league-filter="All">🏆 All Leagues</button><button class="fun-league-filter" data-fun-league-filter="Main">🌍 Main</button><button class="fun-league-filter" data-fun-league-filter="LEGO">🧱 LEGO</button><button class="fun-league-filter" data-fun-league-filter="Family">🏡 Family</button><button class="fun-league-filter" data-fun-league-filter="HFC">⚽ HFC</button></div><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
   <section id="how" class="panel how-built-page v83-how-built-page">
     <div class="page-head unified-final-head build-story-head v83-build-head">
-      <h2 class="premium-page-title">🚀 How I Built This 🚀</h2>
+      <h2 class="premium-page-title">🚀 How I Built This</h2>
     </div>
 
     <div class="v83-intro-card">
@@ -3251,6 +3411,12 @@ function showToast(message){
 }
 $('#entryForm').addEventListener('submit',async e=>{
   e.preventDefault();
+  // V88: Block new entries after kick-off deadline
+  if(entriesAreClosed()){
+    alert('Entries are now closed. The tournament has kicked off!');
+    updateEntriesCountdown();
+    return;
+  }
   const name=$('#nameInput').value.trim();
   const email=$('#emailInput').value.trim().toLowerCase();
   if(!name||!email){alert('Please enter your name and email.');return;}
@@ -3281,7 +3447,7 @@ function boot(){
   if(state.user){
     state.browseMode=false;
     showMainApp();
-    $('#welcomeTitle').textContent='🎯 Prediction Centre 🎯';
+    $('#welcomeTitle').textContent='🎯 Prediction Centre';
     const sub=$('#welcomeSubtitle');
     if(sub) sub.innerHTML=`<span>${state.user.name}</span>, lock in your picks. Climb the leaderboard. Chase the trophy.`;
     const banner=$('#browseBanner'); if(banner) banner.classList.add('hidden');
@@ -3292,7 +3458,7 @@ function enterBrowseMode(){
   state.browseMode=true;
   state.user=null;
   showMainApp();
-  $('#welcomeTitle').textContent='🎯 Prediction Centre 🎯';
+  $('#welcomeTitle').textContent='🎯 Prediction Centre';
   const sub=$('#welcomeSubtitle');
   if(sub) sub.innerHTML='Explore the game, preview the journey, and register when you are ready to save your picks.';
   const banner=$('#browseBanner'); if(banner) banner.classList.remove('hidden');
@@ -3309,28 +3475,60 @@ function requireRegistration(){
   const n=$('#nameInput'); if(n) n.focus();
 }
 
+// V88: Entries closing countdown + entries closed validation
+const ENTRIES_DEADLINE = new Date('2026-06-11T21:00:00+02:00').getTime();
+
+function entriesAreClosed(){
+  return Date.now() >= ENTRIES_DEADLINE;
+}
+
+function updateEntriesCountdown(){
+  const diff = Math.max(0, ENTRIES_DEADLINE - Date.now());
+  const h = Math.floor(diff/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const s = Math.floor((diff%60000)/1000);
+  const hEl=document.getElementById('ect-h');
+  const mEl=document.getElementById('ect-m');
+  const sEl=document.getElementById('ect-s');
+  if(hEl) hEl.textContent=String(h).padStart(2,'0');
+  if(mEl) mEl.textContent=String(m).padStart(2,'0');
+  if(sEl) sEl.textContent=String(s).padStart(2,'0');
+
+  const countdownBlock=document.getElementById('entriesCountdownBlock');
+  const closedBanner=document.getElementById('entriesClosedBanner');
+  const entryForm=document.getElementById('entryForm');
+
+  if(entriesAreClosed()){
+    // Show closed banner, hide countdown and entry form
+    if(countdownBlock) countdownBlock.classList.add('hidden');
+    if(closedBanner) closedBanner.classList.remove('hidden');
+    if(entryForm) entryForm.classList.add('hidden');
+    // Update entry count from Firebase
+    const rows = window.firebasePredictions ? window.firebasePredictions.filter(r=>r.locked===true).length : 0;
+    const countEl=document.getElementById('closedEntryCount');
+    if(countEl && rows>0) countEl.textContent=rows;
+  } else {
+    if(countdownBlock) countdownBlock.classList.remove('hidden');
+    if(closedBanner) closedBanner.classList.add('hidden');
+    if(entryForm) entryForm.classList.remove('hidden');
+  }
+}
+updateEntriesCountdown();
+setInterval(updateEntriesCountdown,1000);
+
+// Redirect closed-banner button to leaderboard
+document.addEventListener('click', function(e){
+  if(e.target && e.target.id==='closedBrowseBtn'){
+    enterBrowseMode();
+    setTimeout(()=>setTab('leaderboard'),100);
+  }
+});
+
+// V88: Block entry form submission after deadline
 function updateKickoffCountdown(){
-  const target = new Date('2026-06-11T21:00:00+02:00').getTime();
-  const now = Date.now();
-  const diff = Math.max(0, target-now);
-  const days=Math.floor(diff/86400000);
-  const hours=Math.floor((diff%86400000)/3600000);
-  const mins=Math.floor((diff%3600000)/60000);
-  const secs=Math.floor((diff%60000)/1000);
-  document.querySelectorAll('[data-countdown]').forEach(card=>{
-    const d=card.querySelector('[data-days]'), h=card.querySelector('[data-hours]'), m=card.querySelector('[data-mins]'), s=card.querySelector('[data-secs]');
-    if(d) d.textContent=String(days).padStart(3,'0');
-    if(h) h.textContent=String(hours).padStart(2,'0');
-    if(m) m.textContent=String(mins).padStart(2,'0');
-    if(s) s.textContent=String(secs).padStart(2,'0');
-    if(diff<=0){
-      const title=card.querySelector('.count-title');
-      if(title) title.textContent='🏆 Tournament Underway 🏆';
-    }
-  });
+  // No-op — countdown removed from inner tabs, kept for compatibility
 }
 updateKickoffCountdown();
-setInterval(updateKickoffCountdown,1000);
 
 function renderAll(){renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();updateProgress();updateKickoffCountdown(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);}
 
@@ -3426,7 +3624,7 @@ function renderSubmissions(){
   dropdown.innerHTML=rows.map((r,i)=>{
     const key=entryKey(r,i);
     const name=r.name||'Unknown player';
-    return `<option value="${key}" ${key===currentSubmissionKey?'selected':''}>⚽ ${name}</option>`;
+    const pts=Number(r.totalPoints||0); return `<option value="${key}" ${key===currentSubmissionKey?'selected':''}>⚽ ${name}${pts>0?' — '+pts+' pts':''}</option>`;
   }).join('');
   dropdown.onchange=()=>{
     currentSubmissionKey=dropdown.value;
@@ -3618,7 +3816,8 @@ function renderSubmissionDetail(entry){
     const metaVenue=p.venue||fx.venue||'Venue TBC';
     const prediction=`<div class="fixture-card-v51"><span class="fixture-team-v51 home">${home}</span><span class="fixture-score-v51">${score}</span><span class="fixture-team-v51 away">${away}</span><div class="fixture-meta-v51"><span>${metaGroup}</span><span>${metaDate}</span><span>${metaTime}</span><span>${metaVenue}</span></div></div>`;
     const max=10; runningMax+=max;
-    rows.push(summaryRow(prediction, max));
+    const matchBreakdown = (entry.groupMatchBreakdown && entry.groupMatchBreakdown[p.matchId]) || null;
+    rows.push(summaryRow(prediction, max, matchBreakdown));
   });
   ['Round of 32 Picks','Round of 16 Picks','Quarter-final Picks','Semi-final Picks','Finalists'].forEach(label=>{
     const teams=stageTeams[label]||[];
@@ -3641,11 +3840,57 @@ function renderSubmissionDetail(entry){
   const championTopBubble = `<div class="champion-first-bubble champion-reveal-v68"><div class="champion-stars">⭐ 🏆 ⭐</div><div class="champion-first-kicker">🏆 Champion Pick 🏆</div><div class="champion-player-line">👑 ${(entry.name||'This player').split(' ')[0]} thinks ${champion==='Not selected yet'?'their champion':'this team'} will lift the trophy 👑</div><div class="champion-first-team">${champion==='Not selected yet'?'<span>Not selected yet</span>':teamLabel(champion)}</div><div class="champion-fact-card"><strong>🌍 World Cup Fact</strong><span>${championFactText}</span></div><div class="champion-popularity">🏅 ${championPopularityText}</div></div>`;
   box.innerHTML=`<div class="player-result-strip"><div class="selected-player-name">⚽ ${(entry.name||'Selected player').toUpperCase()}</div><div class="points-total-card"><div class="total-points">${currentPoints} / ${runningMax}</div><small>Running points / max available</small></div></div>${championTopBubble}<div class="results-grid-v51"><div class="results-grid-header"><div>Your Prediction</div><div>Actual Result</div><div>Points<small>Earned / Max</small></div></div>${rows.join('')}<div class="results-total-row"><div class="results-total-label">Total Running Points</div><div>${currentPoints} / ${runningMax}</div></div></div>`;
 }
-function summaryRow(prediction,maxPoints){return `<div class="results-grid-row"><div class="results-cell prediction-cell" data-label="Your Prediction">${prediction}</div><div class="results-cell actual-cell" data-label="Actual Result"><span class="actual-pending">Result Pending</span></div><div class="results-cell points-cell" data-label="Points">0 / ${maxPoints}</div></div>`}
+function summaryRow(prediction,maxPoints,matchData){
+  // matchData = { points, reason, actualHome, actualAway } from groupMatchBreakdown
+  // or null/undefined if result not yet known
+  let actualHtml, pointsHtml;
+  if(matchData && matchData.reason && matchData.reason !== 'pending'){
+    const score = `${matchData.actualHome} - ${matchData.actualAway}`;
+    const reasonLabel = matchData.reason==='exact_score'?'⭐ Exact Score':matchData.reason==='correct_result'?'✓ Correct Result':'✗ Wrong Result';
+    const reasonColour = matchData.reason==='exact_score'?'var(--gold)':matchData.reason==='correct_result'?'var(--green)':'var(--red)';
+    actualHtml = `<div class="actual-result-v87"><span class="actual-score-v87">${score}</span><span class="actual-reason-v87" style="color:${reasonColour}">${reasonLabel}</span></div>`;
+    const earned = matchData.points||0;
+    const pointsColour = earned===maxPoints?'var(--gold)':earned>0?'var(--green)':'var(--red)';
+    pointsHtml = `<span style="color:${pointsColour};font-weight:1000">${earned} / ${maxPoints}</span>`;
+  } else {
+    actualHtml = `<span class="actual-pending">Result Pending</span>`;
+    pointsHtml = `0 / ${maxPoints}`;
+  }
+  return `<div class="results-grid-row"><div class="results-cell prediction-cell" data-label="Your Prediction">${prediction}</div><div class="results-cell actual-cell" data-label="Actual Result">${actualHtml}</div><div class="results-cell points-cell" data-label="Points">${pointsHtml}</div></div>`;
+}
 function initials(name){return name.split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
 const samplePlayers=[{name:'Blane McKie',type:'max'},{name:'Callum McKie',type:'partial'},{name:'John McKie',type:'max'},{name:'Louise McKie',type:'partial'},{name:'Finance Tester',type:'partial'}];
 function avatarHtml(player){return `<span class="avatar ${player.type==='partial'?'partial':''}" tabindex="0" data-name="${player.name}">${initials(player.name)}</span>`}
-function renderResults(){if(!$('#resultsList')) return; const all=[...fixtures,...ko.map(k=>({date:k.date,ukTime:k.ukTime,group:k.round,home:k.homeSlot,away:k.awaySlot,venue:'Knockout fixture'}))].sort((a,b)=>a.date.localeCompare(b.date)||String(a.ukTime).localeCompare(String(b.ukTime)));$('#resultsList').innerHTML=`<div class="results-legend"><span class="legend-chip">🟡 Max Points = exact / full points</span><span class="legend-chip">🔵 Partial Points = correct outcome only</span><span class="legend-chip">Hover/tap initials to see full name</span></div>`+all.map((f,i)=>{const max=i%4===0?samplePlayers.filter(p=>p.type==='max'):i%5===0?samplePlayers.filter(p=>p.type==='max').slice(0,1):[];const partial=i%3===0?samplePlayers.filter(p=>p.type==='partial'):i%2===0?samplePlayers.filter(p=>p.type==='partial').slice(0,2):[];return `<div class="result-row upcoming"><div class="result-meta"><span class="group-tag">${f.group}</span><span>📅 ${niceDate(f.date)}</span><span>🕒 ${ukToCet(f.date,f.ukTime)}</span></div><div class="result-fixture"><b><span class="inline-team">${teamLabel(f.home)}</span><span class="result-v">v</span><span class="inline-team">${teamLabel(f.away)}</span></b><small>${f.venue||''}</small></div><span class="pending-pill">Result Pending</span><div class="points-col"><strong>Max Points</strong><div class="avatar-stack">${max.length?max.map(avatarHtml).join(''):'<span class="muted">None yet</span>'}</div></div><div class="points-col"><strong>Partial Points</strong><div class="avatar-stack">${partial.length?partial.map(avatarHtml).join(''):'<span class="muted">None yet</span>'}</div></div></div>`}).join('');}
+function renderResults(){
+  if(!$('#resultsList')) return;
+  const all=[...fixtures,...ko.map(k=>({date:k.date,ukTime:k.ukTime,group:k.round,home:k.homeSlot,away:k.awaySlot,venue:'Knockout fixture',id:k.id}))].sort((a,b)=>a.date.localeCompare(b.date)||String(a.ukTime).localeCompare(String(b.ukTime)));
+  const allRows=getEntryRows();
+  $('#resultsList').innerHTML=`<div class="results-legend"><span class="legend-chip">🟡 Exact Score = 10 pts</span><span class="legend-chip">🔵 Correct Result = 5 pts</span><span class="legend-chip">⬜ No points = 0 pts</span><span class="legend-chip">Hover/tap initials to see name</span></div>`+all.map((f)=>{
+    // Find real result for this fixture from any player's breakdown (all have same actual score)
+    let actualResult = null;
+    for(const row of allRows){
+      const bd = row.groupMatchBreakdown && row.groupMatchBreakdown[f.id];
+      if(bd && bd.reason && bd.reason!=='pending' && bd.reason!=='invalid'){
+        actualResult = { homeGoals: bd.actualHome, awayGoals: bd.actualAway, reason: bd.reason };
+        break;
+      }
+    }
+    // Build avatar lists from real player data
+    const maxAvatars=[], partialAvatars=[], wrongAvatars=[];
+    allRows.forEach(row=>{
+      const bd = row.groupMatchBreakdown && row.groupMatchBreakdown[f.id];
+      if(!bd || bd.reason==='pending') return;
+      if(bd.reason==='exact_score') maxAvatars.push(row);
+      else if(bd.reason==='correct_result') partialAvatars.push(row);
+      else wrongAvatars.push(row);
+    });
+    const statusClass = actualResult ? 'completed' : 'upcoming';
+    const resultPill = actualResult
+      ? `<span class="pending-pill" style="background:rgba(50,209,127,.15);border-color:rgba(50,209,127,.4);color:#32d17f">${teamLabel(f.home)} ${actualResult.homeGoals} - ${actualResult.awayGoals} ${teamLabel(f.away)}</span>`
+      : `<span class="pending-pill">Result Pending</span>`;
+    return `<div class="result-row ${statusClass}"><div class="result-meta"><span class="group-tag">${f.group}</span><span>📅 ${niceDate(f.date)}</span><span>🕒 ${ukToCet(f.date,f.ukTime)}</span></div><div class="result-fixture"><b><span class="inline-team">${teamLabel(f.home)}</span><span class="result-v">v</span><span class="inline-team">${teamLabel(f.away)}</span></b><small>${f.venue||''}</small></div>${resultPill}<div class="points-col"><strong>⭐ Exact (10pts)</strong><div class="avatar-stack">${maxAvatars.length?maxAvatars.map(p=>avatarHtml({name:p.name,type:'max'})).join(''):'<span class="muted">None yet</span>'}</div></div><div class="points-col"><strong>✓ Result (5pts)</strong><div class="avatar-stack">${partialAvatars.length?partialAvatars.map(p=>avatarHtml({name:p.name,type:'partial'})).join(''):'<span class="muted">None yet</span>'}</div></div></div>`;
+  }).join('');
+}
 
 window.renderLeaderboard = renderLeaderboard;
 window.renderSubmissions = renderSubmissions;
