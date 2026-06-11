@@ -128,7 +128,8 @@ const WCP_FIXTURES = [
 
 // ── Fetch completed World Cup matches ─────────────────────────────────
 async function fetchCompletedMatches() {
-  const url = `${FD_BASE}/competitions/${WC_CODE}/matches?status=FINISHED`;
+  // Try 2026 World Cup first, fall back to WC code
+  const url = `${FD_BASE}/competitions/WC/matches?season=2026&status=FINISHED`;
   const res = await fetch(url, {
     headers: { 'X-Auth-Token': FD_TOKEN }
   });
@@ -141,7 +142,10 @@ async function fetchCompletedMatches() {
     throw new Error('Unexpected response from football-data.org');
   }
   console.log(`✅ football-data.org returned ${data.matches.length} finished matches`);
+  // Log competition info to confirm correct tournament
+  if(data.competition) console.log(`Competition: ${data.competition.name} ${data.competition.id}`);
   return data.matches;
+}
 }
 
 // ── Build results lookup map ──────────────────────────────────────────
