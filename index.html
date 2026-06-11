@@ -3348,9 +3348,9 @@ function championPopularity(team){
   const pct=total?Math.round((count/total)*100):0;
   return total?`Picked by ${count} player${count===1?'':'s'} (${pct}%)`:'Popularity updates once entries are locked.';
 }
-const familyLeagueNames = ['Danielle','Hayley','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice','Thomas Edwards','John M','Callum','Darragh','Mich','Ray','Mike D','Rosie','Tony','Lauren','Brett','Luke Williamson','MichelleJ','Tommy','Chelsey','Theo McKie','Cian','Deborah','Charlotte','Freddie Ellis','Gordon Ellis','Jon Shaw','Matthew Ellis','Mila McKie','Victoria'];
+const familyLeagueNames = ['Danielle','George','Henry','Lorraine','Ted','Maeve','Lou','Louise','Ant','Patrick Kavanagh','Oliver B','Seb','Janice','Thomas Edwards','John M','Callum','Darragh','Mich','Ray','Mike D','Rosie','Tony','Lauren','Brett','Luke Williamson','MichelleJ','Tommy','Chelsey','Theo McKie','Cian','Deborah','Charlotte','Freddie Ellis','Gordon Ellis','Jon Shaw','Matthew Ellis','Mila McKie','Victoria'];
 const allLeagueNames = ['Blane McKie'];
-const hfcLeagueNames = ['Alfie Lawrence','Bobby Boggans','Marshall','Ryan Doyle','Teddy K','Theo G','Theo Mills','Theodore Smith','Rafferty Harnett','Theo McKie','Hector Humphrey','Jude Lennon','Matt Nimmo','Sean','Fraser','Laura Lennon','Lee','Michael','Sam'];
+const hfcLeagueNames = ['Alfie Lawrence','Bobby Boggans','Marshall','Ryan Doyle','Teddy K','Theo G','Theo Mills','Theodore Smith','Rafferty Harnett','Theo McKie','Hector Humphrey','Jude Lennon','Matt Nimmo','Sean','Fraser','Laura Lennon','Lee','Michael','Sam','Hayley'];
 function normalisePersonName(name){return String(name||'').trim().toLowerCase().replace(/\s+/g,' ');}
 function isFamilyLeagueName(name){
   const cleaned=normalisePersonName(name);
