@@ -1,18 +1,6 @@
-/**
- * WCP Score Updater — score-updater.js
- * Uses football-data.org API (free tier, FIFA World Cup included)
- * Runs via GitHub Actions every 30 minutes.
- *
- * Scoring rules (group stage):
- *   5 pts — correct result (home win / away win / draw)
- *   5 pts — correct exact scoreline (only if result also correct)
- *  10 pts — maximum per match
- */
-
 const fetch = require('node-fetch');
 const admin = require('firebase-admin');
 
-// ── Firebase init ─────────────────────────────────────────────────────
 admin.initializeApp({
   credential: admin.credential.cert({
     projectId:   process.env.FIREBASE_PROJECT_ID,
@@ -22,27 +10,24 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
-// ── football-data.org config ──────────────────────────────────────────
-const FD_TOKEN   = process.env.FOOTBALL_DATA_TOKEN;
-const FD_BASE    = 'https://api.football-data.org/v4';
-const WC_CODE    = 'WC';
+const FD_TOKEN = process.env.FOOTBALL_DATA_TOKEN;
+const FD_BASE  = 'https://api.football-data.org/v4';
 
-// ── Team name aliases ─────────────────────────────────────────────────
 const TEAM_ALIASES = {
-  'Korea Republic':                'South Korea',
-  'Republic of Korea':             'South Korea',
-  'Czechia':                       'Czech Republic',
-  'Bosnia and Herzegovina':        'Bosnia & Herzegovina',
-  "Côte d'Ivoire":                 'Ivory Coast',
-  "Cote d'Ivoire":                 'Ivory Coast',
-  'United States':                 'USA',
-  'Congo DR':                      'DR Congo',
-  'Democratic Republic of Congo':  'DR Congo',
-  'Curaçao':                       'Curacao',
-  'Cabo Verde':                    'Cape Verde',
-  'Cape Verde Islands':            'Cape Verde',
-  'IR Iran':                       'Iran',
-  'Türkiye':                       'Turkey',
+  'Korea Republic':               'South Korea',
+  'Republic of Korea':            'South Korea',
+  'Czechia':                      'Czech Republic',
+  'Bosnia and Herzegovina':       'Bosnia & Herzegovina',
+  "Côte d'Ivoire":                'Ivory Coast',
+  "Cote d'Ivoire":                'Ivory Coast',
+  'United States':                'USA',
+  'Congo DR':                     'DR Congo',
+  'Democratic Republic of Congo': 'DR Congo',
+  'Curaçao':                      'Curacao',
+  'Cabo Verde':                   'Cape Verde',
+  'Cape Verde Islands':           'Cape Verde',
+  'IR Iran':                      'Iran',
+  'Türkiye':                      'Turkey',
 };
 
 function normalise(name) {
@@ -50,7 +35,6 @@ function normalise(name) {
   return TEAM_ALIASES[t] || t;
 }
 
-// ── Your 72 group-stage fixtures ──────────────────────────────────────
 const WCP_FIXTURES = [
   {id:1,  home:'Mexico',               away:'South Africa'},
   {id:2,  home:'South Korea',          away:'Czech Republic'},
@@ -126,49 +110,39 @@ const WCP_FIXTURES = [
   {id:72, home:'Jordan',               away:'Argentina'},
 ];
 
-// ── Fetch completed World Cup matches ─────────────────────────────────
 async function fetchCompletedMatches() {
-  // Try 2026 World Cup first, fall back to WC code
+  // season=2026 ensures we get WC 2026 not a previous tournament
   const url = `${FD_BASE}/competitions/WC/matches?season=2026&status=FINISHED`;
-  const res = await fetch(url, {
-    headers: { 'X-Auth-Token': FD_TOKEN }
-  });
+  console.log(`Fetching: ${url}`);
+  const res = await fetch(url, { headers: { 'X-Auth-Token': FD_TOKEN } });
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`football-data.org responded ${res.status}: ${body}`);
+    throw new Error(`football-data.org ${res.status}: ${body}`);
   }
   const data = await res.json();
-  if (!data.matches || !Array.isArray(data.matches)) {
-    throw new Error('Unexpected response from football-data.org');
-  }
+  if (data.competition) console.log(`Competition: ${data.competition.name} (id:${data.competition.id})`);
+  if (!data.matches || !Array.isArray(data.matches)) throw new Error('Bad response structure');
   console.log(`✅ football-data.org returned ${data.matches.length} finished matches`);
-  // Log competition info to confirm correct tournament
-  if(data.competition) console.log(`Competition: ${data.competition.name} ${data.competition.id}`);
+  data.matches.forEach(m => {
+    console.log(`  API match: "${m.homeTeam?.name}" vs "${m.awayTeam?.name}" — ${m.score?.fullTime?.home}:${m.score?.fullTime?.away}`);
+  });
   return data.matches;
 }
-}
 
-// ── Build results lookup map ──────────────────────────────────────────
 function buildResultsMap(matches) {
   const map = {};
   for (const m of matches) {
     const home = normalise(m.homeTeam?.name || m.homeTeam?.shortName);
     const away = normalise(m.awayTeam?.name || m.awayTeam?.shortName);
-    console.log(`API returned: "${m.homeTeam?.name}" vs "${m.awayTeam?.name}"`);
     const homeGoals = m.score?.fullTime?.home;
     const awayGoals = m.score?.fullTime?.away;
-    if (home && away && homeGoals !== null && homeGoals !== undefined
-        && awayGoals !== null && awayGoals !== undefined) {
-      map[`${home}|${away}`] = {
-        homeGoals: Number(homeGoals),
-        awayGoals: Number(awayGoals),
-      };
+    if (home && away && homeGoals != null && awayGoals != null) {
+      map[`${home}|${away}`] = { homeGoals: Number(homeGoals), awayGoals: Number(awayGoals) };
     }
   }
   return map;
 }
 
-// ── Match fixture IDs to results ──────────────────────────────────────
 function resolveResults(resultsMap) {
   const resolved = {};
   for (const fx of WCP_FIXTURES) {
@@ -177,16 +151,14 @@ function resolveResults(resultsMap) {
   return resolved;
 }
 
-// ── Scoring ───────────────────────────────────────────────────────────
 function outcome(h, a) { return h > a ? 'H' : a > h ? 'A' : 'D'; }
 
-function scoreMatch(actualHome, actualAway, predictedHome, predictedAway) {
-  const aH = Number(actualHome), aA = Number(actualAway);
-  const pH = Number(predictedHome), pA = Number(predictedAway);
-  if ([aH, aA, pH, pA].some(v => isNaN(v))) return { points: 0, reason: 'invalid' };
-  if (outcome(aH, aA) !== outcome(pH, pA)) return { points: 0, reason: 'wrong_result' };
-  if (aH === pH && aA === pA) return { points: 10, reason: 'exact_score' };
-  return { points: 5, reason: 'correct_result' };
+function scoreMatch(aH, aA, pH, pA) {
+  aH = Number(aH); aA = Number(aA); pH = Number(pH); pA = Number(pA);
+  if ([aH,aA,pH,pA].some(v=>isNaN(v))) return {points:0,reason:'invalid'};
+  if (outcome(aH,aA) !== outcome(pH,pA)) return {points:0,reason:'wrong_result'};
+  if (aH===pH && aA===pA) return {points:10,reason:'exact_score'};
+  return {points:5,reason:'correct_result'};
 }
 
 function calcPlayerPoints(groupPredictions, resolvedResults) {
@@ -194,82 +166,47 @@ function calcPlayerPoints(groupPredictions, resolvedResults) {
   const matchBreakdown = {};
   for (const pick of (groupPredictions || [])) {
     const actual = resolvedResults[pick.matchId];
-    if (!actual) {
-      matchBreakdown[pick.matchId] = { points: 0, reason: 'pending' };
-      continue;
-    }
-    const { points, reason } = scoreMatch(
-      actual.homeGoals, actual.awayGoals,
-      pick.homeScore,   pick.awayScore
-    );
+    if (!actual) { matchBreakdown[pick.matchId] = {points:0,reason:'pending'}; continue; }
+    const {points,reason} = scoreMatch(actual.homeGoals,actual.awayGoals,pick.homeScore,pick.awayScore);
     total += points;
-    matchBreakdown[pick.matchId] = {
-      points, reason,
-      actualHome: actual.homeGoals,
-      actualAway: actual.awayGoals,
-    };
+    matchBreakdown[pick.matchId] = {points,reason,actualHome:actual.homeGoals,actualAway:actual.awayGoals};
   }
-  return { total, matchBreakdown };
+  return {total,matchBreakdown};
 }
 
-// ── Main ──────────────────────────────────────────────────────────────
 async function main() {
   console.log('─── WCP Score Updater ───');
   console.log(`Time: ${new Date().toISOString()}`);
-
   const matches         = await fetchCompletedMatches();
   const resultsMap      = buildResultsMap(matches);
   const resolvedResults = resolveResults(resultsMap);
-
-  const completedCount = Object.values(resolvedResults).filter(Boolean).length;
+  const completedCount  = Object.values(resolvedResults).filter(Boolean).length;
   console.log(`📊 Matched ${completedCount} of 72 group fixtures`);
-
   for (const fx of WCP_FIXTURES) {
     const r = resolvedResults[fx.id];
     if (r) console.log(`  ✓ Match ${fx.id}: ${fx.home} ${r.homeGoals}-${r.awayGoals} ${fx.away}`);
   }
-
-  if (completedCount === 0) {
-    console.log('ℹ️  No completed fixtures yet — nothing to score.');
-    return;
-  }
-
-  const snapshot = await db.collection('predictions')
-    .where('locked', '==', true)
-    .get();
-
+  if (completedCount === 0) { console.log('ℹ️  No completed fixtures yet.'); return; }
+  const snapshot = await db.collection('predictions').where('locked','==',true).get();
   console.log(`\n👥 ${snapshot.size} locked predictions to score`);
   if (snapshot.empty) return;
-
   const batch = db.batch();
   let updated = 0;
-
   for (const doc of snapshot.docs) {
     const data = doc.data();
-    const { total, matchBreakdown } = calcPlayerPoints(
-      data.groupPredictions || [],
-      resolvedResults
-    );
+    const {total,matchBreakdown} = calcPlayerPoints(data.groupPredictions||[],resolvedResults);
     if (data.totalPoints === total) continue;
     batch.update(doc.ref, {
-      totalPoints:         total,
+      totalPoints: total,
       groupMatchBreakdown: matchBreakdown,
-      scoresLastUpdated:   admin.firestore.FieldValue.serverTimestamp(),
+      scoresLastUpdated: admin.firestore.FieldValue.serverTimestamp(),
     });
-    console.log(`  📝 ${data.name}: ${data.totalPoints ?? 'unset'} → ${total} pts`);
+    console.log(`  📝 ${data.name}: ${data.totalPoints??'unset'} → ${total} pts`);
     updated++;
   }
-
-  if (updated === 0) {
-    console.log('✅ All scores already up to date.');
-    return;
-  }
-
+  if (updated === 0) { console.log('✅ All scores already up to date.'); return; }
   await batch.commit();
   console.log(`\n✅ Updated ${updated} player scores in Firestore.`);
 }
 
-main().catch(err => {
-  console.error('❌ Fatal error:', err);
-  process.exit(1);
-});
+main().catch(err => { console.error('❌ Fatal error:', err); process.exit(1); });
