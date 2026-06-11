@@ -12,7 +12,7 @@ const db = admin.firestore();
 
 const API_KEY      = process.env.FOOTBALL_DATA_TOKEN;
 const API_HOST     = 'v3.football.api-sports.io';
-const WC_LEAGUE_ID = 1;
+const WC_LEAGUE_ID = 22;
 const WC_SEASON    = 2026;
 
 const TEAM_ALIASES = {
