@@ -3861,6 +3861,51 @@ function renderLeaderboard(){
 $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagueFilter=btn.dataset.leagueFilter;renderLeaderboard();}));
 let currentSubmissionKey = null;
 function entryKey(r,i){ return String(r.id || r.email || r.name || i); }
+
+// V94 FIX: shared helper used by the landing-page name search and Firebase refresh.
+// This updates the real Results Centre selection, not just window.currentSubmissionKey.
+function selectResultsPlayer(rowOrName){
+  const rows=getEntryRows();
+  if(!rows.length) return false;
+  const target = (typeof rowOrName === 'string') ? rowOrName.toLowerCase().trim() : '';
+  let match = null;
+  let idx = -1;
+
+  if(rowOrName && typeof rowOrName === 'object'){
+    idx = rows.findIndex((r,i) =>
+      (rowOrName.id && r.id === rowOrName.id) ||
+      (rowOrName.email && r.email && String(r.email).toLowerCase() === String(rowOrName.email).toLowerCase()) ||
+      (rowOrName.name && r.name && String(r.name).toLowerCase() === String(rowOrName.name).toLowerCase())
+    );
+    if(idx >= 0) match = rows[idx];
+  }
+
+  if(!match && target){
+    idx = rows.findIndex(r => r.name && r.name.toLowerCase() === target);
+    if(idx < 0) idx = rows.findIndex(r => r.name && r.name.toLowerCase().includes(target));
+    if(idx >= 0) match = rows[idx];
+  }
+
+  if(!match) return false;
+  currentSubmissionKey = entryKey(match, idx);
+  window.currentSubmissionKey = currentSubmissionKey; // exposed for Firebase module/debugging
+  return true;
+}
+
+function goToResultsForPlayer(rowOrName){
+  window._pendingPlayerSelect = (typeof rowOrName === 'string') ? rowOrName : (rowOrName && (rowOrName.name || rowOrName.email || rowOrName.id));
+  enterBrowseMode();
+  setTab('submissions');
+  selectResultsPlayer(rowOrName);
+  renderSubmissions();
+  const dropdown=document.getElementById('playerDropdown');
+  if(dropdown) dropdown.value=currentSubmissionKey;
+  window._pendingPlayerSelect = null;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+window.selectResultsPlayer = selectResultsPlayer;
+window.goToResultsForPlayer = goToResultsForPlayer;
+
 function renderSubmissions(){
   const rows=getEntryRows();
   const dropdown=$('#playerDropdown');
@@ -3871,14 +3916,24 @@ function renderSubmissions(){
     box.innerHTML='<div class="empty-state">Locked entries will appear here after players complete and submit their predictions.</div>';
     return;
   }
+
+  // Apply any landing-page selection once rows are available.
+  if(window._pendingPlayerSelect){
+    selectResultsPlayer(window._pendingPlayerSelect);
+    window._pendingPlayerSelect = null;
+  }
+
   if(!currentSubmissionKey || !rows.some((r,i)=>entryKey(r,i)===currentSubmissionKey)) currentSubmissionKey=entryKey(rows[0],0);
+  window.currentSubmissionKey = currentSubmissionKey;
   dropdown.innerHTML=rows.map((r,i)=>{
     const key=entryKey(r,i);
     const name=r.name||'Unknown player';
     const pts=Number(r.totalPoints||0); return `<option value="${key}" ${key===currentSubmissionKey?'selected':''}>⚽ ${name}${pts>0?' — '+pts+' pts':''}</option>`;
   }).join('');
+  dropdown.value=currentSubmissionKey;
   dropdown.onchange=()=>{
     currentSubmissionKey=dropdown.value;
+    window.currentSubmissionKey=currentSubmissionKey;
     renderSubmissions();
   };
   const selected=rows.find((r,i)=>entryKey(r,i)===currentSubmissionKey)||rows[0];
@@ -4588,14 +4643,14 @@ function initNameSearch(){
       el.addEventListener('click', () => {
         const row = matches[i];
         if(!row) return;
-        // Find the key for this player
-        const rows2 = getRows();
-        const idx = rows2.findIndex((r,j) => (r.email||r.name||j) === (row.email||row.name||i));
-        // Enter browse mode, go to submissions, select this player
-        window._pendingPlayerSelect = row.name;
-        enterBrowseMode();
-        setTab('submissions');
-        window.scrollTo({top:0, behavior:'smooth'});
+        // Enter browse mode, go straight to Live Results, and select this player.
+        if(window.goToResultsForPlayer) window.goToResultsForPlayer(row);
+        else {
+          window._pendingPlayerSelect = row.name;
+          enterBrowseMode();
+          setTab('submissions');
+          window.scrollTo({top:0, behavior:'smooth'});
+        }
       });
     });
   }
@@ -4624,10 +4679,13 @@ function initNameSearch(){
       const rows = getRows();
       const match = rows.find(r => r.name && r.name.toLowerCase().includes(query.toLowerCase()));
       if(match){
-        window._pendingPlayerSelect = match.name;
-        enterBrowseMode();
-        setTab('submissions');
-        window.scrollTo({top:0, behavior:'smooth'});
+        if(window.goToResultsForPlayer) window.goToResultsForPlayer(match);
+        else {
+          window._pendingPlayerSelect = match.name;
+          enterBrowseMode();
+          setTab('submissions');
+          window.scrollTo({top:0, behavior:'smooth'});
+        }
       } else {
         input.style.border = '2px solid #ff3b5c';
         setTimeout(() => input.style.border = '', 1500);
@@ -5117,14 +5175,11 @@ function refreshFirebaseViews(){
   if(lpEnt){ const r=(typeof getEntryRows==='function')?getEntryRows():[];  lpEnt.textContent=r.length||'—'; }
   if(window._pendingPlayerSelect){
     const targetName = window._pendingPlayerSelect;
-    const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
-    const match = rows.find(r => r.name && r.name.toLowerCase().includes(targetName.toLowerCase()));
-    if(match){
-      const idx = rows.indexOf(match);
-      const key = entryKey(match, idx);
-      window.currentSubmissionKey = key;
+    if(window.selectResultsPlayer && window.selectResultsPlayer(targetName)){
       window._pendingPlayerSelect = null;
       if(window.renderSubmissions) window.renderSubmissions();
+      const dropdown=document.getElementById('playerDropdown');
+      if(dropdown && window.currentSubmissionKey) dropdown.value=window.currentSubmissionKey;
     }
   }
 }
