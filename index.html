@@ -3103,6 +3103,55 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 .status-ticker .st-dot{color:#fff3a2;font-weight:1000;}
 .status-ticker:hover .st-marquee{animation-play-state:paused}
 
+
+/* V93: Landing page name search + direct entry to results */
+.name-search-card{
+  width:min(560px,100%);margin:16px auto 0;
+  padding:20px;border-radius:22px;
+  background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.06));
+  border:1.5px solid rgba(248,200,74,.45);
+  text-align:center;
+}
+.name-search-label{
+  display:block;color:#fff3a2;font-weight:1000;
+  font-size:13px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;
+}
+.name-search-wrap{position:relative;margin-bottom:10px;}
+.name-search-input{
+  width:100%;padding:14px 16px;border-radius:16px;
+  border:2px solid rgba(248,200,74,.55);
+  background:linear-gradient(135deg,#fff,#edf6ff);
+  color:#061633;font-size:16px;font-weight:900;
+  outline:none;font-family:inherit;
+}
+.name-search-input:focus{border-color:rgba(248,200,74,.95);box-shadow:0 0 0 3px rgba(248,200,74,.14);}
+.name-search-results{
+  position:absolute;top:100%;left:0;right:0;z-index:20;
+  background:#07153a;border:1px solid rgba(248,200,74,.45);
+  border-radius:14px;margin-top:4px;overflow:hidden;
+  box-shadow:0 16px 34px rgba(0,0,0,.32);
+  max-height:240px;overflow-y:auto;
+}
+.name-search-result{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.08);
+  color:#fff;font-weight:900;font-size:15px;transition:background .15s;
+}
+.name-search-result:last-child{border-bottom:0;}
+.name-search-result:hover{background:rgba(248,200,74,.14);}
+.name-search-result .nsr-icon{width:34px;height:34px;border-radius:50%;background:rgba(248,200,74,.18);border:1px solid rgba(248,200,74,.35);display:grid;place-items:center;font-size:14px;font-weight:1000;color:#fff3a2;flex-shrink:0;}
+.name-search-result .nsr-pts{margin-left:auto;color:#fff3a2;font-size:13px;font-weight:1000;}
+.name-search-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(248,200,74,.3),transparent);margin:14px 0;}
+.browse-all-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 22px;border-radius:999px;cursor:pointer;
+  border:1px solid rgba(55,212,255,.35);
+  background:rgba(55,212,255,.10);color:#b9f3ff;
+  font-size:14px;font-weight:1000;font-family:inherit;
+  transition:background .15s;
+}
+.browse-all-btn:hover{background:rgba(55,212,255,.18);}
+
 /* V91: Status bar for Live Table and Results Centre */
 .score-status-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:0 0 14px;padding:10px 16px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font-size:13px;font-weight:900;}
 .score-status-bar .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:6px;}
@@ -3200,9 +3249,16 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
           <div class="closed-stat"><b>4</b><span>Leagues</span></div>
           <div class="closed-stat"><b>64</b><span>Days of Action</span></div>
         </div>
-        <button class="browse-closed-btn" id="closedBrowseBtn">👀 View Live Table &amp; Results →</button>
-        <div class="status-ticker" style="margin:16px 0 0;max-width:520px;margin-left:auto;margin-right:auto"><div class="st-label"><span style="width:8px;height:8px;border-radius:50%;background:#f8c84a;display:inline-block"></span>Live Status</div><div class="st-track"><div class="st-marquee"><span class="st-item gold">⏳ Data refresh pending</span><span class="st-dot">•</span><span class="st-item">First results and league table update expected by end of day Friday 12 June</span><span class="st-dot">•</span><span class="st-item cyan">Check back soon — the leaderboard will come to life automatically</span><span class="st-dot">•</span><span class="st-item gold">⏳ Data refresh pending</span><span class="st-dot">•</span><span class="st-item">First results and league table update expected by end of day Friday 12 June</span><span class="st-dot">•</span><span class="st-item cyan">Check back soon — the leaderboard will come to life automatically</span><span class="st-dot">•</span></div></div></div>
-        <p style="margin-top:14px;color:#b9f3ff;font-size:13px;font-weight:900;line-height:1.5">Tap the button above to view Live Results, the League Table and Fun Stats.<br><span style="color:#fff3a2">Use the tabs at the top to switch between sections.</span></p>
+        <div class="name-search-card" id="nameSearchCard">
+          <span class="name-search-label">🔍 Find Your Predictions</span>
+          <div class="name-search-wrap">
+            <input class="name-search-input" id="nameSearchInput" type="text" placeholder="Type your name…" autocomplete="off">
+            <div class="name-search-results hidden" id="nameSearchResults"></div>
+          </div>
+          <button class="primary" id="goToMyPredictionsBtn" style="width:100%;margin-top:4px;padding:14px 20px;font-size:16px;border-radius:999px">⚽ Take Me To My Predictions</button>
+          <div class="name-search-divider"></div>
+          <button class="browse-all-btn" id="closedBrowseBtn">🕵️ I'm Not a Player — I'm Just Being Nosey!</button>
+        </div>
       </div>
       <form class="entry-card" id="entryForm">
         <h2>Enter Your Game</h2>
@@ -4350,6 +4406,127 @@ async function loadWorldCupTicker(){
 }
 loadWorldCupTicker();
 setInterval(loadWorldCupTicker,15*60*1000);
+
+
+// V93: Landing page name search — find your predictions instantly
+function initNameSearch(){
+  const input = document.getElementById('nameSearchInput');
+  const results = document.getElementById('nameSearchResults');
+  if(!input || !results) return;
+
+  function getRows(){
+    return (typeof getEntryRows === 'function') ? getEntryRows() : [];
+  }
+
+  function renderResults(query){
+    const rows = getRows();
+    if(!query.trim()){
+      results.classList.add('hidden');
+      return;
+    }
+    const q = query.toLowerCase().trim();
+    const matches = rows.filter(r => r.name && r.name.toLowerCase().includes(q)).slice(0, 8);
+    if(!matches.length){
+      results.innerHTML = '<div class="name-search-result"><span style="color:#b8c9e8">No entries found for "' + query + '"</span></div>';
+      results.classList.remove('hidden');
+      return;
+    }
+    results.innerHTML = matches.map((r, i) => {
+      const initials = (r.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+      const pts = Number(r.totalPoints||0);
+      return '<div class="name-search-result" data-index="' + i + '">' +
+        '<span class="nsr-icon">' + initials + '</span>' +
+        '<span>' + (r.name||'Unknown') + '</span>' +
+        (pts > 0 ? '<span class="nsr-pts">' + pts + ' pts</span>' : '') +
+        '</div>';
+    }).join('');
+    results.classList.remove('hidden');
+
+    // Click handler
+    results.querySelectorAll('.name-search-result').forEach((el, i) => {
+      el.addEventListener('click', () => {
+        const row = matches[i];
+        if(!row) return;
+        // Find the key for this player
+        const rows2 = getRows();
+        const idx = rows2.findIndex((r,j) => (r.email||r.name||j) === (row.email||row.name||i));
+        const key = idx >= 0 ? String(row.id || row.email || row.name || idx) : String(row.id || row.email || row.name || 0);
+        // Enter browse mode, go to submissions, select this player
+        enterBrowseMode();
+        setTimeout(() => {
+          setTab('submissions');
+          window.currentSubmissionKey = key;
+          if(typeof renderSubmissions === 'function') renderSubmissions();
+          // Also set dropdown
+          const dd = document.getElementById('playerDropdown');
+          if(dd){
+            // Find option matching this player
+            Array.from(dd.options).forEach(opt => {
+              if(opt.textContent.includes(row.name)) dd.value = opt.value;
+            });
+            window.currentSubmissionKey = dd.value;
+            if(typeof renderSubmissions === 'function') renderSubmissions();
+          }
+          window.scrollTo({top:0, behavior:'smooth'});
+        }, 300);
+      });
+    });
+  }
+
+  input.addEventListener('input', () => renderResults(input.value));
+  input.addEventListener('focus', () => { if(input.value) renderResults(input.value); });
+
+  // Hide results on outside click
+  document.addEventListener('click', (e) => {
+    if(!input.contains(e.target) && !results.contains(e.target)){
+      results.classList.add('hidden');
+    }
+  });
+
+    // "Take me to my predictions" button
+  const goBtn = document.getElementById('goToMyPredictionsBtn');
+  if(goBtn){
+    goBtn.addEventListener('click', () => {
+      const query = input.value.trim();
+      if(!query){
+        input.focus();
+        input.style.border = '2px solid #ff3b5c';
+        setTimeout(() => input.style.border = '', 1500);
+        return;
+      }
+      const rows = getRows();
+      const match = rows.find(r => r.name && r.name.toLowerCase().includes(query.toLowerCase()));
+      if(match){
+        enterBrowseMode();
+        setTimeout(() => {
+          setTab('submissions');
+          window.currentSubmissionKey = String(match.id || match.email || match.name || 0);
+          const dd = document.getElementById('playerDropdown');
+          if(dd){
+            Array.from(dd.options).forEach(opt => {
+              if(opt.textContent.includes(match.name)) dd.value = opt.value;
+            });
+            window.currentSubmissionKey = dd.value;
+          }
+          if(typeof renderSubmissions === 'function') renderSubmissions();
+          window.scrollTo({top:0, behavior:'smooth'});
+        }, 300);
+      } else {
+        input.style.border = '2px solid #ff3b5c';
+        setTimeout(() => input.style.border = '', 1500);
+        results.innerHTML = '<div class="name-search-result"><span style="color:#ff8fa3">No entry found for \"' + query + '\" — try a shorter name</span></div>';
+        results.classList.remove('hidden');
+      }
+    });
+  }
+
+  // Re-init when Firebase data loads
+  window._nameSearchReady = true;
+}
+
+// Init after DOM ready and after Firebase loads
+document.addEventListener('DOMContentLoaded', initNameSearch);
+setTimeout(initNameSearch, 2000); // fallback after Firebase loads
 
 // V22: Keep the landing page as the first screen, even if you have tested before.
 // If local data exists, pre-fill it but do not skip the landing page.
