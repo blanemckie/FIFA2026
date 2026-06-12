@@ -3721,6 +3721,16 @@ $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagu
 let currentSubmissionKey = null;
 function entryKey(r,i){ return String(r.id || r.email || r.name || i); }
 function renderSubmissions(){
+  // V93: Apply pending player selection from landing page name search
+  if(window._pendingPlayerSelect){
+    const rows = getEntryRows();
+    const match = rows.find(r => r.name && r.name.includes(window._pendingPlayerSelect));
+    if(match){
+      const idx = rows.indexOf(match);
+      currentSubmissionKey = entryKey(match, idx);
+      window._pendingPlayerSelect = null;
+    }
+  }
   const rows=getEntryRows();
   const dropdown=$('#playerDropdown');
   const box=$('#submissionSummary');
@@ -4450,25 +4460,26 @@ function initNameSearch(){
         // Find the key for this player
         const rows2 = getRows();
         const idx = rows2.findIndex((r,j) => (r.email||r.name||j) === (row.email||row.name||i));
-        const key = idx >= 0 ? String(row.id || row.email || row.name || idx) : String(row.id || row.email || row.name || 0);
         // Enter browse mode, go to submissions, select this player
         enterBrowseMode();
-        setTimeout(() => {
-          setTab('submissions');
-          window.currentSubmissionKey = key;
-          if(typeof renderSubmissions === 'function') renderSubmissions();
-          // Also set dropdown
+        setTab('submissions');
+        window.scrollTo({top:0, behavior:'smooth'});
+        window._pendingPlayerSelect = row.name;
+        function trySelectPlayer3(attemptsLeft){
           const dd = document.getElementById('playerDropdown');
-          if(dd){
-            // Find option matching this player
-            Array.from(dd.options).forEach(opt => {
-              if(opt.textContent.includes(row.name)) dd.value = opt.value;
-            });
-            window.currentSubmissionKey = dd.value;
+          if(!dd || attemptsLeft <= 0) return;
+          const opts = Array.from(dd.options);
+          const opt = opts.find(o => o.textContent.includes(row.name));
+          if(opt && opt.value && opts.length > 1){
+            dd.value = opt.value;
+            window.currentSubmissionKey = opt.value;
             if(typeof renderSubmissions === 'function') renderSubmissions();
+            window._pendingPlayerSelect = null;
+          } else {
+            setTimeout(() => trySelectPlayer3(attemptsLeft - 1), 300);
           }
-          window.scrollTo({top:0, behavior:'smooth'});
-        }, 300);
+        }
+        trySelectPlayer3(15);
       });
     });
   }
@@ -4498,19 +4509,24 @@ function initNameSearch(){
       const match = rows.find(r => r.name && r.name.toLowerCase().includes(query.toLowerCase()));
       if(match){
         enterBrowseMode();
-        setTimeout(() => {
-          setTab('submissions');
-          window.currentSubmissionKey = String(match.id || match.email || match.name || 0);
+        setTab('submissions');
+        window.scrollTo({top:0, behavior:'smooth'});
+        window._pendingPlayerSelect = match.name;
+        function trySelectPlayer2(attemptsLeft){
           const dd = document.getElementById('playerDropdown');
-          if(dd){
-            Array.from(dd.options).forEach(opt => {
-              if(opt.textContent.includes(match.name)) dd.value = opt.value;
-            });
-            window.currentSubmissionKey = dd.value;
+          if(!dd || attemptsLeft <= 0) return;
+          const opts = Array.from(dd.options);
+          const opt = opts.find(o => o.textContent.includes(match.name));
+          if(opt && opt.value && opts.length > 1){
+            dd.value = opt.value;
+            window.currentSubmissionKey = opt.value;
+            if(typeof renderSubmissions === 'function') renderSubmissions();
+            window._pendingPlayerSelect = null;
+          } else {
+            setTimeout(() => trySelectPlayer2(attemptsLeft - 1), 300);
           }
-          if(typeof renderSubmissions === 'function') renderSubmissions();
-          window.scrollTo({top:0, behavior:'smooth'});
-        }, 300);
+        }
+        trySelectPlayer2(15);
       } else {
         input.style.border = '2px solid #ff3b5c';
         setTimeout(() => input.style.border = '', 1500);
