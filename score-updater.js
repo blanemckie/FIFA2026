@@ -272,7 +272,8 @@ async function main() {
       resolvedResults
     );
 
-    if (data.totalPoints === total) continue; // no change, skip write
+    const hasPending = Object.values(matchBreakdown).some(m => m.reason === 'pending');
+    if (data.totalPoints === total && !hasPending) continue;
 
     batch.update(doc.ref, {
       totalPoints:         total,
