@@ -34,6 +34,7 @@ const TEAM_ALIASES = {
   'Republic of Korea':             'South Korea',
   'Czechia':                       'Czech Republic',
   'Bosnia and Herzegovina':        'Bosnia & Herzegovina',
+  'Bosnia-Herzegovina':            'Bosnia & Herzegovina',  // ← add this
   "Côte d'Ivoire":                 'Ivory Coast',
   "Cote d'Ivoire":                 'Ivory Coast',
   'United States':                 'USA',
