@@ -3721,16 +3721,6 @@ $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagu
 let currentSubmissionKey = null;
 function entryKey(r,i){ return String(r.id || r.email || r.name || i); }
 function renderSubmissions(){
-  // V93: Apply pending player selection from landing page name search
-  if(window._pendingPlayerSelect){
-    const rows = getEntryRows();
-    const match = rows.find(r => r.name && r.name.includes(window._pendingPlayerSelect));
-    if(match){
-      const idx = rows.indexOf(match);
-      currentSubmissionKey = entryKey(match, idx);
-      window._pendingPlayerSelect = null;
-    }
-  }
   const rows=getEntryRows();
   const dropdown=$('#playerDropdown');
   const box=$('#submissionSummary');
@@ -4461,25 +4451,10 @@ function initNameSearch(){
         const rows2 = getRows();
         const idx = rows2.findIndex((r,j) => (r.email||r.name||j) === (row.email||row.name||i));
         // Enter browse mode, go to submissions, select this player
+        window._pendingPlayerSelect = row.name;
         enterBrowseMode();
         setTab('submissions');
         window.scrollTo({top:0, behavior:'smooth'});
-        window._pendingPlayerSelect = row.name;
-        function trySelectPlayer3(attemptsLeft){
-          const dd = document.getElementById('playerDropdown');
-          if(!dd || attemptsLeft <= 0) return;
-          const opts = Array.from(dd.options);
-          const opt = opts.find(o => o.textContent.includes(row.name));
-          if(opt && opt.value && opts.length > 1){
-            dd.value = opt.value;
-            window.currentSubmissionKey = opt.value;
-            if(typeof renderSubmissions === 'function') renderSubmissions();
-            window._pendingPlayerSelect = null;
-          } else {
-            setTimeout(() => trySelectPlayer3(attemptsLeft - 1), 300);
-          }
-        }
-        trySelectPlayer3(15);
       });
     });
   }
@@ -4508,25 +4483,10 @@ function initNameSearch(){
       const rows = getRows();
       const match = rows.find(r => r.name && r.name.toLowerCase().includes(query.toLowerCase()));
       if(match){
+        window._pendingPlayerSelect = match.name;
         enterBrowseMode();
         setTab('submissions');
         window.scrollTo({top:0, behavior:'smooth'});
-        window._pendingPlayerSelect = match.name;
-        function trySelectPlayer2(attemptsLeft){
-          const dd = document.getElementById('playerDropdown');
-          if(!dd || attemptsLeft <= 0) return;
-          const opts = Array.from(dd.options);
-          const opt = opts.find(o => o.textContent.includes(match.name));
-          if(opt && opt.value && opts.length > 1){
-            dd.value = opt.value;
-            window.currentSubmissionKey = opt.value;
-            if(typeof renderSubmissions === 'function') renderSubmissions();
-            window._pendingPlayerSelect = null;
-          } else {
-            setTimeout(() => trySelectPlayer2(attemptsLeft - 1), 300);
-          }
-        }
-        trySelectPlayer2(15);
       } else {
         input.style.border = '2px solid #ff3b5c';
         setTimeout(() => input.style.border = '', 1500);
@@ -4629,9 +4589,22 @@ function normaliseDoc(doc){
 }
 function refreshFirebaseViews(){
   if(window.renderLeaderboard) window.renderLeaderboard();
-    if(window.updateStatusBars) window.updateStatusBars();
+  if(window.updateStatusBars) window.updateStatusBars();
   if(window.renderFunStats) window.renderFunStats();
   if(window.renderSubmissions) window.renderSubmissions();
+  // V93: After Firebase loads, apply any pending player selection from landing page
+  if(window._pendingPlayerSelect){
+    const targetName = window._pendingPlayerSelect;
+    const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
+    const match = rows.find(r => r.name && r.name.toLowerCase().includes(targetName.toLowerCase()));
+    if(match){
+      const idx = rows.indexOf(match);
+      const key = entryKey(match, idx);
+      window.currentSubmissionKey = key;
+      window._pendingPlayerSelect = null;
+      if(window.renderSubmissions) window.renderSubmissions();
+    }
+  }
 }
 window.firebaseSubmissions = [];
 window.firebaseEntries = [];
