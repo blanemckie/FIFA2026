@@ -8,6 +8,7 @@ on:
 concurrency:
   group: wcp-score-updater
   cancel-in-progress: true
+  
   workflow_dispatch:
 
 jobs:
