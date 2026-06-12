@@ -212,7 +212,7 @@ function calcPlayerPoints(groupPredictions, resolvedResults) {
   for (const pick of (groupPredictions || [])) {
     const actual = resolvedResults[pick.matchId];
     if (!actual) {
-      matchBreakdown[pick.matchId] = { points: 0, reason: 'pending' };
+      matchBreakdown[String(pick.matchId)] = { points: 0, reason: 'pending' };
       continue;
     }
     const { points, reason } = scoreMatch(
@@ -220,7 +220,7 @@ function calcPlayerPoints(groupPredictions, resolvedResults) {
       pick.homeScore,   pick.awayScore
     );
     total += points;
-    matchBreakdown[pick.matchId] = {
+    matchBreakdown[String(pick.matchId)] = {
       points, reason,
       actualHome: actual.homeGoals,
       actualAway: actual.awayGoals,
