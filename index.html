@@ -4735,35 +4735,45 @@ const LP_CACHE_KEY = 'wcp-landing-data';
 const LP_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours max (score updater cache-busts earlier)
 
 async function fetchLandingData(){
-  // Check cache first
-  try {
-    const cached = JSON.parse(localStorage.getItem(LP_CACHE_KEY)||'null');
-    if(cached && Date.now() - cached.ts < LP_CACHE_TTL){
-      applyLandingData(cached.matches);
-      return;
-    }
-  } catch(e){}
-  // One single API call for everything
-  try {
-    const url = FD_BASE_LP + '/competitions/WC/matches?season=2026';
-    const res = await fetch(url, { headers: {'X-Auth-Token': FD_TOKEN_LP} });
-    if(!res.ok) throw new Error('API ' + res.status);
-    const data = await res.json();
-    const matches = data.matches || [];
-    try { localStorage.setItem(LP_CACHE_KEY, JSON.stringify({ts: Date.now(), matches})); } catch(e){}
-    applyLandingData(matches);
-  } catch(e) {
-    console.warn('Landing data fetch failed:', e);
-    applyLandingData([]); // render gracefully with no data
-  }
+  // Use Firebase data (same source as results page) — no external API needed
+  applyLandingDataFromFirebase();
+}
+
+function applyLandingDataFromFirebase(){
+  const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
+  // Collect actual scores for each fixture id from any entry's breakdown
+  const scoreMap = {};
+  rows.forEach(row => {
+    const bd = row.groupMatchBreakdown || {};
+    Object.entries(bd).forEach(([id, data]) => {
+      if(!scoreMap[id] && data.reason && data.reason !== 'pending' && data.reason !== 'invalid' && data.actualHome !== undefined && data.actualAway !== undefined){
+        scoreMap[id] = { home: data.actualHome, away: data.actualAway };
+      }
+    });
+  });
+  // Build finished list mapped to our fixture definitions
+  const finished = [];
+  (window.WCP_FIXTURES || []).forEach(f => {
+    const s = scoreMap[f.id] || scoreMap[String(f.id)];
+    if(!s) return;
+    finished.push({
+      fixtureId: f.id,
+      homeTeam: { name: f.home, shortName: f.home },
+      awayTeam: { name: f.away, shortName: f.away },
+      score: { fullTime: { home: s.home, away: s.away } },
+      status: 'FINISHED',
+      utcDate: f.date + 'T00:00:00Z',
+      group: f.group,
+      venue: f.venue
+    });
+  });
+  applyProgressData(finished, 104);
+  applyResultsData(finished);
 }
 
 function applyLandingData(matches){
-  const finished = matches.filter(m => m.score?.fullTime?.home !== null && m.score?.fullTime?.home !== undefined && m.status === 'FINISHED');
-  const upcoming = matches.filter(m => m.status === 'SCHEDULED' || m.status === 'TIMED');
-  applyProgressData(finished, matches.length);
-  applyResultsData(finished);
-  applyFixturesData(upcoming);
+  // Legacy shim — kept so bustLandingCache calls still work
+  applyLandingDataFromFirebase();
 }
 
 function applyProgressData(finished, totalInApi){
@@ -4888,7 +4898,7 @@ function applyFixturesData(upcoming){
 // Bust landing cache when Firebase scores update (new data available)
 function bustLandingCache(){
   try { localStorage.removeItem(LP_CACHE_KEY); } catch(e){}
-  fetchLandingData();
+  applyLandingDataFromFirebase();
 }
 window.bustLandingCache = bustLandingCache;
 
@@ -5169,7 +5179,8 @@ function refreshFirebaseViews(){
   // V93: After Firebase loads, apply any pending player selection from landing page
   // V93: Trigger newspaper generation once Firebase data is ready
   if(typeof triggerNewspaperGeneration === 'function') triggerNewspaperGeneration();
-  // V93b: Bust landing page API cache when Firebase scores update
+  // Update landing page results/progress directly from Firebase (no external API)
+  if(typeof applyLandingDataFromFirebase === 'function') applyLandingDataFromFirebase();
   if(typeof bustLandingCache === 'function') bustLandingCache();
   // Update entries count in progress strip
   const lpEnt = document.getElementById('lpStatEntries');
