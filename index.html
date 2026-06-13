@@ -4710,9 +4710,16 @@ function initNameSearch(){
   window._nameSearchReady = true;
 }
 
-// Init after DOM ready
-document.addEventListener('DOMContentLoaded', initNameSearch);
-setTimeout(initNameSearch, 500); // fallback if DOMContentLoaded already fired
+// Init once — guard against double-init
+let _nameSearchInited = false;
+function initNameSearchOnce(){
+  if(_nameSearchInited) return;
+  _nameSearchInited = true;
+  initNameSearch();
+}
+document.addEventListener('DOMContentLoaded', initNameSearchOnce);
+// Also re-run after Firebase data loads in case DOM was ready before Firebase
+window._reinitNameSearch = initNameSearch;
 
 
 // ── V93: Redesigned Landing Page ─────────────────────────────────────
@@ -5247,7 +5254,8 @@ function refreshFirebaseViews(){
   // Update landing page from Firebase data directly
   if(typeof applyLandingDataFromFirebase === 'function') applyLandingDataFromFirebase();
   if(typeof bustLandingCache === 'function') bustLandingCache();
-  // Refresh name search dropdown if user already typed something
+  // Re-init name search with fresh Firebase data, then refresh if user already typed
+  if(typeof window._reinitNameSearch === 'function') window._reinitNameSearch();
   if(typeof window._nameSearchRefresh === 'function') window._nameSearchRefresh();
   // Update entries count in progress strip
   const lpEnt = document.getElementById('lpStatEntries');
