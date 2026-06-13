@@ -3414,6 +3414,14 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   </div>
 </section>
 <nav class="tabs hidden" id="tabs"><button data-tab="submissions" class="active">Live Results</button><button data-tab="leaderboard">Live Table</button><button data-tab="fun">Fun Stats</button><button data-tab="how">How I Built This</button></nav>
+<div id="adminPanel" class="hidden" style="max-width:960px;margin:30px auto;padding:0 16px 60px">
+  <div style="text-align:center;margin-bottom:22px;padding:22px;border-radius:24px;background:linear-gradient(135deg,rgba(248,200,74,.18),rgba(55,212,255,.10));border:1px solid rgba(248,200,74,.42)">
+    <div style="font-size:28px;margin-bottom:8px">🔐 Admin: Visitor Log</div>
+    <p style="color:#dce9ff;font-weight:850;margin:0">Records every time a player clicks their name in the Results Centre dropdown.</p>
+    <button onclick="loadAndRenderVisitorLog()" style="margin-top:14px;padding:11px 22px;border-radius:999px;background:linear-gradient(135deg,var(--gold),#fff3a2);color:#071633;font-weight:1000;border:0;font-size:14px;cursor:pointer">🔄 Load / Refresh Log</button>
+  </div>
+  <div id="adminVisitorLog" style="color:#dce9ff;font-weight:800;text-align:center;padding:20px">Click "Load / Refresh Log" to view visitor records.</div>
+</div>
 <main class="app hidden" id="app">
   <section id="predictions" class="panel active">
     <div class="page-head unified-final-head prediction-centre-head"><h2 id="welcomeTitle" class="premium-page-title">🎯 Prediction Centre</h2><p id="welcomeSubtitle" class="personal-subtitle"></p></div>
@@ -3926,8 +3934,10 @@ function renderSubmissions(){
 
   if(!currentSubmissionKey || !rows.some((r,i)=>entryKey(r,i)===currentSubmissionKey)) currentSubmissionKey=entryKey(rows[0],0);
   window.currentSubmissionKey = currentSubmissionKey;
-  dropdown.innerHTML=rows.map((r,i)=>{
-    const key=entryKey(r,i);
+  // Sort rows alphabetically by name for the dropdown
+  const sortedRows = [...rows].sort((a,b)=>String(a.name||'').toLowerCase().localeCompare(String(b.name||'').toLowerCase()));
+  dropdown.innerHTML=sortedRows.map((r,i)=>{
+    const key=entryKey(r,rows.indexOf(r));
     const name=r.name||'Unknown player';
     const pts=Number(r.totalPoints||0); return `<option value="${key}" ${key===currentSubmissionKey?'selected':''}>⚽ ${name}${pts>0?' — '+pts+' pts':''}</option>`;
   }).join('');
@@ -3935,6 +3945,9 @@ function renderSubmissions(){
   dropdown.onchange=()=>{
     currentSubmissionKey=dropdown.value;
     window.currentSubmissionKey=currentSubmissionKey;
+    // V95: Log the player view in Firebase
+    const selectedRow = rows.find((r,i)=>entryKey(r,i)===currentSubmissionKey);
+    if(selectedRow && window.logVisitorView) window.logVisitorView(selectedRow.name||'');
     renderSubmissions();
   };
   const selected=rows.find((r,i)=>entryKey(r,i)===currentSubmissionKey)||rows[0];
@@ -4810,7 +4823,12 @@ function applyProgressData(finished, totalInApi){
 function applyResultsData(finished){
   const wrap = document.getElementById('lpRecentResults');
   if(!wrap) return;
-  const last3 = finished.slice(-3).reverse();
+  // Sort by fixture date+time chronologically so most recent appears first
+  const sortedFinished = [...finished].sort((a,b)=>{
+    const da = a.utcDate||''; const db2 = b.utcDate||'';
+    return da < db2 ? -1 : da > db2 ? 1 : 0;
+  });
+  const last3 = sortedFinished.slice(-3).reverse();
   if(!last3.length){
     wrap.innerHTML = '<div class="lp-rc-pending">\u23F3 No results yet \u2014 first kick-off coming soon!</div>';
     return;
@@ -4850,10 +4868,19 @@ function applyResultsData(finished){
 function applyFixturesData(upcoming){
   const wrap = document.getElementById('lpNextFixtures');
   if(!wrap) return;
-  // Use WCP_FIXTURES for richer data (venue, group etc), matched by date
+  // Collect IDs of fixtures that already have results (so we don't show them in upcoming)
+  const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
+  const playedIds = new Set();
+  rows.forEach(row => {
+    const bd = row.groupMatchBreakdown || {};
+    Object.entries(bd).forEach(([id, data]) => {
+      if(data.reason && data.reason !== 'pending' && data.reason !== 'invalid') playedIds.add(String(id));
+    });
+  });
+  // Use WCP_FIXTURES for richer data (venue, group etc), matched by date, exclude played
   const now = new Date();
   const rich = window.WCP_FIXTURES
-    ? window.WCP_FIXTURES.filter(f => new Date(f.date+'T23:59:00') >= now).slice(0,5)
+    ? window.WCP_FIXTURES.filter(f => new Date(f.date+'T23:59:00') >= now && !playedIds.has(String(f.id))).slice(0,5)
     : [];
   if(!rich.length){
     // Fallback to API data
@@ -4918,8 +4945,8 @@ function renderLandingFixtures_local(){
 
 
 // ── Newspaper (Claude API) ────────────────────────────────────────────
-const LP_NP_CACHE_KEY = 'wcp-newspaper-cache';
-const LP_NP_CACHE_TTL = 3 * 24 * 60 * 60 * 1000; // 3 days
+const LP_NP_CACHE_KEY = 'wcp-newspaper-cache-v2'; // v2 forces cache bust with new prompt
+const LP_NP_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
 
 function buildNewspaperPrompt(){
   const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
@@ -4950,7 +4977,9 @@ function buildNewspaperPrompt(){
     '7. HFC LEAGUE section (1-2 sentences)\n\n' +
     'Format as JSON only, no markdown:\n' +
     '{"headline":"...","byline":"...","lead":"...","main":"...","lego":"...","family":"...","hfc":"..."}\n' +
-    'Keep it fun, punchy, engaging and specific — use real names and real points. Bold ALL player and league names with <b>name</b> tags. Under 300 words total. Do NOT include the name Blane McKie in any section.';
+    'IMPORTANT NOTE: If \"Barney\" appears near the top of any league, note playfully that this is ONLY because the leaderboard sorts alphabetically when scores are tied — the scores are moving rapidly and this could change at any second. Make this funny!\n' +
+    'For EACH league section, write exactly 3 varied, punchy comments covering: (a) who is currently leading that league, (b) someone who got max points on a specific result or called 2 in a row, (c) someone who has yet to score their first points or is struggling. Bold all player names with <b>name</b> tags. If a league has no entries, write a fun placeholder instead.\n\n' +
+    'Under 450 words total. Bold ALL player names. Do NOT include the name Blane McKie in any section.';
 }
 
 async function renderLandingNewspaper(){
@@ -5096,6 +5125,53 @@ if(state.user){
   if(n) n.value=state.user.name||'';
   if(e) e.value=state.user.email||'';
 }
+
+// V95: Admin panel — shown if URL contains #admin
+function checkAdminMode(){
+  if(window.location.hash === '#admin'){
+    document.getElementById('adminPanel').classList.remove('hidden');
+    document.getElementById('landing').classList.add('hidden');
+    document.getElementById('tabs').classList.add('hidden');
+    document.getElementById('app').classList.add('hidden');
+  }
+}
+checkAdminMode();
+window.addEventListener('hashchange', checkAdminMode);
+
+async function loadAndRenderVisitorLog(){
+  const box = document.getElementById('adminVisitorLog');
+  if(!box) return;
+  box.innerHTML = '<div style="text-align:center;padding:20px;color:#b8c9e8">Loading…</div>';
+  const entries = window.loadVisitorLog ? await window.loadVisitorLog() : [];
+  if(!entries.length){
+    box.innerHTML = '<div style="text-align:center;padding:20px;color:#b8c9e8">No visitor records yet.</div>';
+    return;
+  }
+  box.innerHTML = '<table style="width:100%;border-collapse:separate;border-spacing:0 8px">' +
+    '<thead><tr>' +
+      '<th style="text-align:left;color:#fff3a2;font-size:12px;text-transform:uppercase;letter-spacing:.08em;padding:0 12px 6px">Player Name</th>' +
+      '<th style="text-align:left;color:#fff3a2;font-size:12px;text-transform:uppercase;letter-spacing:.08em;padding:0 12px 6px">Date</th>' +
+      '<th style="text-align:left;color:#fff3a2;font-size:12px;text-transform:uppercase;letter-spacing:.08em;padding:0 12px 6px">Time (Local)</th>' +
+    '</tr></thead><tbody>' +
+    entries.map(e=>{
+      let dateStr='—', timeStr='—';
+      try{
+        const d = new Date(e.viewedAtLocal||'');
+        if(!isNaN(d)){
+          dateStr = d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+          timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        }
+      }catch(err){}
+      return '<tr style="background:rgba(255,255,255,.07)">' +
+        '<td style="padding:11px 12px;border-top:1px solid rgba(255,255,255,.10);border-bottom:1px solid rgba(255,255,255,.10);border-left:1px solid rgba(255,255,255,.10);border-radius:14px 0 0 14px;font-weight:1000;color:#fff">'+String(e.playerName||'—')+'</td>' +
+        '<td style="padding:11px 12px;border-top:1px solid rgba(255,255,255,.10);border-bottom:1px solid rgba(255,255,255,.10);color:#dce9ff">'+dateStr+'</td>' +
+        '<td style="padding:11px 12px;border-top:1px solid rgba(255,255,255,.10);border-bottom:1px solid rgba(255,255,255,.10);border-right:1px solid rgba(255,255,255,.10);border-radius:0 14px 14px 0;color:#fff3a2;font-weight:1000">'+timeStr+'</td>' +
+      '</tr>';
+    }).join('') +
+    '</tbody></table>' +
+    '<p style="text-align:center;color:#b8c9e8;font-size:12px;margin-top:10px">'+entries.length+' visitor record'+(entries.length===1?'':'s')+' · Most recent first</p>';
+}
+window.loadAndRenderVisitorLog = loadAndRenderVisitorLog;
 </script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
@@ -5113,6 +5189,31 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// V95: Visitor log — log when a player views their predictions in Results Centre
+window.logVisitorView = async function(playerName){
+  if(!playerName || playerName === 'Loading players…' || playerName === 'No submissions yet') return;
+  try {
+    await addDoc(collection(db, "visitorLog"), {
+      playerName: playerName,
+      viewedAt: serverTimestamp(),
+      viewedAtLocal: new Date().toISOString(),
+      userAgent: navigator.userAgent.slice(0,150)
+    });
+  } catch(e){ /* silent — non-critical */ }
+};
+
+// V95: Load visitor log for admin view
+window.loadVisitorLog = async function(){
+  try {
+    const snap = await getDocs(query(collection(db, "visitorLog")));
+    const entries = snap.docs.map(d => {const data=d.data(); return {...data, id:d.id};});
+    entries.sort((a,b)=>{
+      const ta = a.viewedAtLocal||''; const tb = b.viewedAtLocal||'';
+      return tb.localeCompare(ta);
+    });
+    return entries;
+  } catch(e){ return []; }
+};
 window.savePlayerEntryToFirebase = async function({name,email,league}){
   const cleanEmail = String(email||'').trim().toLowerCase();
   if(!name || !cleanEmail){
