@@ -4613,108 +4613,75 @@ setInterval(loadWorldCupTicker,15*60*1000);
 
 
 // V93: Landing page name search — find your predictions instantly
-function initNameSearch(){
-  const input = document.getElementById('nameSearchInput');
-  const results = document.getElementById('nameSearchResults');
-  if(!input || !results) return;
+// ── Landing page name search (event delegation — works regardless of load order) ──
+(function(){
+  function getRows(){ return (typeof getEntryRows === 'function') ? getEntryRows() : []; }
+  let lastMatches = [];
 
-  function getRows(){
-    return (typeof getEntryRows === 'function') ? getEntryRows() : [];
-  }
-
-  function renderResults(query){
-    const rows = getRows();
-    if(!query.trim()){
-      results.classList.add('hidden');
-      return;
-    }
+  function doSearch(input, results){
+    const query = input.value;
+    if(!query.trim()){ results.classList.add('hidden'); return; }
     const q = query.toLowerCase().trim();
-    const matches = rows.filter(r => r.name && r.name.toLowerCase().includes(q)).slice(0, 8);
-    if(!matches.length){
-      results.innerHTML = '<div class="name-search-result"><span style="color:#b8c9e8">No entries found for "' + query + '"</span></div>';
-      results.classList.remove('hidden');
-      return;
+    lastMatches = getRows().filter(r => r.name && r.name.toLowerCase().includes(q)).slice(0,8);
+    if(!lastMatches.length){
+      results.innerHTML = '<div class="name-search-result" style="color:#b8c9e8;padding:12px 16px">No entries found for "'+query+'"</div>';
+      results.classList.remove('hidden'); return;
     }
-    results.innerHTML = matches.map((r, i) => {
-      const initials = (r.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
-      const pts = Number(r.totalPoints||0);
-      return '<div class="name-search-result" data-index="' + i + '">' +
-        '<span class="nsr-icon">' + initials + '</span>' +
-        '<span>' + (r.name||'Unknown') + '</span>' +
-        (pts > 0 ? '<span class="nsr-pts">' + pts + ' pts</span>' : '') +
+    results.innerHTML = lastMatches.map((r,i) => {
+      const initials=(r.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+      const pts=Number(r.totalPoints||0);
+      return '<div class="name-search-result" data-nsr-index="'+i+'">'+
+        '<span class="nsr-icon">'+initials+'</span>'+
+        '<span>'+(r.name||'Unknown')+'</span>'+
+        (pts>0?'<span class="nsr-pts">'+pts+' pts</span>':'')+
         '</div>';
     }).join('');
     results.classList.remove('hidden');
-
-    // Click handler
-    results.querySelectorAll('.name-search-result').forEach((el, i) => {
-      el.addEventListener('click', () => {
-        const row = matches[i];
-        if(!row) return;
-        if(window.logVisit) window.logVisit(row.name || 'Unknown');
-        // Enter browse mode, go straight to Live Results, and select this player.
-        if(window.goToResultsForPlayer) window.goToResultsForPlayer(row);
-        else {
-          window._pendingPlayerSelect = row.name;
-          enterBrowseMode();
-          setTab('submissions');
-          window.scrollTo({top:0, behavior:'smooth'});
-        }
-      });
-    });
   }
 
-  input.addEventListener('input', () => renderResults(input.value));
-  input.addEventListener('focus', () => { if(input.value) renderResults(input.value); });
-
-  // Hide results on outside click
-  document.addEventListener('click', (e) => {
-    if(!input.contains(e.target) && !results.contains(e.target)){
-      results.classList.add('hidden');
+  document.addEventListener('input', function(e){
+    if(e.target && e.target.id==='nameSearchInput'){
+      const results=document.getElementById('nameSearchResults');
+      if(results) doSearch(e.target, results);
     }
   });
 
-    // "Take me to my predictions" button
-  const goBtn = document.getElementById('goToMyPredictionsBtn');
-  if(goBtn){
-    goBtn.addEventListener('click', () => {
-      const query = input.value.trim();
-      if(!query){
-        input.focus();
-        input.style.border = '2px solid #ff3b5c';
-        setTimeout(() => input.style.border = '', 1500);
-        return;
-      }
-      const rows = getRows();
-      const match = rows.find(r => r.name && r.name.toLowerCase().includes(query.toLowerCase()));
+  document.addEventListener('click', function(e){
+    const input=document.getElementById('nameSearchInput');
+    const results=document.getElementById('nameSearchResults');
+    if(!input||!results) return;
+    const nsr=e.target.closest('[data-nsr-index]');
+    if(nsr){
+      const row=lastMatches[parseInt(nsr.dataset.nsrIndex,10)];
+      if(!row) return;
+      input.value=row.name; results.classList.add('hidden');
+      if(window.logVisit) window.logVisit(row.name);
+      if(window.goToResultsForPlayer) window.goToResultsForPlayer(row);
+      else { window._pendingPlayerSelect=row.name; enterBrowseMode(); setTab('submissions'); window.scrollTo({top:0,behavior:'smooth'}); }
+      return;
+    }
+    if(e.target && e.target.id==='goToMyPredictionsBtn'){
+      const query=input.value.trim();
+      if(!query){ input.focus(); input.style.border='2px solid #ff3b5c'; setTimeout(()=>input.style.border='',1500); return; }
+      const match=getRows().find(r=>r.name&&r.name.toLowerCase().includes(query.toLowerCase()));
       if(match){
-        if(window.logVisit) window.logVisit(match.name || query);
+        if(window.logVisit) window.logVisit(match.name||query);
         if(window.goToResultsForPlayer) window.goToResultsForPlayer(match);
-        else {
-          window._pendingPlayerSelect = match.name;
-          enterBrowseMode();
-          setTab('submissions');
-          window.scrollTo({top:0, behavior:'smooth'});
-        }
+        else { window._pendingPlayerSelect=match.name; enterBrowseMode(); setTab('submissions'); window.scrollTo({top:0,behavior:'smooth'}); }
       } else {
-        input.style.border = '2px solid #ff3b5c';
-        setTimeout(() => input.style.border = '', 1500);
-        results.innerHTML = '<div class="name-search-result"><span style="color:#ff8fa3">No entry found for \"' + query + '\" — try a shorter name</span></div>';
+        input.style.border='2px solid #ff3b5c'; setTimeout(()=>input.style.border='',1500);
+        results.innerHTML='<div class="name-search-result" style="color:#ff8fa3;padding:12px 16px">No entry found for "'+query+'" — try a shorter name</div>';
         results.classList.remove('hidden');
       }
-    });
-  }
+      return;
+    }
+    if(!input.contains(e.target)&&!results.contains(e.target)) results.classList.add('hidden');
+  });
 
-  // Re-render results if Firebase loads after user has already typed
-  window._nameSearchRefresh = () => { if(input.value.trim()) renderResults(input.value); };
-  window._nameSearchReady = true;
-}
-
-// Always expose on window so the Firebase module script can call it
-window._reinitNameSearch = initNameSearch;
-// Call immediately (DOM is already ready by the time this script runs)
-initNameSearch();
-
+  window._nameSearchRefresh=function(){ const i=document.getElementById('nameSearchInput'),r=document.getElementById('nameSearchResults'); if(i&&r&&i.value.trim()) doSearch(i,r); };
+  window._reinitNameSearch=window._nameSearchRefresh;
+  window._nameSearchReady=true;
+})()
 
 // ── V93: Redesigned Landing Page ─────────────────────────────────────
 const FD_TOKEN_LP = '8894598260e644eba0a77bc890303669';
