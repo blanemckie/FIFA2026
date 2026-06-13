@@ -4912,56 +4912,153 @@ const LP_NP_CACHE_KEY = 'wcp-newspaper-cache';
 const LP_NP_CACHE_TTL = 3 * 24 * 60 * 60 * 1000; // 3 days
 
 function buildLeagueBullets(players, fixtures){
-  // Build 2-3 bullet points per league about recent match performance
-  const bullets = [];
-  if(!players.length) return 'No entries yet in this league.';
+  if(!players.length) return '<span style="color:#b8c9e8;font-size:13px">No entries yet in this league.</span>';
 
-  // Sort by points desc
   const ranked = [...players].sort((a,b)=>(Number(b.totalPoints)||0)-(Number(a.totalPoints)||0));
-  const leader = ranked[0];
-  const last = ranked[ranked.length-1];
+  const bullets = [];
 
-  // Bullet 1: current standings
-  const top3 = ranked.slice(0,3).map(p=>'<b>'+p.name+'</b> ('+Number(p.totalPoints||0)+'pts)').join(', ');
-  bullets.push('📊 Standings: ' + top3 + (ranked.length > 3 ? ' and ' + (ranked.length-3) + ' more.' : '.'));
+  // ── Helper: get last N completed match IDs across this league ──
+  const allCompletedIds = [];
+  players.forEach(p => {
+    Object.entries(p.groupMatchBreakdown||{}).forEach(([id,m])=>{
+      if(m.reason && m.reason!=='pending' && m.reason!=='invalid'){
+        const n = Number(id);
+        if(!allCompletedIds.includes(n)) allCompletedIds.push(n);
+      }
+    });
+  });
+  allCompletedIds.sort((a,b)=>b-a); // most recent first
+  const recentIds = allCompletedIds.slice(0,3);
 
-  // Bullet 2: exact score heroes in this league
-  const exactHeroes = players.filter(p=>Object.values(p.groupMatchBreakdown||{}).some(m=>m.reason==='exact_score'));
-  if(exactHeroes.length){
-    bullets.push('🎯 Exact score ' + (exactHeroes.length===1?'hero':'heroes') + ': ' + exactHeroes.map(p=>'<b>'+p.name+'</b>').join(', ') + ' — 10 points each time!');
-  } else {
-    bullets.push('🎯 No exact scores yet — the 10-point bonuses are still up for grabs!');
+  // ── Helper: get breakdown for a player+matchId ──
+  function bd(p, id){ return (p.groupMatchBreakdown||{})[id] || (p.groupMatchBreakdown||{})[String(id)] || null; }
+
+  // ── Helper: get prediction for a player+matchId ──
+  function pred(p, id){
+    const preds = p.groupPredictions || [];
+    return preds.find(x => x.matchId===id || x.matchId===String(id) || x.matchId===Number(id)) || null;
   }
 
-  // Bullet 3: recent form — who scored points in the last played match
-  const recentMatchId = (() => {
-    let best = null;
-    players.forEach(p => {
-      Object.entries(p.groupMatchBreakdown||{}).forEach(([id,m])=>{
-        if(m.reason && m.reason!=='pending'){
-          const n = Number(id);
-          if(best===null || n > best) best = n;
-        }
-      });
+  // ── Helper: fixture name ──
+  function fname(id){
+    const f = (fixtures||[]).find(f=>f.id===id||f.id===Number(id));
+    return f ? (f.home+' v '+f.away) : ('Match #'+id);
+  }
+
+  // ── BULLET: Exact score kings across recent games ──
+  const exactByPlayer = {};
+  players.forEach(p=>{
+    recentIds.forEach(id=>{
+      const b = bd(p,id);
+      if(b && b.reason==='exact_score'){
+        exactByPlayer[p.name] = (exactByPlayer[p.name]||0)+1;
+      }
     });
-    return best;
-  })();
-  if(recentMatchId !== null){
-    const fixture = (window.WCP_FIXTURES||[]).find(f=>f.id===recentMatchId||f.id===Number(recentMatchId));
-    const scorers = players.filter(p=>{
-      const bd = (p.groupMatchBreakdown||{})[recentMatchId] || (p.groupMatchBreakdown||{})[String(recentMatchId)];
-      return bd && (bd.reason==='exact_score'||bd.reason==='correct_result');
+  });
+  const exactEntries = Object.entries(exactByPlayer).sort((a,b)=>b[1]-a[1]);
+  if(exactEntries.length){
+    const top = exactEntries[0];
+    const plural = top[1]>1 ? top[1]+' exact scores' : 'an exact score';
+    bullets.push('🎯 <b>'+top[0]+'</b> has nailed '+plural+' in the last '+recentIds.length+' games — crystal ball territory!');
+  }
+
+  // ── BULLET: Whitewash — who got zero points across recent games ──
+  const nilPointers = players.filter(p=>{
+    return recentIds.length>=2 && recentIds.every(id=>{
+      const b = bd(p,id);
+      return b && b.reason && b.reason!=='pending' && b.reason!=='exact_score' && b.reason!=='correct_result';
     });
-    const matchName = fixture ? (fixture.home+' v '+fixture.away) : ('Match #'+recentMatchId);
-    if(scorers.length){
-      bullets.push('⚽ Latest points from <b>'+matchName+'</b>: ' + scorers.map(p=>'<b>'+p.name+'</b>').join(', ') + ' picked up points.');
-    } else {
-      bullets.push('⚽ <b>'+matchName+'</b> — nobody in this league called it right. Tough one!');
+  });
+  if(nilPointers.length){
+    const names = nilPointers.map(p=>'<b>'+p.name+'</b>').join(', ');
+    const commiserations = ['Keep the faith!','It can only get better!','The comeback starts now!','Still time to turn it around!'];
+    bullets.push('😬 Rough patch: '+names+' picked up nothing across the last '+recentIds.length+' games. '+commiserations[Math.floor(Math.random()*commiserations.length)]);
+  }
+
+  // ── BULLET: High scorer predictor — who predicted the highest-scoring game ──
+  let highScorePlayer=null, highScoreTotal=0, highScoreMatch='', highScorePred='';
+  players.forEach(p=>{
+    recentIds.forEach(id=>{
+      const pr = pred(p,id);
+      if(!pr) return;
+      const hs = Number(pr.homeScore), as = Number(pr.awayScore);
+      if(isNaN(hs)||isNaN(as)) return;
+      const total = hs+as;
+      if(total > highScoreTotal){ highScoreTotal=total; highScorePlayer=p.name; highScoreMatch=fname(id); highScorePred=hs+'-'+as; }
+    });
+  });
+  if(highScorePlayer && highScoreTotal>=4){
+    bullets.push('🔥 <b>'+highScorePlayer+'</b> was the most optimistic — predicted a '+highScorePred+' thriller in <b>'+highScoreMatch+'</b>. Goals galore vision!');
+  }
+
+  // ── BULLET: Low scorer — who predicted the most boring game ──
+  let lowScorePlayer=null, lowScoreTotal=999, lowScoreMatch='', lowScorePred='';
+  players.forEach(p=>{
+    recentIds.forEach(id=>{
+      const pr = pred(p,id);
+      if(!pr) return;
+      const hs = Number(pr.homeScore), as = Number(pr.awayScore);
+      if(isNaN(hs)||isNaN(as)) return;
+      const total = hs+as;
+      if(total < lowScoreTotal){ lowScoreTotal=total; lowScorePlayer=p.name; lowScoreMatch=fname(id); lowScorePred=hs+'-'+as; }
+    });
+  });
+  if(lowScorePlayer && lowScoreTotal<=1){
+    bullets.push('🥱 <b>'+lowScorePlayer+'</b> called a '+lowScorePred+' snooze-fest in <b>'+lowScoreMatch+'</b>. Sometimes defence wins. Sometimes.');
+  }
+
+  // ── BULLET: Most players predicted the same result ──
+  recentIds.forEach(id=>{
+    const f = (fixtures||[]).find(f=>f.id===id||f.id===Number(id));
+    if(!f) return;
+    const resultVotes = {};
+    players.forEach(p=>{
+      const pr = pred(p,id);
+      if(!pr) return;
+      const hs=Number(pr.homeScore),as=Number(pr.awayScore);
+      if(isNaN(hs)||isNaN(as)) return;
+      const outcome = hs>as?'home':hs<as?'away':'draw';
+      resultVotes[outcome]=(resultVotes[outcome]||[]);
+      resultVotes[outcome].push(p.name);
+    });
+    const sorted = Object.entries(resultVotes).sort((a,b)=>b[1].length-a[1].length);
+    if(sorted.length && sorted[0][1].length >= Math.ceil(players.length*0.6) && players.length>=3){
+      const outcome=sorted[0][0], names=sorted[0][1];
+      const outcomeLabel = outcome==='home'?f.home+' win':outcome==='away'?f.away+' win':'a draw';
+      bullets.push('🤝 The '+fname(id)+' consensus: '+names.length+' of '+players.length+' tipped '+outcomeLabel+'. The herd instinct is strong!');
+    }
+  });
+
+  // ── BULLET: Biggest points swing on last game ──
+  if(recentIds.length){
+    const lastId = recentIds[0];
+    const withBd = players.map(p=>({ name:p.name, pts: (bd(p,lastId)||{}).points||0 })).filter(x=>x.pts!==undefined);
+    const maxPts = Math.max(...withBd.map(x=>x.pts));
+    const minPts = Math.min(...withBd.map(x=>x.pts));
+    if(maxPts > 0 && maxPts !== minPts){
+      const winners = withBd.filter(x=>x.pts===maxPts).map(x=>'<b>'+x.name+'</b>').join(', ');
+      const losers  = withBd.filter(x=>x.pts===minPts).map(x=>'<b>'+x.name+'</b>').join(', ');
+      bullets.push('📈 <b>'+fname(lastId)+'</b>: '+winners+' bagged '+maxPts+'pts while '+losers+' took home '+minPts+'pts. Gap-maker!');
     }
   }
 
-  return '<ul style="margin:6px 0 0;padding-left:18px;list-style:none">' +
-    bullets.map(b=>'<li style="margin-bottom:6px">'+b+'</li>').join('') +
+  // ── BULLET: Standout player — most points in last 3 games ──
+  const recentPts = players.map(p=>({
+    name: p.name,
+    pts: recentIds.reduce((s,id)=>s+((bd(p,id)||{}).points||0),0)
+  })).sort((a,b)=>b.pts-a.pts);
+  if(recentPts.length && recentPts[0].pts>0 && recentIds.length>=2){
+    bullets.push('⭐ Form player: <b>'+recentPts[0].name+'</b> has picked up <b>'+recentPts[0].pts+'pts</b> across the last '+recentIds.length+' games. On fire!');
+  }
+
+  // Cap to 3 most interesting bullets, prefer variety
+  const finalBullets = bullets.slice(0,3);
+  if(!finalBullets.length){
+    finalBullets.push('⏳ Results coming in — check back soon for league insights!');
+  }
+
+  return '<ul style="margin:8px 0 0;padding:0;list-style:none">' +
+    finalBullets.map(b=>'<li style="margin-bottom:8px;padding:8px 10px;background:rgba(255,255,255,0.05);border-radius:10px;border-left:3px solid rgba(248,200,74,0.4);font-size:13px;line-height:1.45;color:#dce9ff">'+b+'</li>').join('') +
     '</ul>';
 }
 
