@@ -4775,7 +4775,7 @@ function applyLandingDataFromFirebase(){
       awayTeam: { name: f.away, shortName: f.away },
       score: { fullTime: { home: s.home, away: s.away } },
       status: 'FINISHED',
-      utcDate: f.date + 'T00:00:00Z',
+      utcDate: f.date + 'T' + String(Math.floor(ukTimeToMins(f.ukTime)/60)).padStart(2,'0') + ':' + String(ukTimeToMins(f.ukTime) % 60).padStart(2,'0') + ':00Z',
       group: f.group,
       venue: f.venue
     });
