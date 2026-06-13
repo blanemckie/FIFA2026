@@ -4735,45 +4735,35 @@ const LP_CACHE_KEY = 'wcp-landing-data';
 const LP_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours max (score updater cache-busts earlier)
 
 async function fetchLandingData(){
-  // Use Firebase data (same source as results page) — no external API needed
-  applyLandingDataFromFirebase();
-}
-
-function applyLandingDataFromFirebase(){
-  const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
-  // Collect actual scores for each fixture id from any entry's breakdown
-  const scoreMap = {};
-  rows.forEach(row => {
-    const bd = row.groupMatchBreakdown || {};
-    Object.entries(bd).forEach(([id, data]) => {
-      if(!scoreMap[id] && data.reason && data.reason !== 'pending' && data.reason !== 'invalid' && data.actualHome !== undefined && data.actualAway !== undefined){
-        scoreMap[id] = { home: data.actualHome, away: data.actualAway };
-      }
-    });
-  });
-  // Build finished list mapped to our fixture definitions
-  const finished = [];
-  (window.WCP_FIXTURES || []).forEach(f => {
-    const s = scoreMap[f.id] || scoreMap[String(f.id)];
-    if(!s) return;
-    finished.push({
-      fixtureId: f.id,
-      homeTeam: { name: f.home, shortName: f.home },
-      awayTeam: { name: f.away, shortName: f.away },
-      score: { fullTime: { home: s.home, away: s.away } },
-      status: 'FINISHED',
-      utcDate: f.date + 'T00:00:00Z',
-      group: f.group,
-      venue: f.venue
-    });
-  });
-  applyProgressData(finished, 104);
-  applyResultsData(finished);
+  // Check cache first
+  try {
+    const cached = JSON.parse(localStorage.getItem(LP_CACHE_KEY)||'null');
+    if(cached && Date.now() - cached.ts < LP_CACHE_TTL){
+      applyLandingData(cached.matches);
+      return;
+    }
+  } catch(e){}
+  // One single API call for everything
+  try {
+    const url = FD_BASE_LP + '/competitions/WC/matches?season=2026';
+    const res = await fetch(url, { headers: {'X-Auth-Token': FD_TOKEN_LP} });
+    if(!res.ok) throw new Error('API ' + res.status);
+    const data = await res.json();
+    const matches = data.matches || [];
+    try { localStorage.setItem(LP_CACHE_KEY, JSON.stringify({ts: Date.now(), matches})); } catch(e){}
+    applyLandingData(matches);
+  } catch(e) {
+    console.warn('Landing data fetch failed:', e);
+    applyLandingData([]); // render gracefully with no data
+  }
 }
 
 function applyLandingData(matches){
-  // Legacy shim — kept so bustLandingCache calls still work
-  applyLandingDataFromFirebase();
+  const finished = matches.filter(m => m.score?.fullTime?.home !== null && m.score?.fullTime?.home !== undefined && m.status === 'FINISHED');
+  const upcoming = matches.filter(m => m.status === 'SCHEDULED' || m.status === 'TIMED');
+  applyProgressData(finished, matches.length);
+  applyResultsData(finished);
+  applyFixturesData(upcoming);
 }
 
 function applyProgressData(finished, totalInApi){
@@ -4898,7 +4888,7 @@ function applyFixturesData(upcoming){
 // Bust landing cache when Firebase scores update (new data available)
 function bustLandingCache(){
   try { localStorage.removeItem(LP_CACHE_KEY); } catch(e){}
-  applyLandingDataFromFirebase();
+  fetchLandingData();
 }
 window.bustLandingCache = bustLandingCache;
 
@@ -4920,6 +4910,60 @@ function renderLandingFixtures_local(){
 // ── Newspaper (Claude API) ────────────────────────────────────────────
 const LP_NP_CACHE_KEY = 'wcp-newspaper-cache';
 const LP_NP_CACHE_TTL = 3 * 24 * 60 * 60 * 1000; // 3 days
+
+function buildLeagueBullets(players, fixtures){
+  // Build 2-3 bullet points per league about recent match performance
+  const bullets = [];
+  if(!players.length) return 'No entries yet in this league.';
+
+  // Sort by points desc
+  const ranked = [...players].sort((a,b)=>(Number(b.totalPoints)||0)-(Number(a.totalPoints)||0));
+  const leader = ranked[0];
+  const last = ranked[ranked.length-1];
+
+  // Bullet 1: current standings
+  const top3 = ranked.slice(0,3).map(p=>'<b>'+p.name+'</b> ('+Number(p.totalPoints||0)+'pts)').join(', ');
+  bullets.push('📊 Standings: ' + top3 + (ranked.length > 3 ? ' and ' + (ranked.length-3) + ' more.' : '.'));
+
+  // Bullet 2: exact score heroes in this league
+  const exactHeroes = players.filter(p=>Object.values(p.groupMatchBreakdown||{}).some(m=>m.reason==='exact_score'));
+  if(exactHeroes.length){
+    bullets.push('🎯 Exact score ' + (exactHeroes.length===1?'hero':'heroes') + ': ' + exactHeroes.map(p=>'<b>'+p.name+'</b>').join(', ') + ' — 10 points each time!');
+  } else {
+    bullets.push('🎯 No exact scores yet — the 10-point bonuses are still up for grabs!');
+  }
+
+  // Bullet 3: recent form — who scored points in the last played match
+  const recentMatchId = (() => {
+    let best = null;
+    players.forEach(p => {
+      Object.entries(p.groupMatchBreakdown||{}).forEach(([id,m])=>{
+        if(m.reason && m.reason!=='pending'){
+          const n = Number(id);
+          if(best===null || n > best) best = n;
+        }
+      });
+    });
+    return best;
+  })();
+  if(recentMatchId !== null){
+    const fixture = (window.WCP_FIXTURES||[]).find(f=>f.id===recentMatchId||f.id===Number(recentMatchId));
+    const scorers = players.filter(p=>{
+      const bd = (p.groupMatchBreakdown||{})[recentMatchId] || (p.groupMatchBreakdown||{})[String(recentMatchId)];
+      return bd && (bd.reason==='exact_score'||bd.reason==='correct_result');
+    });
+    const matchName = fixture ? (fixture.home+' v '+fixture.away) : ('Match #'+recentMatchId);
+    if(scorers.length){
+      bullets.push('⚽ Latest points from <b>'+matchName+'</b>: ' + scorers.map(p=>'<b>'+p.name+'</b>').join(', ') + ' picked up points.');
+    } else {
+      bullets.push('⚽ <b>'+matchName+'</b> — nobody in this league called it right. Tough one!');
+    }
+  }
+
+  return '<ul style="margin:6px 0 0;padding-left:18px;list-style:none">' +
+    bullets.map(b=>'<li style="margin-bottom:6px">'+b+'</li>').join('') +
+    '</ul>';
+}
 
 function buildNewspaperPrompt(){
   const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
@@ -5016,22 +5060,28 @@ async function renderLandingNewspaper(){
 function renderNewspaperContent(d){
   const wrap = document.getElementById('lpNpContent');
   if(!wrap) return;
+  const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
+  const leagueRows = {
+    Main:   rows.filter(r=>normaliseLeague(r.league)==='Main'   && !r.allLeagues),
+    LEGO:   rows.filter(r=>normaliseLeague(r.league)==='LEGO'   && !r.allLeagues),
+    Family: rows.filter(r=>normaliseLeague(r.league)==='Family' && !r.allLeagues),
+    HFC:    rows.filter(r=>r.hfcLeague                          && !r.allLeagues),
+  };
+  function leagueBlock(name, icon, text, key){
+    const bullets = buildLeagueBullets(leagueRows[key]||[], window.WCP_FIXTURES||[]);
+    return '<div class="lp-np-rule"></div>' +
+      '<div class="lp-np-league-name">' + icon + ' ' + name + '</div>' +
+      '<div class="lp-np-league-text">' + (text||'') + '</div>' +
+      '<div class="lp-np-league-bullets" style="margin-top:6px;font-size:13px;color:#dce9ff">' + bullets + '</div>';
+  }
   wrap.innerHTML =
     '<div class="lp-np-headline">' + (d.headline||'') + '</div>' +
     '<div class="lp-np-byline">' + (d.byline||'') + '</div>' +
     '<div class="lp-np-body">' + (d.lead||'') + '</div>' +
-    '<div class="lp-np-rule"></div>' +
-    '<div class="lp-np-league-name">\uD83C\uDF0D Main League</div>' +
-    '<div class="lp-np-league-text">' + (d.main||'') + '</div>' +
-    '<div class="lp-np-rule"></div>' +
-    '<div class="lp-np-league-name">\uD83E\uDDF1 LEGO League</div>' +
-    '<div class="lp-np-league-text">' + (d.lego||'') + '</div>' +
-    '<div class="lp-np-rule"></div>' +
-    '<div class="lp-np-league-name">\uD83C\uDFE1 Family League</div>' +
-    '<div class="lp-np-league-text">' + (d.family||'') + '</div>' +
-    '<div class="lp-np-rule"></div>' +
-    '<div class="lp-np-league-name">\u26BD HFC League</div>' +
-    '<div class="lp-np-league-text">' + (d.hfc||'') + '</div>';
+    leagueBlock('Main League',   '\uD83C\uDF0D', d.main,   'Main') +
+    leagueBlock('LEGO League',   '\uD83E\uDDF1', d.lego,   'LEGO') +
+    leagueBlock('Family League', '\uD83C\uDFE1', d.family, 'Family') +
+    leagueBlock('HFC League',    '\u26BD',        d.hfc,    'HFC');
 }
 
 // ── World Cup news ────────────────────────────────────────────────────
@@ -5179,8 +5229,7 @@ function refreshFirebaseViews(){
   // V93: After Firebase loads, apply any pending player selection from landing page
   // V93: Trigger newspaper generation once Firebase data is ready
   if(typeof triggerNewspaperGeneration === 'function') triggerNewspaperGeneration();
-  // Update landing page results/progress directly from Firebase (no external API)
-  if(typeof applyLandingDataFromFirebase === 'function') applyLandingDataFromFirebase();
+  // V93b: Bust landing page API cache when Firebase scores update
   if(typeof bustLandingCache === 'function') bustLandingCache();
   // Update entries count in progress strip
   const lpEnt = document.getElementById('lpStatEntries');
