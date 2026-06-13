@@ -3856,7 +3856,7 @@ function renderLeaderboard(){
   const main=allRows.filter(r=>normaliseLeague(r.league)==='Main' || r.allLeagues).length;
   const summary=`<div class="live-summary live-table-summary v80-five"><div class="summary-tile"><b>${total}</b><span>🏆 All Leagues</span></div><div class="summary-tile"><b>${main}</b><span>🌍 Main League</span></div><div class="summary-tile"><b>${lego}</b><span>🧱 LEGO League</span></div><div class="summary-tile"><b>${family}</b><span>🏡 Family League</span></div><div class="summary-tile"><b>${hfc}</b><span>⚽ HFC League</span></div></div>`;
   if(!filtered.length){$('#leaderboardList').innerHTML=summary+'<div class="empty-state">No entries for this league yet.</div>';return;}
-  const table=`<table class="league-table upgraded-table"><thead><tr><th>Rank</th><th>Player</th><th>Entry</th><th>Total Points</th></tr></thead><tbody>${filtered.map((r,i)=>`<tr style="cursor:pointer" title="View ${r.name||'player'}'s predictions" onclick="if(window.goToResultsForPlayer) window.goToResultsForPlayer(${JSON.stringify(r.name||'')})"><td data-label="Rank"><span class="rank-badge">${i+1}</span></td><td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span> <span style="font-size:11px;color:#37d4ff;font-weight:900;opacity:.7">→ view</span></td><td data-label="Entry">${entryBadgesHtml(r.league,r.name)}</td><td data-label="Total Points"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td></tr>`).join('')}</tbody></table>`;
+  const table=`<table class="league-table upgraded-table"><thead><tr><th>Rank</th><th>Player</th><th>Entry</th><th>Total Points</th></tr></thead><tbody>${filtered.map((r,i)=>`<tr style="cursor:pointer" title="View ${(r.name||'').replace(/'/g,''')}'s predictions" onclick="if(window.goToResultsForPlayer)window.goToResultsForPlayer('${(r.name||'').replace(/'/g,''')}')"><td data-label="Rank"><span class="rank-badge">${i+1}</span></td><td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span> <span style="font-size:11px;color:#37d4ff;font-weight:900;opacity:.7">→ view</span></td><td data-label="Entry">${entryBadgesHtml(r.league,r.name)}</td><td data-label="Total Points"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td></tr>`).join('')}</tbody></table>`;
   $('#leaderboardList').innerHTML=summary+table;
 }
 $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagueFilter=btn.dataset.leagueFilter;renderLeaderboard();}));
@@ -3926,7 +3926,6 @@ function renderSubmissions(){
 
   if(!currentSubmissionKey || !rows.some((r,i)=>entryKey(r,i)===currentSubmissionKey)) currentSubmissionKey=entryKey(rows[0],0);
   window.currentSubmissionKey = currentSubmissionKey;
-  // Sort alphabetically by name for the dropdown
   const sortedRows = [...rows].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
   dropdown.innerHTML=sortedRows.map((r)=>{
     const key=entryKey(r, rows.indexOf(r));
@@ -4646,6 +4645,7 @@ function initNameSearch(){
       el.addEventListener('click', () => {
         const row = matches[i];
         if(!row) return;
+        if(window.logVisit) window.logVisit(row.name || 'Unknown');
         // Enter browse mode, go straight to Live Results, and select this player.
         if(window.goToResultsForPlayer) window.goToResultsForPlayer(row);
         else {
@@ -4682,6 +4682,7 @@ function initNameSearch(){
       const rows = getRows();
       const match = rows.find(r => r.name && r.name.toLowerCase().includes(query.toLowerCase()));
       if(match){
+        if(window.logVisit) window.logVisit(match.name || query);
         if(window.goToResultsForPlayer) window.goToResultsForPlayer(match);
         else {
           window._pendingPlayerSelect = match.name;
@@ -4737,36 +4738,40 @@ const LP_CACHE_KEY = 'wcp-landing-data';
 const LP_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours max (score updater cache-busts earlier)
 
 async function fetchLandingData(){
-  // Check cache first
-  try {
-    const cached = JSON.parse(localStorage.getItem(LP_CACHE_KEY)||'null');
-    if(cached && Date.now() - cached.ts < LP_CACHE_TTL){
-      applyLandingData(cached.matches);
-      return;
-    }
-  } catch(e){}
-  // One single API call for everything
-  try {
-    const url = FD_BASE_LP + '/competitions/WC/matches?season=2026';
-    const res = await fetch(url, { headers: {'X-Auth-Token': FD_TOKEN_LP} });
-    if(!res.ok) throw new Error('API ' + res.status);
-    const data = await res.json();
-    const matches = data.matches || [];
-    try { localStorage.setItem(LP_CACHE_KEY, JSON.stringify({ts: Date.now(), matches})); } catch(e){}
-    applyLandingData(matches);
-  } catch(e) {
-    console.warn('Landing data fetch failed:', e);
-    applyLandingData([]); // render gracefully with no data
-  }
+  applyLandingDataFromFirebase();
 }
 
-function applyLandingData(matches){
-  const finished = matches.filter(m => m.score?.fullTime?.home !== null && m.score?.fullTime?.home !== undefined && m.status === 'FINISHED');
-  const upcoming = matches.filter(m => m.status === 'SCHEDULED' || m.status === 'TIMED');
-  applyProgressData(finished, matches.length);
+function applyLandingDataFromFirebase(){
+  const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
+  const scoreMap = {};
+  rows.forEach(row => {
+    const bd = row.groupMatchBreakdown || {};
+    Object.entries(bd).forEach(([id, data]) => {
+      if(!scoreMap[id] && data.reason && data.reason !== 'pending' && data.reason !== 'invalid' && data.actualHome !== undefined && data.actualAway !== undefined){
+        scoreMap[id] = { home: data.actualHome, away: data.actualAway };
+      }
+    });
+  });
+  const finished = [];
+  (window.WCP_FIXTURES || []).forEach(f => {
+    const s = scoreMap[f.id] || scoreMap[String(f.id)];
+    if(!s) return;
+    finished.push({
+      fixtureId: f.id,
+      homeTeam: { name: f.home, shortName: f.home },
+      awayTeam: { name: f.away, shortName: f.away },
+      score: { fullTime: { home: s.home, away: s.away } },
+      status: 'FINISHED',
+      utcDate: f.date + 'T00:00:00Z',
+      group: f.group,
+      venue: f.venue
+    });
+  });
+  applyProgressData(finished, 104);
   applyResultsData(finished);
-  applyFixturesData(upcoming);
 }
+
+function applyLandingData(matches){ applyLandingDataFromFirebase(); }
 
 function applyProgressData(finished, totalInApi){
   const played = finished.length;
@@ -4890,13 +4895,12 @@ function applyFixturesData(upcoming){
 // Bust landing cache when Firebase scores update (new data available)
 function bustLandingCache(){
   try { localStorage.removeItem(LP_CACHE_KEY); } catch(e){}
-  fetchLandingData();
+  applyLandingDataFromFirebase();
 }
 window.bustLandingCache = bustLandingCache;
 
-// Initial load
-fetchLandingData();
-// Also refresh fixtures from local data immediately (no API needed)
+// Don't call fetchLandingData() here — needs Firebase data.
+// refreshFirebaseViews() handles this after Firebase loads.
 renderLandingFixtures_local();
 
 function renderLandingFixtures_local(){
@@ -5005,25 +5009,74 @@ async function renderLandingNewspaper(){
   }
 }
 
+function buildLeagueBullets(players, fixtures){
+  if(!players.length) return '<span style="color:#b8c9e8;font-size:13px">No entries yet in this league.</span>';
+  const ranked = [...players].sort((a,b)=>(Number(b.totalPoints)||0)-(Number(a.totalPoints)||0));
+  const bullets = [];
+  const allCompletedIds = [];
+  players.forEach(p => {
+    Object.entries(p.groupMatchBreakdown||{}).forEach(([id,m])=>{
+      if(m.reason && m.reason!=='pending' && m.reason!=='invalid'){
+        const n = Number(id);
+        if(!allCompletedIds.includes(n)) allCompletedIds.push(n);
+      }
+    });
+  });
+  allCompletedIds.sort((a,b)=>b-a);
+  const recentIds = allCompletedIds.slice(0,3);
+  function bd(p,id){ return (p.groupMatchBreakdown||{})[id]||(p.groupMatchBreakdown||{})[String(id)]||null; }
+  function pred(p,id){ const preds=p.groupPredictions||[]; return preds.find(x=>x.matchId===id||x.matchId===String(id)||x.matchId===Number(id))||null; }
+  function fname(id){ const f=(fixtures||[]).find(f=>f.id===id||f.id===Number(id)); return f?(f.home+' v '+f.away):('Match #'+id); }
+  // Exact score kings
+  const exactByPlayer={};
+  players.forEach(p=>{ recentIds.forEach(id=>{ const b=bd(p,id); if(b&&b.reason==='exact_score') exactByPlayer[p.name]=(exactByPlayer[p.name]||0)+1; }); });
+  const exactEntries=Object.entries(exactByPlayer).sort((a,b)=>b[1]-a[1]);
+  if(exactEntries.length){ const top=exactEntries[0]; bullets.push('🎯 <b>'+top[0]+'</b> has nailed '+(top[1]>1?top[1]+' exact scores':'an exact score')+' in the last '+recentIds.length+' games — crystal ball territory!'); }
+  // Nil pointers
+  const nilPointers=players.filter(p=>recentIds.length>=2&&recentIds.every(id=>{ const b=bd(p,id); return b&&b.reason&&b.reason!=='pending'&&b.reason!=='exact_score'&&b.reason!=='correct_result'; }));
+  if(nilPointers.length){ const names=nilPointers.map(p=>'<b>'+p.name+'</b>').join(', '); const c=['Keep the faith!','It can only get better!','The comeback starts now!','Still time to turn it around!']; bullets.push('😬 Rough patch: '+names+' picked up nothing across the last '+recentIds.length+' games. '+c[Math.floor(Math.random()*c.length)]); }
+  // High scorer predictor
+  let hsp=null,hst=0,hsm='',hspred='';
+  players.forEach(p=>{ recentIds.forEach(id=>{ const pr=pred(p,id); if(!pr)return; const hs=Number(pr.homeScore),as=Number(pr.awayScore); if(isNaN(hs)||isNaN(as))return; const t=hs+as; if(t>hst){hst=t;hsp=p.name;hsm=fname(id);hspred=hs+'-'+as;} }); });
+  if(hsp&&hst>=4) bullets.push('🔥 <b>'+hsp+'</b> predicted a '+hspred+' thriller in <b>'+hsm+'</b>. Goals galore vision!');
+  // Low scorer
+  let lsp=null,lst=999,lsm='',lspred='';
+  players.forEach(p=>{ recentIds.forEach(id=>{ const pr=pred(p,id); if(!pr)return; const hs=Number(pr.homeScore),as=Number(pr.awayScore); if(isNaN(hs)||isNaN(as))return; const t=hs+as; if(t<lst){lst=t;lsp=p.name;lsm=fname(id);lspred=hs+'-'+as;} }); });
+  if(lsp&&lst<=1) bullets.push('🥱 <b>'+lsp+'</b> called a '+lspred+' snooze-fest in <b>'+lsm+'</b>. Sometimes defence wins.');
+  // Herd instinct
+  recentIds.forEach(id=>{ const f=(fixtures||[]).find(f=>f.id===id||f.id===Number(id)); if(!f)return; const rv={}; players.forEach(p=>{ const pr=pred(p,id); if(!pr)return; const hs=Number(pr.homeScore),as=Number(pr.awayScore); if(isNaN(hs)||isNaN(as))return; const o=hs>as?'home':hs<as?'away':'draw'; rv[o]=(rv[o]||[]); rv[o].push(p.name); }); const s=Object.entries(rv).sort((a,b)=>b[1].length-a[1].length); if(s.length&&s[0][1].length>=Math.ceil(players.length*0.6)&&players.length>=3){ const o=s[0][0],ol=o==='home'?f.home+' win':o==='away'?f.away+' win':'a draw'; bullets.push('🤝 '+s[0][1].length+' of '+players.length+' tipped '+ol+' in '+fname(id)+'. The herd is strong!'); } });
+  // Gap maker
+  if(recentIds.length){ const lid=recentIds[0]; const wb=players.map(p=>({name:p.name,pts:(bd(p,lid)||{}).points||0})).filter(x=>x.pts!==undefined); const mx=Math.max(...wb.map(x=>x.pts)),mn=Math.min(...wb.map(x=>x.pts)); if(mx>0&&mx!==mn){ const w=wb.filter(x=>x.pts===mx).map(x=>'<b>'+x.name+'</b>').join(', '); const l=wb.filter(x=>x.pts===mn).map(x=>'<b>'+x.name+'</b>').join(', '); bullets.push('📈 <b>'+fname(lid)+'</b>: '+w+' bagged '+mx+'pts while '+l+' took '+mn+'pts. Gap-maker!'); } }
+  // Form player
+  const rp=players.map(p=>({name:p.name,pts:recentIds.reduce((s,id)=>s+((bd(p,id)||{}).points||0),0)})).sort((a,b)=>b.pts-a.pts);
+  if(rp.length&&rp[0].pts>0&&recentIds.length>=2) bullets.push('⭐ Form player: <b>'+rp[0].name+'</b> has picked up <b>'+rp[0].pts+'pts</b> across the last '+recentIds.length+' games. On fire!');
+  const final=bullets.slice(0,3);
+  if(!final.length) final.push('⏳ Results coming in — check back soon for league insights!');
+  return '<ul style="margin:8px 0 0;padding:0;list-style:none">'+final.map(b=>'<li style="margin-bottom:8px;padding:8px 10px;background:rgba(255,255,255,0.05);border-radius:10px;border-left:3px solid rgba(248,200,74,0.4);font-size:13px;line-height:1.45;color:#dce9ff">'+b+'</li>').join('')+'</ul>';
+}
+
 function renderNewspaperContent(d){
   const wrap = document.getElementById('lpNpContent');
   if(!wrap) return;
+  const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
+  const leagueRows = {
+    Main:   rows.filter(r=>normaliseLeague(r.league)==='Main'   && !r.allLeagues),
+    LEGO:   rows.filter(r=>normaliseLeague(r.league)==='LEGO'   && !r.allLeagues),
+    Family: rows.filter(r=>normaliseLeague(r.league)==='Family' && !r.allLeagues),
+    HFC:    rows.filter(r=>r.hfcLeague                          && !r.allLeagues),
+  };
+  function leagueBlock(name, icon, text, key){
+    const bullets = buildLeagueBullets(leagueRows[key]||[], window.WCP_FIXTURES||[]);
+    return '<div class="lp-np-rule"></div>'+'<div class="lp-np-league-name">'+icon+' '+name+'</div>'+'<div class="lp-np-league-text">'+（text||'')+'</div>'+'<div style="margin-top:6px">'+bullets+'</div>';
+  }
   wrap.innerHTML =
     '<div class="lp-np-headline">' + (d.headline||'') + '</div>' +
     '<div class="lp-np-byline">' + (d.byline||'') + '</div>' +
     '<div class="lp-np-body">' + (d.lead||'') + '</div>' +
-    '<div class="lp-np-rule"></div>' +
-    '<div class="lp-np-league-name">\uD83C\uDF0D Main League</div>' +
-    '<div class="lp-np-league-text">' + (d.main||'') + '</div>' +
-    '<div class="lp-np-rule"></div>' +
-    '<div class="lp-np-league-name">\uD83E\uDDF1 LEGO League</div>' +
-    '<div class="lp-np-league-text">' + (d.lego||'') + '</div>' +
-    '<div class="lp-np-rule"></div>' +
-    '<div class="lp-np-league-name">\uD83C\uDFE1 Family League</div>' +
-    '<div class="lp-np-league-text">' + (d.family||'') + '</div>' +
-    '<div class="lp-np-rule"></div>' +
-    '<div class="lp-np-league-name">\u26BD HFC League</div>' +
-    '<div class="lp-np-league-text">' + (d.hfc||'') + '</div>';
+    leagueBlock('Main League',   '\uD83C\uDF0D', d.main,   'Main') +
+    leagueBlock('LEGO League',   '\uD83E\uDDF1', d.lego,   'LEGO') +
+    leagueBlock('Family League', '\uD83C\uDFE1', d.family, 'Family') +
+    leagueBlock('HFC League',    '\u26BD',        d.hfc,    'HFC');
 }
 
 // ── World Cup news ────────────────────────────────────────────────────
@@ -5105,6 +5158,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// ── Visit logger ──────────────────────────────────────────────────────
+async function logVisit(playerName){
+  try {
+    await addDoc(collection(db, 'visits'), {
+      name: playerName,
+      ts: serverTimestamp(),
+      localTime: new Date().toISOString(),
+      ua: navigator.userAgent.slice(0,120)
+    });
+  } catch(e){ console.warn('Visit log failed:', e); }
+}
+window.logVisit = logVisit;
+
 window.savePlayerEntryToFirebase = async function({name,email,league}){
   const cleanEmail = String(email||'').trim().toLowerCase();
   if(!name || !cleanEmail){
@@ -5171,7 +5237,8 @@ function refreshFirebaseViews(){
   // V93: After Firebase loads, apply any pending player selection from landing page
   // V93: Trigger newspaper generation once Firebase data is ready
   if(typeof triggerNewspaperGeneration === 'function') triggerNewspaperGeneration();
-  // V93b: Bust landing page API cache when Firebase scores update
+  // Update landing page from Firebase data directly
+  if(typeof applyLandingDataFromFirebase === 'function') applyLandingDataFromFirebase();
   if(typeof bustLandingCache === 'function') bustLandingCache();
   // Update entries count in progress strip
   const lpEnt = document.getElementById('lpStatEntries');
