@@ -4775,7 +4775,7 @@ function applyLandingDataFromFirebase(){
       awayTeam: { name: f.away, shortName: f.away },
       score: { fullTime: { home: s.home, away: s.away } },
       status: 'FINISHED',
-      utcDate: f.date + 'T' + String(Math.floor(ukTimeToMins(f.ukTime)/60)).padStart(2,'0') + ':' + String(ukTimeToMins(f.ukTime) % 60).padStart(2,'0') + ':00Z',
+      utcDate: f.date + 'T00:00:00Z',
       group: f.group,
       venue: f.venue
     });
@@ -4823,10 +4823,13 @@ function applyProgressData(finished, totalInApi){
 function applyResultsData(finished){
   const wrap = document.getElementById('lpRecentResults');
   if(!wrap) return;
-  // Sort by fixture date+time chronologically so most recent appears first
+  // Sort by fixture position in WCP_FIXTURES (already in chronological date+time order)
+  const fixtureOrder = {};
+  (window.WCP_FIXTURES||[]).forEach((f,i) => { fixtureOrder[String(f.id)] = i; });
   const sortedFinished = [...finished].sort((a,b)=>{
-    const da = a.utcDate||''; const db2 = b.utcDate||'';
-    return da < db2 ? -1 : da > db2 ? 1 : 0;
+    const ia = fixtureOrder[String(a.fixtureId)] ?? 9999;
+    const ib = fixtureOrder[String(b.fixtureId)] ?? 9999;
+    return ia - ib;
   });
   const last3 = sortedFinished.slice(-3).reverse();
   if(!last3.length){
@@ -4945,8 +4948,8 @@ function renderLandingFixtures_local(){
 
 
 // ── Newspaper (Claude API) ────────────────────────────────────────────
-const LP_NP_CACHE_KEY = 'wcp-newspaper-cache-v2'; // v2 forces cache bust with new prompt
-const LP_NP_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
+const LP_NP_CACHE_KEY = 'wcp-newspaper-cache-v3'; // v3 forces cache bust with 3-per-league prompt
+const LP_NP_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours - regenerates regularly during tournament
 
 function buildNewspaperPrompt(){
   const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
@@ -5014,7 +5017,7 @@ async function renderLandingNewspaper(){
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
+        max_tokens: 1500,
         messages:[{role:'user', content: prompt}]
       })
     });
@@ -5029,14 +5032,36 @@ async function renderLandingNewspaper(){
     // Fallback to static content from Firebase data
     const ranked = ((typeof getEntryRows === 'function') ? getEntryRows() : []).sort((a,b)=>(Number(b.totalPoints)||0)-(Number(a.totalPoints)||0));
     const leader = ranked[0];
+    const leagueRows = {
+      Main:   ranked.filter(r=>normaliseLeague(r.league)==='Main'   && !r.allLeagues),
+      LEGO:   ranked.filter(r=>normaliseLeague(r.league)==='LEGO'   && !r.allLeagues),
+      Family: ranked.filter(r=>normaliseLeague(r.league)==='Family' && !r.allLeagues),
+      HFC:    ranked.filter(r=>r.hfcLeague                          && !r.allLeagues),
+    };
+    const zeroers = (arr) => arr.filter(r=>!Number(r.totalPoints||0));
+    const topOf = (arr) => arr[0] ? '<b>'+arr[0].name+'</b> ('+Number(arr[0].totalPoints||0)+' pts)' : null;
+    const second = (arr) => arr[1] ? '<b>'+arr[1].name+'</b> ('+Number(arr[1].totalPoints||0)+' pts)' : null;
+    const zeroName = (arr) => zeroers(arr)[0] ? '<b>'+zeroers(arr)[0].name+'</b>' : null;
+    const barneyNote = (arr) => {
+      if(arr.length>=2 && arr[0].name && arr[0].name.toLowerCase().startsWith('barn') && Number(arr[0].totalPoints||0)===Number(arr[1].totalPoints||0))
+        return ' (Fun fact: ' + '<b>'+arr[0].name+'</b> is only top due to alphabetical order — the scores are tied and this table is about to get spicy! 🌶️)';
+      return '';
+    };
+    const leagueSummary = (arr, name) => {
+      if(!arr.length) return 'No '+name+' entries yet — watch this space!';
+      let txt = topOf(arr) ? topOf(arr)+' is leading the '+name+' charge'+barneyNote(arr)+'. ' : '';
+      txt += second(arr) ? second(arr)+' is breathing down their neck and refusing to give up the hunt. ' : '';
+      txt += zeroName(arr) ? zeroName(arr)+' is still waiting for their first points — but the tournament is long and anything can happen. ' : (arr.length>1?'Every point counts as the group stage heats up. ':'');
+      return txt.trim();
+    };
     const fallback = {
       headline: leader ? (leader.name + ' leads the pack after the opening matches') : 'The tournament has kicked off — who will come out on top?',
       byline: 'By our Prediction Correspondent',
-      lead: leader ? '<b>' + leader.name + '</b> is setting the pace with <b>' + Number(leader.totalPoints||0) + ' points</b>. The leaderboard is taking shape — can anyone catch them?' : 'The tournament is underway and the predictions are being put to the test.',
-      main: 'The Main League is heating up — check the Live Table for the latest standings.',
-      lego: 'LEGO League competitors are battling hard across the groups.',
-      family: 'The Family League is a tight contest — every point will matter.',
-      hfc: 'HFC League entries are off and running in the group stage.'
+      lead: leader ? '<b>'+leader.name+'</b> is setting the pace with <b>'+Number(leader.totalPoints||0)+' points</b> as the World Cup group stage roars into life. The leaderboard is already taking shape — but with 100 games still to go, this is far from over.' : 'The tournament is underway and predictions are being put to the test across all leagues.',
+      main: leagueSummary(leagueRows.Main, 'Main League'),
+      lego: leagueSummary(leagueRows.LEGO, 'LEGO League'),
+      family: leagueSummary(leagueRows.Family, 'Family League'),
+      hfc: leagueSummary(leagueRows.HFC, 'HFC League'),
     };
     renderNewspaperContent(fallback);
   }
