@@ -4710,16 +4710,10 @@ function initNameSearch(){
   window._nameSearchReady = true;
 }
 
-// Init once — guard against double-init
-let _nameSearchInited = false;
-function initNameSearchOnce(){
-  if(_nameSearchInited) return;
-  _nameSearchInited = true;
-  initNameSearch();
-}
-document.addEventListener('DOMContentLoaded', initNameSearchOnce);
-// Also re-run after Firebase data loads in case DOM was ready before Firebase
+// Always expose on window so the Firebase module script can call it
 window._reinitNameSearch = initNameSearch;
+// Call immediately (DOM is already ready by the time this script runs)
+initNameSearch();
 
 
 // ── V93: Redesigned Landing Page ─────────────────────────────────────
