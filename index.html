@@ -3856,7 +3856,7 @@ function renderLeaderboard(){
   const main=allRows.filter(r=>normaliseLeague(r.league)==='Main' || r.allLeagues).length;
   const summary=`<div class="live-summary live-table-summary v80-five"><div class="summary-tile"><b>${total}</b><span>🏆 All Leagues</span></div><div class="summary-tile"><b>${main}</b><span>🌍 Main League</span></div><div class="summary-tile"><b>${lego}</b><span>🧱 LEGO League</span></div><div class="summary-tile"><b>${family}</b><span>🏡 Family League</span></div><div class="summary-tile"><b>${hfc}</b><span>⚽ HFC League</span></div></div>`;
   if(!filtered.length){$('#leaderboardList').innerHTML=summary+'<div class="empty-state">No entries for this league yet.</div>';return;}
-  const table=`<table class="league-table upgraded-table"><thead><tr><th>Rank</th><th>Player</th><th>Entry</th><th>Total Points</th></tr></thead><tbody>${filtered.map((r,i)=>`<tr><td data-label="Rank"><span class="rank-badge">${i+1}</span></td><td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span></td><td data-label="Entry">${entryBadgesHtml(r.league,r.name)}</td><td data-label="Total Points"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td></tr>`).join('')}</tbody></table>`;
+  const table=`<table class="league-table upgraded-table"><thead><tr><th>Rank</th><th>Player</th><th>Entry</th><th>Total Points</th></tr></thead><tbody>${filtered.map((r,i)=>`<tr style="cursor:pointer" title="View ${r.name||'player'}'s predictions" onclick="if(window.goToResultsForPlayer) window.goToResultsForPlayer(${JSON.stringify(r.name||'')})"><td data-label="Rank"><span class="rank-badge">${i+1}</span></td><td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span> <span style="font-size:11px;color:#37d4ff;font-weight:900;opacity:.7">→ view</span></td><td data-label="Entry">${entryBadgesHtml(r.league,r.name)}</td><td data-label="Total Points"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td></tr>`).join('')}</tbody></table>`;
   $('#leaderboardList').innerHTML=summary+table;
 }
 $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagueFilter=btn.dataset.leagueFilter;renderLeaderboard();}));
@@ -3926,8 +3926,10 @@ function renderSubmissions(){
 
   if(!currentSubmissionKey || !rows.some((r,i)=>entryKey(r,i)===currentSubmissionKey)) currentSubmissionKey=entryKey(rows[0],0);
   window.currentSubmissionKey = currentSubmissionKey;
-  dropdown.innerHTML=rows.map((r,i)=>{
-    const key=entryKey(r,i);
+  // Sort alphabetically by name for the dropdown
+  const sortedRows = [...rows].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  dropdown.innerHTML=sortedRows.map((r)=>{
+    const key=entryKey(r, rows.indexOf(r));
     const name=r.name||'Unknown player';
     const pts=Number(r.totalPoints||0); return `<option value="${key}" ${key===currentSubmissionKey?'selected':''}>⚽ ${name}${pts>0?' — '+pts+' pts':''}</option>`;
   }).join('');
@@ -4735,43 +4737,35 @@ const LP_CACHE_KEY = 'wcp-landing-data';
 const LP_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours max (score updater cache-busts earlier)
 
 async function fetchLandingData(){
-  // Reads from Firebase (same source as results page) — called after Firebase loads
-  applyLandingDataFromFirebase();
-}
-
-function applyLandingDataFromFirebase(){
-  const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
-  const scoreMap = {};
-  rows.forEach(row => {
-    const bd = row.groupMatchBreakdown || {};
-    Object.entries(bd).forEach(([id, data]) => {
-      if(!scoreMap[id] && data.reason && data.reason !== 'pending' && data.reason !== 'invalid' && data.actualHome !== undefined && data.actualAway !== undefined){
-        scoreMap[id] = { home: data.actualHome, away: data.actualAway };
-      }
-    });
-  });
-  const finished = [];
-  (window.WCP_FIXTURES || []).forEach(f => {
-    const s = scoreMap[f.id] || scoreMap[String(f.id)];
-    if(!s) return;
-    finished.push({
-      fixtureId: f.id,
-      homeTeam: { name: f.home, shortName: f.home },
-      awayTeam: { name: f.away, shortName: f.away },
-      score: { fullTime: { home: s.home, away: s.away } },
-      status: 'FINISHED',
-      utcDate: f.date + 'T00:00:00Z',
-      group: f.group,
-      venue: f.venue
-    });
-  });
-  applyProgressData(finished, 104);
-  applyResultsData(finished);
+  // Check cache first
+  try {
+    const cached = JSON.parse(localStorage.getItem(LP_CACHE_KEY)||'null');
+    if(cached && Date.now() - cached.ts < LP_CACHE_TTL){
+      applyLandingData(cached.matches);
+      return;
+    }
+  } catch(e){}
+  // One single API call for everything
+  try {
+    const url = FD_BASE_LP + '/competitions/WC/matches?season=2026';
+    const res = await fetch(url, { headers: {'X-Auth-Token': FD_TOKEN_LP} });
+    if(!res.ok) throw new Error('API ' + res.status);
+    const data = await res.json();
+    const matches = data.matches || [];
+    try { localStorage.setItem(LP_CACHE_KEY, JSON.stringify({ts: Date.now(), matches})); } catch(e){}
+    applyLandingData(matches);
+  } catch(e) {
+    console.warn('Landing data fetch failed:', e);
+    applyLandingData([]); // render gracefully with no data
+  }
 }
 
 function applyLandingData(matches){
-  // Legacy shim
-  applyLandingDataFromFirebase();
+  const finished = matches.filter(m => m.score?.fullTime?.home !== null && m.score?.fullTime?.home !== undefined && m.status === 'FINISHED');
+  const upcoming = matches.filter(m => m.status === 'SCHEDULED' || m.status === 'TIMED');
+  applyProgressData(finished, matches.length);
+  applyResultsData(finished);
+  applyFixturesData(upcoming);
 }
 
 function applyProgressData(finished, totalInApi){
@@ -4900,9 +4894,9 @@ function bustLandingCache(){
 }
 window.bustLandingCache = bustLandingCache;
 
-// Don't call fetchLandingData() here — it reads from getEntryRows() which
-// needs Firebase to be loaded first. refreshFirebaseViews() handles this
-// after Firebase data arrives. Just render upcoming fixtures from local data.
+// Initial load
+fetchLandingData();
+// Also refresh fixtures from local data immediately (no API needed)
 renderLandingFixtures_local();
 
 function renderLandingFixtures_local(){
@@ -5177,8 +5171,7 @@ function refreshFirebaseViews(){
   // V93: After Firebase loads, apply any pending player selection from landing page
   // V93: Trigger newspaper generation once Firebase data is ready
   if(typeof triggerNewspaperGeneration === 'function') triggerNewspaperGeneration();
-  // Update landing page results/progress from Firebase (no external API)
-  if(typeof applyLandingDataFromFirebase === 'function') applyLandingDataFromFirebase();
+  // V93b: Bust landing page API cache when Firebase scores update
   if(typeof bustLandingCache === 'function') bustLandingCache();
   // Update entries count in progress strip
   const lpEnt = document.getElementById('lpStatEntries');
