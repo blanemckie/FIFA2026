@@ -4705,13 +4705,14 @@ function initNameSearch(){
     });
   }
 
-  // Re-init when Firebase data loads
+  // Re-render results if Firebase loads after user has already typed
+  window._nameSearchRefresh = () => { if(input.value.trim()) renderResults(input.value); };
   window._nameSearchReady = true;
 }
 
-// Init after DOM ready and after Firebase loads
+// Init after DOM ready
 document.addEventListener('DOMContentLoaded', initNameSearch);
-setTimeout(initNameSearch, 2000); // fallback after Firebase loads
+setTimeout(initNameSearch, 500); // fallback if DOMContentLoaded already fired
 
 
 // ── V93: Redesigned Landing Page ─────────────────────────────────────
@@ -5246,6 +5247,8 @@ function refreshFirebaseViews(){
   // Update landing page from Firebase data directly
   if(typeof applyLandingDataFromFirebase === 'function') applyLandingDataFromFirebase();
   if(typeof bustLandingCache === 'function') bustLandingCache();
+  // Refresh name search dropdown if user already typed something
+  if(typeof window._nameSearchRefresh === 'function') window._nameSearchRefresh();
   // Update entries count in progress strip
   const lpEnt = document.getElementById('lpStatEntries');
   if(lpEnt){ const r=(typeof getEntryRows==='function')?getEntryRows():[];  lpEnt.textContent=r.length||'—'; }
