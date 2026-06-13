@@ -3856,8 +3856,14 @@ function renderLeaderboard(){
   const main=allRows.filter(r=>normaliseLeague(r.league)==='Main' || r.allLeagues).length;
   const summary=`<div class="live-summary live-table-summary v80-five"><div class="summary-tile"><b>${total}</b><span>🏆 All Leagues</span></div><div class="summary-tile"><b>${main}</b><span>🌍 Main League</span></div><div class="summary-tile"><b>${lego}</b><span>🧱 LEGO League</span></div><div class="summary-tile"><b>${family}</b><span>🏡 Family League</span></div><div class="summary-tile"><b>${hfc}</b><span>⚽ HFC League</span></div></div>`;
   if(!filtered.length){$('#leaderboardList').innerHTML=summary+'<div class="empty-state">No entries for this league yet.</div>';return;}
-  const table=`<table class="league-table upgraded-table"><thead><tr><th>Rank</th><th>Player</th><th>Entry</th><th>Total Points</th></tr></thead><tbody>${filtered.map((r,i)=>`<tr style="cursor:pointer" title="View ${(r.name||'').replace(/'/g,''')}'s predictions" onclick="if(window.goToResultsForPlayer)window.goToResultsForPlayer('${(r.name||'').replace(/'/g,''')}')"><td data-label="Rank"><span class="rank-badge">${i+1}</span></td><td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span> <span style="font-size:11px;color:#37d4ff;font-weight:900;opacity:.7">→ view</span></td><td data-label="Entry">${entryBadgesHtml(r.league,r.name)}</td><td data-label="Total Points"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td></tr>`).join('')}</tbody></table>`;
+  const table=`<table class="league-table upgraded-table"><thead><tr><th>Rank</th><th>Player</th><th>Entry</th><th>Total Points</th></tr></thead><tbody>${filtered.map((r,i)=>`<tr style="cursor:pointer" class="lb-player-row" data-player-name="${(r.name||'').replace(/"/g,'&quot;')}"><td data-label="Rank"><span class="rank-badge">${i+1}</span></td><td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span> <span style="font-size:11px;color:#37d4ff;font-weight:900;opacity:.7">→ view</span></td><td data-label="Entry">${entryBadgesHtml(r.league,r.name)}</td><td data-label="Total Points"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td></tr>`).join('')}</tbody></table>`;
   $('#leaderboardList').innerHTML=summary+table;
+  $('#leaderboardList').querySelectorAll('.lb-player-row').forEach(row=>{
+    row.addEventListener('click',()=>{
+      const name=row.dataset.playerName;
+      if(name && window.goToResultsForPlayer) window.goToResultsForPlayer(name);
+    });
+  });
 }
 $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagueFilter=btn.dataset.leagueFilter;renderLeaderboard();}));
 let currentSubmissionKey = null;
