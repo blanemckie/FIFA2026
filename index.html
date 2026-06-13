@@ -4735,35 +4735,43 @@ const LP_CACHE_KEY = 'wcp-landing-data';
 const LP_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours max (score updater cache-busts earlier)
 
 async function fetchLandingData(){
-  // Check cache first
-  try {
-    const cached = JSON.parse(localStorage.getItem(LP_CACHE_KEY)||'null');
-    if(cached && Date.now() - cached.ts < LP_CACHE_TTL){
-      applyLandingData(cached.matches);
-      return;
-    }
-  } catch(e){}
-  // One single API call for everything
-  try {
-    const url = FD_BASE_LP + '/competitions/WC/matches?season=2026';
-    const res = await fetch(url, { headers: {'X-Auth-Token': FD_TOKEN_LP} });
-    if(!res.ok) throw new Error('API ' + res.status);
-    const data = await res.json();
-    const matches = data.matches || [];
-    try { localStorage.setItem(LP_CACHE_KEY, JSON.stringify({ts: Date.now(), matches})); } catch(e){}
-    applyLandingData(matches);
-  } catch(e) {
-    console.warn('Landing data fetch failed:', e);
-    applyLandingData([]); // render gracefully with no data
-  }
+  // Reads from Firebase (same source as results page) — called after Firebase loads
+  applyLandingDataFromFirebase();
+}
+
+function applyLandingDataFromFirebase(){
+  const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
+  const scoreMap = {};
+  rows.forEach(row => {
+    const bd = row.groupMatchBreakdown || {};
+    Object.entries(bd).forEach(([id, data]) => {
+      if(!scoreMap[id] && data.reason && data.reason !== 'pending' && data.reason !== 'invalid' && data.actualHome !== undefined && data.actualAway !== undefined){
+        scoreMap[id] = { home: data.actualHome, away: data.actualAway };
+      }
+    });
+  });
+  const finished = [];
+  (window.WCP_FIXTURES || []).forEach(f => {
+    const s = scoreMap[f.id] || scoreMap[String(f.id)];
+    if(!s) return;
+    finished.push({
+      fixtureId: f.id,
+      homeTeam: { name: f.home, shortName: f.home },
+      awayTeam: { name: f.away, shortName: f.away },
+      score: { fullTime: { home: s.home, away: s.away } },
+      status: 'FINISHED',
+      utcDate: f.date + 'T00:00:00Z',
+      group: f.group,
+      venue: f.venue
+    });
+  });
+  applyProgressData(finished, 104);
+  applyResultsData(finished);
 }
 
 function applyLandingData(matches){
-  const finished = matches.filter(m => m.score?.fullTime?.home !== null && m.score?.fullTime?.home !== undefined && m.status === 'FINISHED');
-  const upcoming = matches.filter(m => m.status === 'SCHEDULED' || m.status === 'TIMED');
-  applyProgressData(finished, matches.length);
-  applyResultsData(finished);
-  applyFixturesData(upcoming);
+  // Legacy shim
+  applyLandingDataFromFirebase();
 }
 
 function applyProgressData(finished, totalInApi){
@@ -4892,9 +4900,9 @@ function bustLandingCache(){
 }
 window.bustLandingCache = bustLandingCache;
 
-// Initial load
-fetchLandingData();
-// Also refresh fixtures from local data immediately (no API needed)
+// Don't call fetchLandingData() here — it reads from getEntryRows() which
+// needs Firebase to be loaded first. refreshFirebaseViews() handles this
+// after Firebase data arrives. Just render upcoming fixtures from local data.
 renderLandingFixtures_local();
 
 function renderLandingFixtures_local(){
@@ -4910,157 +4918,6 @@ function renderLandingFixtures_local(){
 // ── Newspaper (Claude API) ────────────────────────────────────────────
 const LP_NP_CACHE_KEY = 'wcp-newspaper-cache';
 const LP_NP_CACHE_TTL = 3 * 24 * 60 * 60 * 1000; // 3 days
-
-function buildLeagueBullets(players, fixtures){
-  if(!players.length) return '<span style="color:#b8c9e8;font-size:13px">No entries yet in this league.</span>';
-
-  const ranked = [...players].sort((a,b)=>(Number(b.totalPoints)||0)-(Number(a.totalPoints)||0));
-  const bullets = [];
-
-  // ── Helper: get last N completed match IDs across this league ──
-  const allCompletedIds = [];
-  players.forEach(p => {
-    Object.entries(p.groupMatchBreakdown||{}).forEach(([id,m])=>{
-      if(m.reason && m.reason!=='pending' && m.reason!=='invalid'){
-        const n = Number(id);
-        if(!allCompletedIds.includes(n)) allCompletedIds.push(n);
-      }
-    });
-  });
-  allCompletedIds.sort((a,b)=>b-a); // most recent first
-  const recentIds = allCompletedIds.slice(0,3);
-
-  // ── Helper: get breakdown for a player+matchId ──
-  function bd(p, id){ return (p.groupMatchBreakdown||{})[id] || (p.groupMatchBreakdown||{})[String(id)] || null; }
-
-  // ── Helper: get prediction for a player+matchId ──
-  function pred(p, id){
-    const preds = p.groupPredictions || [];
-    return preds.find(x => x.matchId===id || x.matchId===String(id) || x.matchId===Number(id)) || null;
-  }
-
-  // ── Helper: fixture name ──
-  function fname(id){
-    const f = (fixtures||[]).find(f=>f.id===id||f.id===Number(id));
-    return f ? (f.home+' v '+f.away) : ('Match #'+id);
-  }
-
-  // ── BULLET: Exact score kings across recent games ──
-  const exactByPlayer = {};
-  players.forEach(p=>{
-    recentIds.forEach(id=>{
-      const b = bd(p,id);
-      if(b && b.reason==='exact_score'){
-        exactByPlayer[p.name] = (exactByPlayer[p.name]||0)+1;
-      }
-    });
-  });
-  const exactEntries = Object.entries(exactByPlayer).sort((a,b)=>b[1]-a[1]);
-  if(exactEntries.length){
-    const top = exactEntries[0];
-    const plural = top[1]>1 ? top[1]+' exact scores' : 'an exact score';
-    bullets.push('🎯 <b>'+top[0]+'</b> has nailed '+plural+' in the last '+recentIds.length+' games — crystal ball territory!');
-  }
-
-  // ── BULLET: Whitewash — who got zero points across recent games ──
-  const nilPointers = players.filter(p=>{
-    return recentIds.length>=2 && recentIds.every(id=>{
-      const b = bd(p,id);
-      return b && b.reason && b.reason!=='pending' && b.reason!=='exact_score' && b.reason!=='correct_result';
-    });
-  });
-  if(nilPointers.length){
-    const names = nilPointers.map(p=>'<b>'+p.name+'</b>').join(', ');
-    const commiserations = ['Keep the faith!','It can only get better!','The comeback starts now!','Still time to turn it around!'];
-    bullets.push('😬 Rough patch: '+names+' picked up nothing across the last '+recentIds.length+' games. '+commiserations[Math.floor(Math.random()*commiserations.length)]);
-  }
-
-  // ── BULLET: High scorer predictor — who predicted the highest-scoring game ──
-  let highScorePlayer=null, highScoreTotal=0, highScoreMatch='', highScorePred='';
-  players.forEach(p=>{
-    recentIds.forEach(id=>{
-      const pr = pred(p,id);
-      if(!pr) return;
-      const hs = Number(pr.homeScore), as = Number(pr.awayScore);
-      if(isNaN(hs)||isNaN(as)) return;
-      const total = hs+as;
-      if(total > highScoreTotal){ highScoreTotal=total; highScorePlayer=p.name; highScoreMatch=fname(id); highScorePred=hs+'-'+as; }
-    });
-  });
-  if(highScorePlayer && highScoreTotal>=4){
-    bullets.push('🔥 <b>'+highScorePlayer+'</b> was the most optimistic — predicted a '+highScorePred+' thriller in <b>'+highScoreMatch+'</b>. Goals galore vision!');
-  }
-
-  // ── BULLET: Low scorer — who predicted the most boring game ──
-  let lowScorePlayer=null, lowScoreTotal=999, lowScoreMatch='', lowScorePred='';
-  players.forEach(p=>{
-    recentIds.forEach(id=>{
-      const pr = pred(p,id);
-      if(!pr) return;
-      const hs = Number(pr.homeScore), as = Number(pr.awayScore);
-      if(isNaN(hs)||isNaN(as)) return;
-      const total = hs+as;
-      if(total < lowScoreTotal){ lowScoreTotal=total; lowScorePlayer=p.name; lowScoreMatch=fname(id); lowScorePred=hs+'-'+as; }
-    });
-  });
-  if(lowScorePlayer && lowScoreTotal<=1){
-    bullets.push('🥱 <b>'+lowScorePlayer+'</b> called a '+lowScorePred+' snooze-fest in <b>'+lowScoreMatch+'</b>. Sometimes defence wins. Sometimes.');
-  }
-
-  // ── BULLET: Most players predicted the same result ──
-  recentIds.forEach(id=>{
-    const f = (fixtures||[]).find(f=>f.id===id||f.id===Number(id));
-    if(!f) return;
-    const resultVotes = {};
-    players.forEach(p=>{
-      const pr = pred(p,id);
-      if(!pr) return;
-      const hs=Number(pr.homeScore),as=Number(pr.awayScore);
-      if(isNaN(hs)||isNaN(as)) return;
-      const outcome = hs>as?'home':hs<as?'away':'draw';
-      resultVotes[outcome]=(resultVotes[outcome]||[]);
-      resultVotes[outcome].push(p.name);
-    });
-    const sorted = Object.entries(resultVotes).sort((a,b)=>b[1].length-a[1].length);
-    if(sorted.length && sorted[0][1].length >= Math.ceil(players.length*0.6) && players.length>=3){
-      const outcome=sorted[0][0], names=sorted[0][1];
-      const outcomeLabel = outcome==='home'?f.home+' win':outcome==='away'?f.away+' win':'a draw';
-      bullets.push('🤝 The '+fname(id)+' consensus: '+names.length+' of '+players.length+' tipped '+outcomeLabel+'. The herd instinct is strong!');
-    }
-  });
-
-  // ── BULLET: Biggest points swing on last game ──
-  if(recentIds.length){
-    const lastId = recentIds[0];
-    const withBd = players.map(p=>({ name:p.name, pts: (bd(p,lastId)||{}).points||0 })).filter(x=>x.pts!==undefined);
-    const maxPts = Math.max(...withBd.map(x=>x.pts));
-    const minPts = Math.min(...withBd.map(x=>x.pts));
-    if(maxPts > 0 && maxPts !== minPts){
-      const winners = withBd.filter(x=>x.pts===maxPts).map(x=>'<b>'+x.name+'</b>').join(', ');
-      const losers  = withBd.filter(x=>x.pts===minPts).map(x=>'<b>'+x.name+'</b>').join(', ');
-      bullets.push('📈 <b>'+fname(lastId)+'</b>: '+winners+' bagged '+maxPts+'pts while '+losers+' took home '+minPts+'pts. Gap-maker!');
-    }
-  }
-
-  // ── BULLET: Standout player — most points in last 3 games ──
-  const recentPts = players.map(p=>({
-    name: p.name,
-    pts: recentIds.reduce((s,id)=>s+((bd(p,id)||{}).points||0),0)
-  })).sort((a,b)=>b.pts-a.pts);
-  if(recentPts.length && recentPts[0].pts>0 && recentIds.length>=2){
-    bullets.push('⭐ Form player: <b>'+recentPts[0].name+'</b> has picked up <b>'+recentPts[0].pts+'pts</b> across the last '+recentIds.length+' games. On fire!');
-  }
-
-  // Cap to 3 most interesting bullets, prefer variety
-  const finalBullets = bullets.slice(0,3);
-  if(!finalBullets.length){
-    finalBullets.push('⏳ Results coming in — check back soon for league insights!');
-  }
-
-  return '<ul style="margin:8px 0 0;padding:0;list-style:none">' +
-    finalBullets.map(b=>'<li style="margin-bottom:8px;padding:8px 10px;background:rgba(255,255,255,0.05);border-radius:10px;border-left:3px solid rgba(248,200,74,0.4);font-size:13px;line-height:1.45;color:#dce9ff">'+b+'</li>').join('') +
-    '</ul>';
-}
 
 function buildNewspaperPrompt(){
   const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
@@ -5157,28 +5014,22 @@ async function renderLandingNewspaper(){
 function renderNewspaperContent(d){
   const wrap = document.getElementById('lpNpContent');
   if(!wrap) return;
-  const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
-  const leagueRows = {
-    Main:   rows.filter(r=>normaliseLeague(r.league)==='Main'   && !r.allLeagues),
-    LEGO:   rows.filter(r=>normaliseLeague(r.league)==='LEGO'   && !r.allLeagues),
-    Family: rows.filter(r=>normaliseLeague(r.league)==='Family' && !r.allLeagues),
-    HFC:    rows.filter(r=>r.hfcLeague                          && !r.allLeagues),
-  };
-  function leagueBlock(name, icon, text, key){
-    const bullets = buildLeagueBullets(leagueRows[key]||[], window.WCP_FIXTURES||[]);
-    return '<div class="lp-np-rule"></div>' +
-      '<div class="lp-np-league-name">' + icon + ' ' + name + '</div>' +
-      '<div class="lp-np-league-text">' + (text||'') + '</div>' +
-      '<div class="lp-np-league-bullets" style="margin-top:6px;font-size:13px;color:#dce9ff">' + bullets + '</div>';
-  }
   wrap.innerHTML =
     '<div class="lp-np-headline">' + (d.headline||'') + '</div>' +
     '<div class="lp-np-byline">' + (d.byline||'') + '</div>' +
     '<div class="lp-np-body">' + (d.lead||'') + '</div>' +
-    leagueBlock('Main League',   '\uD83C\uDF0D', d.main,   'Main') +
-    leagueBlock('LEGO League',   '\uD83E\uDDF1', d.lego,   'LEGO') +
-    leagueBlock('Family League', '\uD83C\uDFE1', d.family, 'Family') +
-    leagueBlock('HFC League',    '\u26BD',        d.hfc,    'HFC');
+    '<div class="lp-np-rule"></div>' +
+    '<div class="lp-np-league-name">\uD83C\uDF0D Main League</div>' +
+    '<div class="lp-np-league-text">' + (d.main||'') + '</div>' +
+    '<div class="lp-np-rule"></div>' +
+    '<div class="lp-np-league-name">\uD83E\uDDF1 LEGO League</div>' +
+    '<div class="lp-np-league-text">' + (d.lego||'') + '</div>' +
+    '<div class="lp-np-rule"></div>' +
+    '<div class="lp-np-league-name">\uD83C\uDFE1 Family League</div>' +
+    '<div class="lp-np-league-text">' + (d.family||'') + '</div>' +
+    '<div class="lp-np-rule"></div>' +
+    '<div class="lp-np-league-name">\u26BD HFC League</div>' +
+    '<div class="lp-np-league-text">' + (d.hfc||'') + '</div>';
 }
 
 // ── World Cup news ────────────────────────────────────────────────────
@@ -5326,7 +5177,8 @@ function refreshFirebaseViews(){
   // V93: After Firebase loads, apply any pending player selection from landing page
   // V93: Trigger newspaper generation once Firebase data is ready
   if(typeof triggerNewspaperGeneration === 'function') triggerNewspaperGeneration();
-  // V93b: Bust landing page API cache when Firebase scores update
+  // Update landing page results/progress from Firebase (no external API)
+  if(typeof applyLandingDataFromFirebase === 'function') applyLandingDataFromFirebase();
   if(typeof bustLandingCache === 'function') bustLandingCache();
   // Update entries count in progress strip
   const lpEnt = document.getElementById('lpStatEntries');
