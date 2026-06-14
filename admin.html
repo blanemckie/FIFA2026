@@ -162,11 +162,12 @@ window.loadVisits = async function(){
   empty.classList.add('hidden');
 
   try {
-    const snap = await getDocs(query(collection(db, 'visits'), orderBy('ts', 'desc')));
+    const snap = await getDocs(query(collection(db, 'visitorLog')));
     allVisits = snap.docs.map(d => {
-      const data = d.data();
-      const ts = data.ts?.toDate ? data.ts.toDate() : new Date(data.localTime || 0);
-      return { name: data.name || 'Unknown', ts, ua: data.ua || '' };
+  const data = d.data();
+  const ts = data.viewedAt?.toDate ? data.viewedAt.toDate() : new Date(data.viewedAtLocal || 0);
+  return { name: data.playerName || 'Unknown', ts, ua: data.userAgent || '' };
+}).sort((a,b) => b.ts - a.ts);
     });
     updateStats();
     applyFilters();
