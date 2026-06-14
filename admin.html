@@ -8,8 +8,6 @@
   :root{--navy:#04112d;--gold:#f8c84a;--green:#32d17f;--red:#ff3b5c;--cyan:#37d4ff;--muted:#b8c9e8}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:Inter,system-ui,sans-serif;background:linear-gradient(180deg,#02091f 0%,#061633 100%);min-height:100vh;color:#fff;padding:24px 16px}
-  
-  /* Lock screen */
   #lockScreen{display:flex;align-items:center;justify-content:center;min-height:90vh}
   .lock-card{background:linear-gradient(180deg,rgba(15,45,108,.94),rgba(8,25,62,.96));border:1px solid rgba(255,255,255,.14);border-radius:28px;padding:40px 32px;width:min(400px,100%);text-align:center}
   .lock-card h1{font-size:28px;margin-bottom:6px;letter-spacing:-.03em}
@@ -18,29 +16,21 @@
   .lock-card input:focus{border-color:rgba(248,200,74,.6)}
   .lock-card button{width:100%;padding:14px;border-radius:999px;border:0;background:linear-gradient(135deg,#f8c84a,#fff1a7);color:#061633;font-weight:1000;font-size:16px;cursor:pointer}
   .lock-card .error{color:var(--red);font-size:13px;font-weight:800;margin-top:8px;min-height:20px}
-
-  /* Admin content */
   #adminContent{display:none}
   .header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px}
   .header h1{font-size:clamp(22px,4vw,36px);letter-spacing:-.03em}
   .header h1 span{color:var(--gold)}
   .refresh-btn{padding:10px 20px;border-radius:999px;border:1px solid rgba(55,212,255,.35);background:rgba(55,212,255,.12);color:#b9f3ff;font-weight:900;font-size:13px;cursor:pointer}
   .refresh-btn:hover{background:rgba(55,212,255,.22)}
-
-  /* Stats strip */
   .stats-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
   .stat-box{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px;text-align:center}
   .stat-box b{display:block;font-size:28px;color:var(--gold)}
   .stat-box span{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:4px;display:block}
-
-  /* Filters */
   .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
   .filters input{padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff;font-size:14px;font-weight:700;outline:none;width:200px}
   .filters input:focus{border-color:rgba(248,200,74,.5)}
   .filters select{padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(5,18,45,.9);color:#fff;font-size:14px;font-weight:700;outline:none;cursor:pointer}
   .count-label{color:var(--muted);font-size:13px;font-weight:800;margin-left:auto}
-
-  /* Table */
   .table-wrap{background:linear-gradient(180deg,rgba(15,45,108,.94),rgba(8,25,62,.96));border:1px solid rgba(255,255,255,.12);border-radius:22px;overflow:hidden}
   table{width:100%;border-collapse:collapse}
   thead th{padding:14px 16px;text-align:left;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.10);white-space:nowrap}
@@ -54,10 +44,8 @@
   td.num{color:var(--gold);font-weight:900;text-align:center}
   .avatar{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#fff1a7);color:#061633;font-weight:1000;font-size:12px;margin-right:10px;flex-shrink:0;vertical-align:middle}
   .empty{text-align:center;padding:48px;color:var(--muted);font-weight:800}
-
-  /* Today badge */
   .badge-today{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(50,209,127,.2);border:1px solid rgba(50,209,127,.4);color:var(--green);font-size:11px;font-weight:900;margin-left:6px}
-
+  .hidden{display:none}
   @media(max-width:600px){
     td.device{display:none}
     thead th.device-h{display:none}
@@ -67,7 +55,6 @@
 </head>
 <body>
 
-<!-- Lock Screen -->
 <div id="lockScreen">
   <div class="lock-card">
     <div style="font-size:48px;margin-bottom:12px">🔐</div>
@@ -79,20 +66,17 @@
   </div>
 </div>
 
-<!-- Admin Content -->
 <div id="adminContent">
   <div class="header">
     <h1>👁️ Visit <span>Log</span></h1>
     <button class="refresh-btn" onclick="loadVisits()">🔄 Refresh</button>
   </div>
-
   <div class="stats-strip">
     <div class="stat-box"><b id="statTotal">—</b><span>Total Visits</span></div>
     <div class="stat-box"><b id="statToday">—</b><span>Today</span></div>
     <div class="stat-box"><b id="statUnique">—</b><span>Unique Players</span></div>
     <div class="stat-box"><b id="statLast">—</b><span>Last Visit</span></div>
   </div>
-
   <div class="filters">
     <input type="text" id="searchInput" placeholder="🔍 Search name…" oninput="applyFilters()"/>
     <select id="sortSelect" onchange="applyFilters()">
@@ -103,7 +87,6 @@
     </select>
     <span class="count-label" id="countLabel"></span>
   </div>
-
   <div class="table-wrap">
     <table>
       <thead>
@@ -122,7 +105,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDgiFVKBAXtxQPSTygPfC2PR8Zjb4n_vZE",
@@ -135,7 +118,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 const PASSWORD = 'Eidur!23';
 let allVisits = [];
 
@@ -160,15 +142,13 @@ window.loadVisits = async function(){
   const empty = document.getElementById('emptyState');
   tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:32px;color:#b8c9e8">Loading…</td></tr>';
   empty.classList.add('hidden');
-
   try {
     const snap = await getDocs(query(collection(db, 'visitorLog')));
     allVisits = snap.docs.map(d => {
-  const data = d.data();
-  const ts = data.viewedAt?.toDate ? data.viewedAt.toDate() : new Date(data.viewedAtLocal || 0);
-  return { name: data.playerName || 'Unknown', ts, ua: data.userAgent || '' };
-}).sort((a,b) => b.ts - a.ts);
-
+      const data = d.data();
+      const ts = data.viewedAt?.toDate ? data.viewedAt.toDate() : new Date(data.viewedAtLocal || 0);
+      return { name: data.playerName || 'Unknown', ts, ua: data.userAgent || '' };
+    }).sort((a,b) => b.ts - a.ts);
     updateStats();
     applyFilters();
   } catch(e) {
@@ -191,9 +171,7 @@ function updateStats(){
 window.applyFilters = function(){
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
   const sort = document.getElementById('sortSelect').value;
-
   let filtered = allVisits.filter(v => !search || v.name.toLowerCase().includes(search));
-
   if(sort === 'newest') filtered.sort((a,b) => b.ts - a.ts);
   else if(sort === 'oldest') filtered.sort((a,b) => a.ts - b.ts);
   else if(sort === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
@@ -202,7 +180,6 @@ window.applyFilters = function(){
     allVisits.forEach(v => { freq[v.name] = (freq[v.name]||0)+1; });
     filtered.sort((a,b) => (freq[b.name]||0) - (freq[a.name]||0) || b.ts - a.ts);
   }
-
   document.getElementById('countLabel').textContent = filtered.length + ' visit' + (filtered.length!==1?'s':'');
   renderTable(filtered);
 };
@@ -210,21 +187,16 @@ window.applyFilters = function(){
 function renderTable(visits){
   const tbody = document.getElementById('visitTable');
   const empty = document.getElementById('emptyState');
-
   if(!visits.length){
     tbody.innerHTML = '';
     empty.classList.remove('hidden');
     return;
   }
   empty.classList.add('hidden');
-
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-  // Count visits per name for frequency badge
   const freq = {};
   allVisits.forEach(v => { freq[v.name] = (freq[v.name]||0)+1; });
-
   tbody.innerHTML = visits.map((v, i) => {
     const initials = v.name.split(' ').map(x=>x[0]||'').join('').slice(0,2).toUpperCase() || '?';
     const isToday = v.ts >= todayStart;
