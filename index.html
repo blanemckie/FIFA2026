@@ -618,6 +618,18 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 .live-table-summary .summary-tile{border-radius:22px!important;background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.045))!important;border:1px solid rgba(255,255,255,.14)!important;padding:18px!important;text-align:center!important}
 .live-table-summary .summary-tile b{display:block;color:#fff3a2;font-size:40px!important;line-height:1;font-weight:1000}.live-table-summary .summary-tile span{display:block;color:#dbe8ff;margin-top:8px;font-weight:1000;text-transform:uppercase;letter-spacing:.06em;font-size:12px}
 .upgraded-table{border-spacing:0 12px!important}.upgraded-table th{font-size:12px!important;color:#fff3a2!important}.upgraded-table td{padding:16px 14px!important;background:linear-gradient(90deg,rgba(255,255,255,.095),rgba(255,255,255,.055))!important;border-color:rgba(255,255,255,.14)!important}.rank-badge{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:50%;background:rgba(248,200,74,.16);border:1px solid rgba(248,200,74,.35);color:#fff3a2;font-weight:1000}.leader-player{font-size:17px;font-weight:1000;color:#fff}.points-badge{display:inline-flex;align-items:center;justify-content:center;min-width:82px;padding:8px 12px;border-radius:14px;background:rgba(248,200,74,.15);border:1px solid rgba(248,200,74,.36);color:#fff3a2;font-weight:1000}
+.stat-badge-cyan{display:inline-flex;align-items:center;justify-content:center;min-width:42px;padding:6px 10px;border-radius:12px;background:rgba(55,212,255,.12);border:1px solid rgba(55,212,255,.30);color:#37d4ff;font-weight:1000;font-size:14px}
+.lb-expanded thead th{white-space:nowrap}
+.lb-expanded td:nth-child(4),.lb-expanded td:nth-child(5),.lb-expanded td:nth-child(6){text-align:center!important}
+.lb-expanded td:nth-child(7){text-align:right!important}
+@media(max-width:900px){
+  .lb-expanded thead{display:none!important}
+  .lb-expanded,.lb-expanded tbody,.lb-expanded tr,.lb-expanded td{display:block!important;width:100%!important}
+  .lb-expanded tr{margin-bottom:12px!important;border-radius:18px!important;background:rgba(255,255,255,.07)!important;border:1px solid rgba(255,255,255,.12)!important;padding:12px!important}
+  .lb-expanded td{border:0!important;background:transparent!important;border-radius:0!important;padding:5px 0!important;text-align:left!important}
+  .lb-expanded td:before{content:attr(data-label);display:block;color:#fff3a2;font-weight:1000;font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+  .lb-expanded td:nth-child(4),.lb-expanded td:nth-child(5),.lb-expanded td:nth-child(6),.lb-expanded td:nth-child(7){text-align:left!important}
+}
 .result-row{grid-template-columns:170px minmax(360px,1fr) 150px 160px 160px!important;align-items:center!important}.result-fixture{min-width:0!important;overflow:hidden!important}.result-fixture b{display:grid!important;grid-template-columns:minmax(120px,1fr) 34px minmax(120px,1fr)!important;align-items:center!important;gap:10px!important;width:100%!important}.result-fixture .inline-team{min-width:0!important;display:flex!important;align-items:center!important;gap:7px!important;white-space:normal!important;overflow-wrap:anywhere!important;line-height:1.15!important}.result-fixture .inline-team:first-child{justify-content:flex-start!important;text-align:left!important}.result-fixture .inline-team:last-child{justify-content:flex-end!important;text-align:right!important}.result-v{justify-self:center!important;color:#fff3a2!important;font-weight:1000!important}.pending-pill{justify-self:center!important;min-width:136px!important;text-align:center!important;white-space:nowrap!important;position:relative!important;z-index:1!important}.prediction-table{table-layout:fixed!important}.prediction-table td{overflow:hidden!important}.prediction-table th:nth-child(1),.prediction-table td:nth-child(1){width:52%!important}.prediction-table th:nth-child(2),.prediction-table td:nth-child(2){width:25%!important}.prediction-table th:nth-child(3),.prediction-table td:nth-child(3){width:23%!important}.compact-prediction{max-width:100%!important;overflow:hidden!important}.actual-pending{position:relative!important;z-index:2!important;white-space:nowrap!important;max-width:100%!important}
 @media(max-width:1100px){.result-row{grid-template-columns:1fr!important}.pending-pill{justify-self:start!important}.points-col{width:100%}.live-table-summary{grid-template-columns:1fr!important}.league-controls.upgraded .league-filter{min-width:0;flex:1 1 160px}.result-fixture b{grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr)!important}}
 @media(max-width:650px){.live-table-head{padding:22px 16px!important}.live-table-head h2{font-size:48px!important}.upgraded-table td{padding:12px!important}.result-fixture b{grid-template-columns:1fr!important}.result-fixture .inline-team:last-child{justify-content:flex-start!important;text-align:left!important}.result-v{justify-self:start!important}.pending-pill{white-space:normal!important}}
@@ -3926,7 +3938,38 @@ function renderLeaderboard(){
   const main=allRows.filter(r=>normaliseLeague(r.league)==='Main' || r.allLeagues).length;
   const summary=`<div class="live-summary live-table-summary v80-five"><div class="summary-tile"><b>${total}</b><span>🏆 All Leagues</span></div><div class="summary-tile"><b>${main}</b><span>🌍 Main League</span></div><div class="summary-tile"><b>${lego}</b><span>🧱 LEGO League</span></div><div class="summary-tile"><b>${family}</b><span>🏡 Family League</span></div><div class="summary-tile"><b>${hfc}</b><span>⚽ HFC League</span></div></div>`;
   if(!filtered.length){$('#leaderboardList').innerHTML=summary+'<div class="empty-state">No entries for this league yet.</div>';return;}
-  const table=`<table class="league-table upgraded-table"><thead><tr><th>Rank</th><th>Player</th><th>Entry</th><th>Total Points</th></tr></thead><tbody>${filtered.map((r,i)=>`<tr><td data-label="Rank"><span class="rank-badge">${i+1}</span></td><td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span></td><td data-label="Entry">${entryBadgesHtml(r.league,r.name)}</td><td data-label="Total Points"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td></tr>`).join('')}</tbody></table>`;
+  // Helper: calculate match stats from groupMatchBreakdown
+  function getMatchStats(r){
+    const bd=r.groupMatchBreakdown||{};
+    const entries=Object.values(bd);
+    const played=entries.filter(m=>m&&m.reason&&m.reason!=='pending'&&m.reason!=='invalid').length;
+    const correct=entries.filter(m=>m&&(m.reason==='correct_result'||m.reason==='exact_score')).length;
+    const exact=entries.filter(m=>m&&m.reason==='exact_score').length;
+    return {played,correct,exact};
+  }
+  const table=`<table class="league-table upgraded-table lb-expanded">
+    <thead><tr>
+      <th>Rank</th>
+      <th>Player</th>
+      <th>Entry</th>
+      <th style="text-align:center;color:#37d4ff">Played</th>
+      <th style="text-align:center;color:#37d4ff">Correct</th>
+      <th style="text-align:center;color:#37d4ff">Exact</th>
+      <th style="text-align:right;color:#f8c84a">Total Pts</th>
+    </tr></thead>
+    <tbody>${filtered.map((r,i)=>{
+      const {played,correct,exact}=getMatchStats(r);
+      return `<tr>
+        <td data-label="Rank"><span class="rank-badge">${i+1}</span></td>
+        <td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span></td>
+        <td data-label="Entry">${entryBadgesHtml(r.league,r.name)}</td>
+        <td data-label="Played" style="text-align:center"><span class="stat-badge-cyan">${played}</span></td>
+        <td data-label="Correct Result" style="text-align:center"><span class="stat-badge-cyan">${correct}</span></td>
+        <td data-label="Exact Score" style="text-align:center"><span class="stat-badge-cyan">${exact}</span></td>
+        <td data-label="Total Points" style="text-align:right"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
   $('#leaderboardList').innerHTML=summary+table;
 }
 $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagueFilter=btn.dataset.leagueFilter;renderLeaderboard();}));
