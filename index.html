@@ -4281,125 +4281,120 @@ let fvLeagueFilter = 'All';
 function renderFixtureView(){
   const dropdown = document.getElementById('fixtureDropdown');
   const content  = document.getElementById('fixtureViewContent');
-  if(!dropdown || !content) return;
+  if(!dropdown||!content) return;
 
-  // Wire league slicer buttons
   document.querySelectorAll('[data-fv-league]').forEach(btn=>{
-    btn.onclick = () => {
-      fvLeagueFilter = btn.dataset.fvLeague;
-      document.querySelectorAll('[data-fv-league]').forEach(b=>b.classList.toggle('active', b===btn));
+    btn.onclick=()=>{
+      fvLeagueFilter=btn.dataset.fvLeague;
+      document.querySelectorAll('[data-fv-league]').forEach(b=>b.classList.toggle('active',b===btn));
       renderFixtureViewContent();
     };
   });
 
-  const allRows = (typeof getEntryRows==='function') ? getEntryRows() : [];
-  const sortedFixtures = (window.WCP_FIXTURES||[]).slice().sort((a,b)=>
-    a.date.localeCompare(b.date)||(ukTimeToMins(a.ukTime)-ukTimeToMins(b.ukTime))
-  );
+  const allRows=(typeof getEntryRows==='function')?getEntryRows():[];
+  const sortedFixtures=(window.WCP_FIXTURES||[]).slice().sort((a,b)=>
+    a.date.localeCompare(b.date)||(ukTimeToMins(a.ukTime)-ukTimeToMins(b.ukTime)));
 
-  // Populate dropdown once
-  if(dropdown.options[0] && dropdown.options[0].text==='Loading fixtures…'){
-    dropdown.innerHTML = sortedFixtures.map(f=>{
-      let hasResult = false;
+  if(dropdown.options[0]&&dropdown.options[0].text==='Loading fixtures\u2026'){
+    dropdown.innerHTML=sortedFixtures.map(f=>{
+      let hasResult=false;
       for(const row of allRows){
-        const bd = row.groupMatchBreakdown&&(row.groupMatchBreakdown[f.id]||row.groupMatchBreakdown[String(f.id)]);
+        const bd=row.groupMatchBreakdown&&(row.groupMatchBreakdown[f.id]||row.groupMatchBreakdown[String(f.id)]);
         if(bd&&bd.reason&&bd.reason!=='pending'&&bd.reason!=='invalid'){hasResult=true;break;}
       }
-      return `<option value="${f.id}">${hasResult?'✅':'⏳'} ${f.home} v ${f.away} — ${niceDate(f.date)} ${ukToCet(f.date,f.ukTime)}</option>`;
+      return `<option value="${f.id}">${hasResult?'\u2705':'\u23f3'} ${f.home} v ${f.away} \u2014 ${niceDate(f.date)} ${ukToCet(f.date,f.ukTime)}</option>`;
     }).join('');
-    dropdown.onchange = renderFixtureViewContent;
+    dropdown.onchange=renderFixtureViewContent;
   }
   renderFixtureViewContent();
 }
 
 function renderFixtureViewContent(){
-  const dropdown = document.getElementById('fixtureDropdown');
-  const content  = document.getElementById('fixtureViewContent');
+  const dropdown=document.getElementById('fixtureDropdown');
+  const content=document.getElementById('fixtureViewContent');
   if(!dropdown||!content) return;
 
-  const allRows = (typeof getEntryRows==='function') ? getEntryRows() : [];
-  const sortedFixtures = (window.WCP_FIXTURES||[]).slice().sort((a,b)=>
-    a.date.localeCompare(b.date)||(ukTimeToMins(a.ukTime)-ukTimeToMins(b.ukTime))
-  );
+  const allRows=(typeof getEntryRows==='function')?getEntryRows():[];
+  const sortedFixtures=(window.WCP_FIXTURES||[]).slice().sort((a,b)=>
+    a.date.localeCompare(b.date)||(ukTimeToMins(a.ukTime)-ukTimeToMins(b.ukTime)));
 
-  const selectedId = parseInt(dropdown.value)||(sortedFixtures[0]&&sortedFixtures[0].id);
-  const f = sortedFixtures.find(x=>x.id===selectedId)||sortedFixtures[0];
+  const selectedId=parseInt(dropdown.value)||(sortedFixtures[0]&&sortedFixtures[0].id);
+  const f=sortedFixtures.find(x=>x.id===selectedId)||sortedFixtures[0];
   if(!f){content.innerHTML='<div class="fv-no-data">No fixtures available.</div>';return;}
 
-  // Filter rows by league slicer
-  const filteredRows = allRows.filter(row=>{
+  const filteredRows=allRows.filter(row=>{
     if(fvLeagueFilter==='All') return true;
     if(fvLeagueFilter==='HFC') return row.hfcLeague;
-    return normaliseLeague(row.league)===fvLeagueFilter && !row.allLeagues;
+    return normaliseLeague(row.league)===fvLeagueFilter&&!row.allLeagues;
   });
 
-  // Get actual result
-  let actualResult = null;
+  let actualResult=null;
   for(const row of allRows){
-    const bd = row.groupMatchBreakdown&&(row.groupMatchBreakdown[f.id]||row.groupMatchBreakdown[String(f.id)]);
+    const bd=row.groupMatchBreakdown&&(row.groupMatchBreakdown[f.id]||row.groupMatchBreakdown[String(f.id)]);
     if(bd&&bd.reason&&bd.reason!=='pending'&&bd.reason!=='invalid'){
-      actualResult={home:bd.actualHome,away:bd.actualAway,reason:bd.reason}; break;
+      actualResult={home:bd.actualHome,away:bd.actualAway,reason:bd.reason};break;
     }
   }
 
-  // Build player rows
-  const playerRows = filteredRows.map(row=>{
-    const bd = row.groupMatchBreakdown&&(row.groupMatchBreakdown[f.id]||row.groupMatchBreakdown[String(f.id)]);
-    const pred = row.predictions&&(row.predictions[f.id]||row.predictions[String(f.id)]);
-    let predHome='—',predAway='—';
-    if(bd&&bd.predictedHome!==undefined){predHome=bd.predictedHome;predAway=bd.predictedAway;}
-    else if(pred){predHome=pred.home!==undefined?pred.home:'—';predAway=pred.away!==undefined?pred.away:'—';}
-    const reason = bd?bd.reason:'pending';
-    const pts = (bd&&reason&&reason!=='pending'&&reason!=='invalid')
+  // Read predictions from groupPredictions array (homeScore/awayScore fields)
+  const playerRows=filteredRows.map(row=>{
+    const bd=row.groupMatchBreakdown&&(row.groupMatchBreakdown[f.id]||row.groupMatchBreakdown[String(f.id)]);
+    const gp=(row.groupPredictions||[]).find(p=>String(p.matchId)===String(f.id));
+    let predHome='\u2014',predAway='\u2014';
+    if(gp&&gp.homeScore!==null&&gp.homeScore!==undefined&&gp.homeScore!==''){
+      predHome=gp.homeScore; predAway=gp.awayScore;
+    }
+    const reason=bd?bd.reason:'pending';
+    const pts=(bd&&reason&&reason!=='pending'&&reason!=='invalid')
       ?(reason==='exact_score'?10:reason==='correct_result'?5:0):null;
     return {name:row.name||'Unknown',league:row.league||'',predHome,predAway,reason,pts};
-  }).sort((a,b)=>{
-    const pa=a.pts??-1,pb=b.pts??-1;
-    return pb-pa||a.name.localeCompare(b.name);
-  });
+  }).sort((a,b)=>{const pa=a.pts??-1,pb=b.pts??-1;return pb-pa||a.name.localeCompare(b.name);});
 
-  const exact   = playerRows.filter(r=>r.reason==='exact_score').length;
-  const correct = playerRows.filter(r=>r.reason==='correct_result').length;
-  const wrong   = playerRows.filter(r=>r.reason==='wrong_result').length;
-  const pending = playerRows.filter(r=>!r.reason||r.reason==='pending'||r.reason==='invalid').length;
+  const exact=playerRows.filter(r=>r.reason==='exact_score').length;
+  const correct=playerRows.filter(r=>r.reason==='correct_result').length;
+  const wrong=playerRows.filter(r=>r.reason==='wrong_result').length;
+  const pending=playerRows.filter(r=>!r.reason||r.reason==='pending'||r.reason==='invalid').length;
 
-  const leagueBadge = l=>l&&l!=='All'?`<span class="fv-league-badge">${l}</span>`:'';
+  const leagueBadge=l=>l&&l!=='All'?`<span class="fv-league-badge">${l}</span>`:'';
   const ptsHtml=(pts,reason)=>{
-    if(reason==='pending'||reason==='invalid'||pts===null) return `<span class="fv-pts-badge pts-pending">—</span>`;
+    if(reason==='pending'||reason==='invalid'||pts===null) return `<span class="fv-pts-badge pts-pending">\u2014</span>`;
     if(pts===10) return `<span class="fv-pts-badge pts-10">10</span>`;
     if(pts===5)  return `<span class="fv-pts-badge pts-5">5</span>`;
     return `<span class="fv-pts-badge pts-0">0</span>`;
   };
   const statusHtml=reason=>{
     if(!reason||reason==='pending'||reason==='invalid') return `<span class="fv-status-badge pending">Pending</span>`;
-    if(reason==='exact_score')    return `<span class="fv-status-badge exact">⭐ Exact</span>`;
-    if(reason==='correct_result') return `<span class="fv-status-badge correct">✓ Correct</span>`;
-    return `<span class="fv-status-badge wrong">✗ Wrong</span>`;
+    if(reason==='exact_score')    return `<span class="fv-status-badge exact">\u2b50 Exact</span>`;
+    if(reason==='correct_result') return `<span class="fv-status-badge correct">\u2713 Correct</span>`;
+    return `<span class="fv-status-badge wrong">\u2717 Wrong</span>`;
   };
 
-  const hFlag = typeof flagFor==='function'?flagFor(f.home):'';
-  const aFlag = typeof flagFor==='function'?flagFor(f.away):'';
+  // Use teamLabel for flags (returns img tag + name)
+  const homeLabel=typeof teamLabel==='function'?teamLabel(f.home):f.home;
+  const awayLabel=typeof teamLabel==='function'?teamLabel(f.away):f.away;
 
-  const resultHtml = actualResult
-    ?`<div class="fv-actual-result result-known">⚽ Result: ${f.home} ${actualResult.home} – ${actualResult.away} ${f.away}</div>`
-    :`<div class="fv-actual-result result-pending">⏳ Result Pending</div>`;
+  const resultHtml=actualResult
+    ?`<div class="fv-actual-result result-known">\u26bd Result: ${f.home} ${actualResult.home} \u2013 ${actualResult.away} ${f.away}</div>`
+    :`<div class="fv-actual-result result-pending">\u23f3 Result Pending</div>`;
 
-  const summaryBar = actualResult?`
+  const summaryBar=actualResult?`
     <div class="fv-summary-bar">
-      ${exact  ?`<div class="fv-summary-pill s-exact">⭐ Exact: ${exact}</div>`:''}
-      ${correct?`<div class="fv-summary-pill s-correct">✓ Correct: ${correct}</div>`:''}
-      ${wrong  ?`<div class="fv-summary-pill s-wrong">✗ Wrong: ${wrong}</div>`:''}
-      ${pending?`<div class="fv-summary-pill s-pending">⏳ Pending: ${pending}</div>`:''}
+      ${exact  ?`<div class="fv-summary-pill s-exact">\u2b50 Exact: ${exact}</div>`:''}
+      ${correct?`<div class="fv-summary-pill s-correct">\u2713 Correct: ${correct}</div>`:''}
+      ${wrong  ?`<div class="fv-summary-pill s-wrong">\u2717 Wrong: ${wrong}</div>`:''}
+      ${pending?`<div class="fv-summary-pill s-pending">\u23f3 Pending: ${pending}</div>`:''}
     </div>`:'';
 
   content.innerHTML=`
     <div class="fv-fixture-header">
-      <div class="fv-teams">${hFlag} ${f.home} <span style="color:#fff3a2;margin:0 10px">v</span> ${f.away} ${aFlag}</div>
+      <div class="fv-teams" style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+        ${homeLabel}<span style="color:#fff3a2;font-size:18px">v</span>${awayLabel}
+      </div>
       <div class="fv-meta">
         <span>Group ${f.group}</span>
-        <span>📅 ${niceDate(f.date)}</span>
-        <span>🕒 ${ukToCet(f.date,f.ukTime)}</span>
-        <span>📍 ${f.venue||''}</span>
+        <span>\ud83d\udcc5 ${niceDate(f.date)}</span>
+        <span>\ud83d\udd52 ${ukToCet(f.date,f.ukTime)}</span>
+        <span>\ud83d\udccd ${f.venue||''}</span>
       </div>
       ${resultHtml}
     </div>
@@ -4416,7 +4411,7 @@ function renderFixtureViewContent(){
           ${playerRows.map(r=>`
           <tr>
             <td class="fv-name-cell">${r.name}${fvLeagueFilter==='All'?leagueBadge(r.league):''}</td>
-            <td class="${r.predHome==='—'?'fv-pred-cell no-pred':'fv-pred-cell'}">${r.predHome==='—'?'No prediction':`${r.predHome} – ${r.predAway}`}</td>
+            <td class="${r.predHome==='\u2014'?'fv-pred-cell no-pred':'fv-pred-cell'}">${r.predHome==='\u2014'?'No prediction':`${r.predHome} \u2013 ${r.predAway}`}</td>
             ${actualResult?`<td class="td-center">${statusHtml(r.reason)}</td><td class="fv-pts-cell">${ptsHtml(r.pts,r.reason)}</td>`:''}
           </tr>`).join('')}
         </tbody>
@@ -4425,8 +4420,8 @@ function renderFixtureViewContent(){
   `;
 }
 
-window.renderFixtureView = renderFixtureView;
-window.renderFixtureViewContent = renderFixtureViewContent;
+window.renderFixtureView=renderFixtureView;
+window.renderFixtureViewContent=renderFixtureViewContent;
 
 window.renderLeaderboard = renderLeaderboard;
 window.renderSubmissions = renderSubmissions;
