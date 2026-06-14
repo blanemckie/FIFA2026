@@ -168,7 +168,7 @@ window.loadVisits = async function(){
   const ts = data.viewedAt?.toDate ? data.viewedAt.toDate() : new Date(data.viewedAtLocal || 0);
   return { name: data.playerName || 'Unknown', ts, ua: data.userAgent || '' };
 }).sort((a,b) => b.ts - a.ts);
-    });
+
     updateStats();
     applyFilters();
   } catch(e) {
