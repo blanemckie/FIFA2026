@@ -31,6 +31,8 @@
   .filters input:focus{border-color:rgba(248,200,74,.5)}
   .filters select{padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(5,18,45,.9);color:#fff;font-size:14px;font-weight:700;outline:none;cursor:pointer}
   .count-label{color:var(--muted);font-size:13px;font-weight:800;margin-left:auto}
+  .toggle-btn{padding:10px 16px;border-radius:12px;border:1px solid rgba(248,200,74,.35);background:rgba(248,200,74,.10);color:var(--gold);font-weight:900;font-size:13px;cursor:pointer;white-space:nowrap}
+  .toggle-btn.active{background:rgba(248,200,74,.25);border-color:rgba(248,200,74,.7)}
   .table-wrap{background:linear-gradient(180deg,rgba(15,45,108,.94),rgba(8,25,62,.96));border:1px solid rgba(255,255,255,.12);border-radius:22px;overflow:hidden}
   table{width:100%;border-collapse:collapse}
   thead th{padding:14px 16px;text-align:left;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.10);white-space:nowrap}
@@ -45,6 +47,7 @@
   .avatar{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#fff1a7);color:#061633;font-weight:1000;font-size:12px;margin-right:10px;flex-shrink:0;vertical-align:middle}
   .empty{text-align:center;padding:48px;color:var(--muted);font-weight:800}
   .badge-today{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(50,209,127,.2);border:1px solid rgba(50,209,127,.4);color:var(--green);font-size:11px;font-weight:900;margin-left:6px}
+  .badge-count{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(55,212,255,.15);border:1px solid rgba(55,212,255,.35);color:var(--cyan);font-size:11px;font-weight:900;margin-left:6px}
   .hidden{display:none}
   @media(max-width:600px){
     td.device{display:none}
@@ -61,7 +64,7 @@
     <h1>WCP Admin</h1>
     <p>FIFA 2026 Prediction Challenge</p>
     <input type="password" id="pwInput" placeholder="Enter password" autocomplete="off"/>
-    <button onclick="checkPassword()">Unlock</button>
+    <button id="unlockBtn">Unlock</button>
     <div class="error" id="pwError"></div>
   </div>
 </div>
@@ -69,7 +72,7 @@
 <div id="adminContent">
   <div class="header">
     <h1>👁️ Visit <span>Log</span></h1>
-    <button class="refresh-btn" onclick="loadVisits()">🔄 Refresh</button>
+    <button class="refresh-btn" id="refreshBtn">🔄 Refresh</button>
   </div>
   <div class="stats-strip">
     <div class="stat-box"><b id="statTotal">—</b><span>Total Visits</span></div>
@@ -78,19 +81,20 @@
     <div class="stat-box"><b id="statLast">—</b><span>Last Visit</span></div>
   </div>
   <div class="filters">
-    <input type="text" id="searchInput" placeholder="🔍 Search name…" oninput="applyFilters()"/>
-    <select id="sortSelect" onchange="applyFilters()">
+    <input type="text" id="searchInput" placeholder="🔍 Search name…"/>
+    <select id="sortSelect">
       <option value="newest">Newest first</option>
       <option value="oldest">Oldest first</option>
       <option value="name">Name A–Z</option>
       <option value="freq">Most visits</option>
     </select>
+    <button class="toggle-btn" id="groupToggle">👥 Group by Player</button>
     <span class="count-label" id="countLabel"></span>
   </div>
   <div class="table-wrap">
     <table>
       <thead>
-        <tr>
+        <tr id="tableHead">
           <th>#</th>
           <th>Player</th>
           <th>Date &amp; Time</th>
@@ -120,8 +124,22 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const PASSWORD = 'Eidur!23';
 let allVisits = [];
+let grouped = false;
 
-window.checkPassword = function(){
+document.getElementById('unlockBtn').addEventListener('click', checkPassword);
+document.getElementById('pwInput').addEventListener('keydown', e => { if(e.key === 'Enter') checkPassword(); });
+document.getElementById('refreshBtn').addEventListener('click', loadVisits);
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('sortSelect').addEventListener('change', applyFilters);
+document.getElementById('groupToggle').addEventListener('click', () => {
+  grouped = !grouped;
+  document.getElementById('groupToggle').classList.toggle('active', grouped);
+  document.getElementById('groupToggle').textContent = grouped ? '📋 Show All Visits' : '👥 Group by Player';
+  updateTableHead();
+  applyFilters();
+});
+
+function checkPassword(){
   const val = document.getElementById('pwInput').value;
   if(val === PASSWORD){
     document.getElementById('lockScreen').style.display = 'none';
@@ -131,13 +149,9 @@ window.checkPassword = function(){
     document.getElementById('pwError').textContent = 'Wrong password. Try again.';
     document.getElementById('pwInput').value = '';
   }
-};
+}
 
-document.getElementById('pwInput').addEventListener('keydown', e => {
-  if(e.key === 'Enter') window.checkPassword();
-});
-
-window.loadVisits = async function(){
+async function loadVisits(){
   const tbody = document.getElementById('visitTable');
   const empty = document.getElementById('emptyState');
   tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:32px;color:#b8c9e8">Loading…</td></tr>';
@@ -152,9 +166,9 @@ window.loadVisits = async function(){
     updateStats();
     applyFilters();
   } catch(e) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:32px;color:#ff3b5c">Error loading visits: ' + e.message + '</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:32px;color:#ff3b5c">Error: ' + e.message + '</td></tr>';
   }
-};
+}
 
 function updateStats(){
   const now = new Date();
@@ -168,30 +182,75 @@ function updateStats(){
   document.getElementById('statLast').textContent = last;
 }
 
-window.applyFilters = function(){
+function updateTableHead(){
+  document.getElementById('tableHead').innerHTML = grouped
+    ? '<th>#</th><th>Player</th><th>Total Visits</th><th>First Visit</th><th>Last Visit</th>'
+    : '<th>#</th><th>Player</th><th>Date &amp; Time</th><th class="device-h">Device</th>';
+}
+
+function applyFilters(){
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
   const sort = document.getElementById('sortSelect').value;
   let filtered = allVisits.filter(v => !search || v.name.toLowerCase().includes(search));
-  if(sort === 'newest') filtered.sort((a,b) => b.ts - a.ts);
-  else if(sort === 'oldest') filtered.sort((a,b) => a.ts - b.ts);
-  else if(sort === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
-  else if(sort === 'freq'){
-    const freq = {};
-    allVisits.forEach(v => { freq[v.name] = (freq[v.name]||0)+1; });
-    filtered.sort((a,b) => (freq[b.name]||0) - (freq[a.name]||0) || b.ts - a.ts);
+
+  if(grouped){
+    const map = {};
+    filtered.forEach(v => {
+      const key = v.name.toLowerCase().trim();
+      if(!map[key]){
+        map[key] = { name: v.name, visits: 0, first: v.ts, last: v.ts, ua: v.ua };
+      }
+      map[key].visits++;
+      if(v.ts < map[key].first) map[key].first = v.ts;
+      if(v.ts > map[key].last) map[key].last = v.ts;
+    });
+    let grouped_rows = Object.values(map);
+    if(sort === 'freq' || sort === 'newest') grouped_rows.sort((a,b) => b.visits - a.visits || b.last - a.last);
+    else if(sort === 'oldest') grouped_rows.sort((a,b) => a.first - b.first);
+    else if(sort === 'name') grouped_rows.sort((a,b) => a.name.localeCompare(b.name));
+    document.getElementById('countLabel').textContent = grouped_rows.length + ' player' + (grouped_rows.length!==1?'s':'');
+    renderGrouped(grouped_rows);
+  } else {
+    if(sort === 'newest') filtered.sort((a,b) => b.ts - a.ts);
+    else if(sort === 'oldest') filtered.sort((a,b) => a.ts - b.ts);
+    else if(sort === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
+    else if(sort === 'freq'){
+      const freq = {};
+      allVisits.forEach(v => { freq[v.name] = (freq[v.name]||0)+1; });
+      filtered.sort((a,b) => (freq[b.name]||0) - (freq[a.name]||0) || b.ts - a.ts);
+    }
+    document.getElementById('countLabel').textContent = filtered.length + ' visit' + (filtered.length!==1?'s':'');
+    renderTable(filtered);
   }
-  document.getElementById('countLabel').textContent = filtered.length + ' visit' + (filtered.length!==1?'s':'');
-  renderTable(filtered);
-};
+}
+
+function renderGrouped(rows){
+  const tbody = document.getElementById('visitTable');
+  const empty = document.getElementById('emptyState');
+  if(!rows.length){ tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden');
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  tbody.innerHTML = rows.map((r, i) => {
+    const initials = r.name.split(' ').map(x=>x[0]||'').join('').slice(0,2).toUpperCase() || '?';
+    const visitedToday = r.last >= todayStart;
+    return `<tr>
+      <td class="num">${i+1}</td>
+      <td class="name">
+        <span class="avatar">${initials}</span>${r.name}
+        ${visitedToday ? '<span class="badge-today">Today</span>' : ''}
+      </td>
+      <td><span class="badge-count">${r.visits} visit${r.visits!==1?'s':''}</span></td>
+      <td class="time">${formatDateTime(r.first)}</td>
+      <td class="time">${formatDateTime(r.last)}</td>
+    </tr>`;
+  }).join('');
+}
 
 function renderTable(visits){
   const tbody = document.getElementById('visitTable');
   const empty = document.getElementById('emptyState');
-  if(!visits.length){
-    tbody.innerHTML = '';
-    empty.classList.remove('hidden');
-    return;
-  }
+  if(!visits.length){ tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
