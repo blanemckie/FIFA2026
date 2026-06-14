@@ -3959,7 +3959,6 @@ function renderLeaderboard(){
   const main=allRows.filter(r=>normaliseLeague(r.league)==='Main' || r.allLeagues).length;
   const summary=`<div class="live-summary live-table-summary v80-five"><div class="summary-tile"><b>${total}</b><span>🏆 All Leagues</span></div><div class="summary-tile"><b>${main}</b><span>🌍 Main League</span></div><div class="summary-tile"><b>${lego}</b><span>🧱 LEGO League</span></div><div class="summary-tile"><b>${family}</b><span>🏡 Family League</span></div><div class="summary-tile"><b>${hfc}</b><span>⚽ HFC League</span></div></div>`;
   if(!filtered.length){$('#leaderboardList').innerHTML=summary+'<div class="empty-state">No entries for this league yet.</div>';return;}
-  // Helper: calculate match stats from groupMatchBreakdown
   function getMatchStats(r){
     const bd=r.groupMatchBreakdown||{};
     const entries=Object.values(bd);
@@ -3968,46 +3967,61 @@ function renderLeaderboard(){
     const exact=entries.filter(m=>m&&m.reason==='exact_score').length;
     return {played,correct,exact};
   }
-  const table=`<table class="league-table upgraded-table lb-expanded">
-    <thead><tr>
-      <th>Rank</th>
-      <th>Player</th>
-      <th>Entry</th>
-      <th style="text-align:center;color:#37d4ff">Played</th>
-      <th style="text-align:center;color:#37d4ff">Correct</th>
-      <th style="text-align:center;color:#37d4ff">Exact Score</th>
-      <th style="text-align:right;color:#f8c84a">Total Pts</th>
-    </tr></thead>
-    <tbody>${filtered.map((r,i)=>{
+  const isMobile = window.innerWidth <= 650;
+  if(isMobile){
+    // Mobile: clean self-contained cards — no table
+    const cards = filtered.map((r,i)=>{
       const {played,correct,exact}=getMatchStats(r);
-      return `<tr>
-        <td data-label="Rank"><span class="rank-badge">${i+1}</span></td>
-        <td data-label="Player"><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span></td>
-        <td data-label="Entry">${entryBadgesHtml(r.league,r.name)}</td>
-        <td data-label="Played" style="text-align:center"><span class="stat-badge-cyan">${played}</span></td>
-        <td data-label="Correct Result" style="text-align:center"><span class="stat-badge-cyan">${correct}</span></td>
-        <td data-label="Exact Score" style="text-align:center"><span class="stat-badge-cyan">${exact}</span></td>
-        <td data-label="Total Points" style="text-align:right"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td>
-        <td style="display:none" class="lb-stats-data" data-played="${played}" data-correct="${correct}" data-exact="${exact}"></td>
-      </tr>
-      <tr class="lb-mobile-stats-row" style="display:none">
-        <td colspan="8">
-          <div class="lb-mobile-stats">
-            <span class="ms-item"><span class="ms-label">Played</span> ${played}</span>
-            <span class="ms-item"><span class="ms-label">Correct</span> ${correct}</span>
-            <span class="ms-item"><span class="ms-label">Exact</span> ${exact}</span>
+      const medal = i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':'';
+      return `<div class="lb-mobile-card">
+        <div class="lb-mc-top">
+          <span class="rank-badge">${i+1}</span>
+          <div class="lb-mc-info">
+            <span class="leader-player">${medal}${r.name||'Unknown player'}</span>
+            <div class="lb-mc-entry">${entryBadgesHtml(r.league,r.name)}</div>
           </div>
-        </td>
-      </tr>`;
-    }).join('')}</tbody>
-  </table>`;
-  $('#leaderboardList').innerHTML=summary+table;
-  // Show mobile stats rows on small screens
-  if(window.innerWidth <= 650){
-    document.querySelectorAll('.lb-mobile-stats-row').forEach(r=>r.style.display='');
+          <span class="points-badge lb-mc-pts">${Number(r.totalPoints||0)} pts</span>
+        </div>
+        <div class="lb-mc-stats">
+          <div class="lb-mc-stat"><span class="lb-mc-val">${played}</span><span class="lb-mc-lbl">Played</span></div>
+          <div class="lb-mc-stat"><span class="lb-mc-val">${correct}</span><span class="lb-mc-lbl">Correct</span></div>
+          <div class="lb-mc-stat lb-mc-stat-exact"><span class="lb-mc-val lb-mc-val-gold">${exact}</span><span class="lb-mc-lbl">Exact Score</span></div>
+        </div>
+      </div>`;
+    }).join('');
+    $('#leaderboardList').innerHTML=summary+`<div class="lb-mobile-list">${cards}</div>`;
+  } else {
+    // Desktop: full table with all columns
+    const table=`<table class="league-table upgraded-table lb-expanded">
+      <thead><tr>
+        <th>Rank</th>
+        <th>Player</th>
+        <th>Entry</th>
+        <th style="text-align:center;color:#37d4ff">Played</th>
+        <th style="text-align:center;color:#37d4ff">Correct</th>
+        <th style="text-align:center;color:#37d4ff">Exact Score</th>
+        <th style="text-align:right;color:#f8c84a">Total Pts</th>
+      </tr></thead>
+      <tbody>${filtered.map((r,i)=>{
+        const {played,correct,exact}=getMatchStats(r);
+        return `<tr>
+          <td><span class="rank-badge">${i+1}</span></td>
+          <td><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span></td>
+          <td>${entryBadgesHtml(r.league,r.name)}</td>
+          <td style="text-align:center"><span class="stat-badge-cyan">${played}</span></td>
+          <td style="text-align:center"><span class="stat-badge-cyan">${correct}</span></td>
+          <td style="text-align:center"><span class="stat-badge-cyan">${exact}</span></td>
+          <td style="text-align:right"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+    $('#leaderboardList').innerHTML=summary+table;
   }
 }
 $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagueFilter=btn.dataset.leagueFilter;renderLeaderboard();}));
+// Re-render leaderboard on resize so mobile/desktop layout switches correctly
+let _lbResizeTimer;
+window.addEventListener('resize',()=>{clearTimeout(_lbResizeTimer);_lbResizeTimer=setTimeout(renderLeaderboard,200);});
 let currentSubmissionKey = null;
 function entryKey(r,i){ return String(r.id || r.email || r.name || i); }
 
@@ -6427,4 +6441,49 @@ document.addEventListener('click', function(e){
   .fun-stats-grid{grid-template-columns:1fr!important;}
   .lb-mobile-stats .ms-item{font-size:9px!important;padding:2px 5px!important;}
 }
+
+/* ===== LB Mobile Cards v96b ===== */
+.lb-mobile-list{display:flex;flex-direction:column;gap:8px;width:100%;}
+.lb-mobile-card{
+  background:linear-gradient(135deg,rgba(255,255,255,.11),rgba(255,255,255,.055));
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:16px;
+  padding:12px 12px 10px;
+  box-shadow:0 4px 14px rgba(0,0,0,.16);
+}
+.lb-mc-top{
+  display:grid;
+  grid-template-columns:32px 1fr auto;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+.lb-mc-info{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.lb-mc-entry{margin-top:2px;}
+.lb-mc-pts{font-size:15px!important;padding:5px 10px!important;min-width:56px!important;border-radius:10px!important;white-space:nowrap;}
+.lb-mc-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+  border-top:1px solid rgba(255,255,255,.09);
+  padding-top:8px;
+}
+.lb-mc-stat{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  background:rgba(55,212,255,.08);
+  border:1px solid rgba(55,212,255,.18);
+  border-radius:10px;
+  padding:5px 4px;
+}
+.lb-mc-stat-exact{
+  background:rgba(248,200,74,.10);
+  border-color:rgba(248,200,74,.28);
+}
+.lb-mc-val{font-size:16px;font-weight:1000;color:#37d4ff;line-height:1;}
+.lb-mc-val-gold{color:#f8c84a;}
+.lb-mc-lbl{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#8899bb;line-height:1;}
+
 </style>
