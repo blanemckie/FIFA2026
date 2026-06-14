@@ -4013,7 +4013,9 @@ function renderSubmissions(){
     renderSubmissions();
   };
   const selected=rows.find((r,i)=>entryKey(r,i)===currentSubmissionKey)||rows[0];
-  renderSubmissionDetail(selected);
+// Log initial view on load
+if(selected && window.logVisitorView) window.logVisitorView(selected.name||'');
+renderSubmissionDetail(selected);
 }
 function maxPointsForRound(round, matchId){
   const label=String(round||matchId||'').toLowerCase();
@@ -5437,7 +5439,7 @@ window.logVisitorView = async function(playerName){
       viewedAtLocal: new Date().toISOString(),
       userAgent: navigator.userAgent.slice(0,150)
     });
-  } catch(e){ /* silent — non-critical */ }
+  } catch(e){ console.error('visitorLog write failed:', e); }
 };
 
 // V95: Load visitor log for admin view
