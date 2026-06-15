@@ -5737,7 +5737,7 @@ const db = getFirestore(app);
 // V95: Visitor log — log when a player views their predictions in Results Centre
 window.logVisitorView = async function(playerName){
   if(!playerName || playerName === 'Loading players…' || playerName === 'No submissions yet') return;
-  const sessionKey = 'visitLogged_' + playerName.toLowerCase().trim();
+  const sessionKey = 'visitLogged';
   if(sessionStorage.getItem(sessionKey)) return;
   try {
     await addDoc(collection(db, "visitorLog"), {
