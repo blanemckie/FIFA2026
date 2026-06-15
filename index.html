@@ -4646,7 +4646,7 @@ function renderFunStats(){
     {icon:'🧘',title:'Cautious Conservative',desc:'The player predicting the fewest group-stage goals.',value:lowGoalRows[0]?lowGoalRows[0].name:'Waiting',copy:lowGoalRows[0]?goalsAndDiffCopy(lowGoalRows[0].goals):'Expecting a lot of cagey football'}
   ];
   grid.innerHTML=statCards.map(c=>`<article class="stat-bubble stat-bubble-v69 stat-bubble-v71 stat-bubble-v77 ${c.title.includes('Optimist')?'optimist-stat':c.title.includes('Conservative')?'pessimist-stat':''}"><div class="stat-icon">${c.icon}</div><div class="stat-title">${c.title}</div><div class="stat-desc">${c.desc}</div><div class="stat-value">${c.value}</div><div class="stat-copy">${c.copy}</div></article>`).join('');
-  renderInTournamentStats(filteredSubmissions);
+  renderInTournamentStats(filteredRows);
 }
 
 function renderInTournamentStats(filteredSubmissions){
@@ -4756,7 +4756,7 @@ function renderInTournamentStats(filteredSubmissions){
       title:'Total Exact Scores',
       desc:'How many exact scoreline predictions have come true across all players.',
       value:String(totalExactScores),
-      copy:`<span>Across ${gamesWithData} Match${gamesWithData===1?'':'es} with Results</span>`
+      copy:`<span>Across ${gamesWithData} ${gamesWithData===1?'Match':'Matches'} with Results</span>`
     },
     {
       icon:'⚡',
@@ -4977,9 +4977,8 @@ function buildPlayerResultsHeadlines(){
 }
 
 
+function buildPredictionTickerHeadlines(){
   const rows=(window.firebaseSubmissions&&window.firebaseSubmissions.length)?window.firebaseSubmissions:[];
-  const locked=rows.filter(r=>r&&(r.predictedWinner||r.groupPredictions));
-  if(!locked.length) return ['Champion Watch: the most popular winner pick will update from live submissions','Big scorelines, dark horses and champion picks will appear here as entries lock in'];
   const headlines=[];
 
   // Leaderboard standings
