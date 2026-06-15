@@ -5737,6 +5737,8 @@ const db = getFirestore(app);
 // V95: Visitor log — log when a player views their predictions in Results Centre
 window.logVisitorView = async function(playerName){
   if(!playerName || playerName === 'Loading players…' || playerName === 'No submissions yet') return;
+  const sessionKey = 'visitLogged_' + playerName.toLowerCase().trim();
+  if(sessionStorage.getItem(sessionKey)) return;
   try {
     await addDoc(collection(db, "visitorLog"), {
       playerName: playerName,
@@ -5744,6 +5746,7 @@ window.logVisitorView = async function(playerName){
       viewedAtLocal: new Date().toISOString(),
       userAgent: navigator.userAgent.slice(0,150)
     });
+    sessionStorage.setItem(sessionKey, '1');
   } catch(e){ console.error('visitorLog write failed:', e); }
 };
 
