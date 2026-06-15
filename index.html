@@ -3228,37 +3228,35 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   .lp-prog-stats{gap:12px}
 }
 
-/* V92: Status ticker for Live Table and Results Centre */
+/* V92: Status stamp for Live Table and Player View (replaces rolling ticker) */
 .status-ticker{
   width:100%;margin:0 0 14px;border-radius:14px;
   border:1.6px solid rgba(248,200,74,.55);
   background:linear-gradient(90deg,#061633,#0d3176 42%,#061633);
   box-shadow:0 8px 24px rgba(0,0,0,.18);
-  overflow:hidden;display:grid;
-  grid-template-columns:auto minmax(0,1fr);
-  align-items:center;
+  overflow:hidden;display:flex;
+  align-items:center;gap:0;
+  min-height:38px;
 }
 .status-ticker .st-label{
   height:100%;display:flex;align-items:center;gap:7px;
   padding:9px 13px;color:#071633;
   background:linear-gradient(135deg,var(--gold),#fff1a7);
   font-weight:1000;letter-spacing:.08em;text-transform:uppercase;
-  font-size:12px;white-space:nowrap;
+  font-size:12px;white-space:nowrap;flex-shrink:0;
 }
 .status-ticker .st-track{
-  position:relative;overflow:hidden;min-height:36px;display:flex;align-items:center;
+  flex:1;overflow:hidden;min-height:36px;display:flex;align-items:center;padding:0 14px;
 }
 .status-ticker .st-marquee{
-  display:inline-flex;align-items:center;gap:32px;
-  white-space:nowrap;will-change:transform;
-  animation:wcpTickerMove 60s linear infinite;
-  padding-left:100%;
+  display:inline-flex;align-items:center;gap:16px;
+  white-space:nowrap;width:100%;
 }
 .status-ticker .st-item{color:#eaf2ff;font-weight:900;font-size:13px;}
 .status-ticker .st-item.gold{color:#fff3a2;}
 .status-ticker .st-item.cyan{color:#b9f3ff;}
 .status-ticker .st-dot{color:#fff3a2;font-weight:1000;}
-.status-ticker:hover .st-marquee{animation-play-state:paused}
+/* No marquee animation — static stamp display */
 
 
 /* V93: Landing page name search + direct entry to results */
@@ -3488,7 +3486,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     </div>
   </div>
 </section>
-<nav class="tabs hidden" id="tabs"><button data-tab="submissions" class="active">Live Results</button><button data-tab="fixture-view">Fixture View</button><button data-tab="leaderboard">Live Table</button><button data-tab="fun">Fun Stats</button><button data-tab="how">How I Built This</button></nav>
+<nav class="tabs hidden" id="tabs"><button data-tab="submissions" class="active">Player View</button><button data-tab="fixture-view">Fixture View</button><button data-tab="leaderboard">Live Table</button><button data-tab="fun">Fun Stats</button><button data-tab="how">How I Built This</button></nav>
 <div id="adminPanel" class="hidden" style="max-width:960px;margin:30px auto;padding:0 16px 60px">
   <div style="text-align:center;margin-bottom:22px;padding:22px;border-radius:24px;background:linear-gradient(135deg,rgba(248,200,74,.18),rgba(55,212,255,.10));border:1px solid rgba(248,200,74,.42)">
     <div style="font-size:28px;margin-bottom:8px">🔐 Admin: Visitor Log</div>
@@ -3540,6 +3538,8 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
       <h2 class="premium-page-title">🔍 Fixture View</h2>
       <p>Select a fixture to see all predictions side by side.</p>
     </div>
+    <div class="status-ticker" id="fvStatusTicker" style="margin-bottom:10px"><div class="st-label"><span id="fvDot" style="width:8px;height:8px;border-radius:50%;background:#f8c84a;display:inline-block;box-shadow:0 0 6px rgba(248,200,74,.5)"></span>Live Status</div><div class="st-track"><div class="st-marquee" id="fvTickerMarquee"><span class="st-item gold">⏳ Scores updating shortly</span><span class="st-dot">•</span><span class="st-item">Fixture data refreshes automatically</span><span class="st-dot">•</span><span class="st-item cyan">Select a game to compare all predictions</span></div></div></div>
+    <div class="world-cup-ticker" id="fvWorldCupTicker" aria-label="World Cup Wire - Fixture View" style="margin-bottom:14px"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest player points updates…</span></div></div></div>
     <div class="card" style="padding:18px 20px 14px">
       <div class="league-controls upgraded" id="fvLeagueControls" style="margin-bottom:14px">
         <button class="league-filter active" data-fv-league="All">🏆 All Leagues</button>
@@ -3555,9 +3555,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     </div>
     <div id="fixtureViewContent" style="margin-top:14px"></div>
   </section>
-  <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button><button class="league-filter" data-league-filter="HFC">⚽ HFC League</button></div><div class="status-ticker" id="lbStatusTicker"><div class="st-label"><span id="lbDot" style="width:8px;height:8px;border-radius:50%;background:#f8c84a;display:inline-block;box-shadow:0 0 6px rgba(248,200,74,.5)"></span>Live Status</div><div class="st-track"><div class="st-marquee" id="lbTickerMarquee"><span class="st-item gold">⏳ Data refresh pending</span><span class="st-dot">•</span><span class="st-item">First results and league table update expected by end of day Friday 12 June</span><span class="st-dot">•</span><span class="st-item cyan">Check back soon — the leaderboard will come to life automatically</span><span class="st-dot">•</span><span class="st-item gold">⏳ Data refresh pending</span><span class="st-dot">•</span><span class="st-item">First results and league table update expected by end of day Friday 12 June</span><span class="st-dot">•</span><span class="st-item cyan">Check back soon — the leaderboard will come to life automatically</span><span class="st-dot">•</span></div></div></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div><p class="scores-updated-note" id="scoresUpdatedNote"></p><div style="text-align:center;margin-top:8px"><button onclick="fetchFirebaseData(true)" style="background:rgba(55,212,255,.15);border:1px solid rgba(55,212,255,.35);color:#b9f3ff;border-radius:999px;padding:8px 18px;font-size:12px;font-weight:900;cursor:pointer">🔄 Refresh Scores Now</button></div><div style="text-align:center;margin-top:12px"><button id="fbRefreshBtn" style="background:rgba(55,212,255,.14);border:1px solid rgba(55,212,255,.32);color:#b9f3ff;border-radius:999px;padding:10px 20px;font-weight:1000;font-size:13px;cursor:pointer;">🔄 Refresh</button></div></div></section>
-  <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">⚽ Results Centre</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="world-cup-ticker" id="worldCupNewsTicker" aria-label="World Cup 2026 news ticker"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest World Cup 2026 headlines…</span></div></div></div><div class="card live-results-card"><div class="status-ticker" id="rcStatusTicker"><div class="st-label"><span id="rcDot" style="width:8px;height:8px;border-radius:50%;background:#f8c84a;display:inline-block;box-shadow:0 0 6px rgba(248,200,74,.5)"></span>Live Status</div><div class="st-track"><div class="st-marquee" id="rcTickerMarquee"><span class="st-item gold">⏳ Data refresh pending</span><span class="st-dot">•</span><span class="st-item">First results and league table update expected by end of day Friday 12 June</span><span class="st-dot">•</span><span class="st-item cyan">Check back soon — the leaderboard will come to life automatically</span><span class="st-dot">•</span><span class="st-item gold">⏳ Data refresh pending</span><span class="st-dot">•</span><span class="st-item">First results and league table update expected by end of day Friday 12 June</span><span class="st-dot">•</span><span class="st-item cyan">Check back soon — the leaderboard will come to life automatically</span><span class="st-dot">•</span></div></div></div><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
-  <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="league-controls upgraded fun-league-controls" id="funLeagueControls"><button class="fun-league-filter active" data-fun-league-filter="All">🏆 All Leagues</button><button class="fun-league-filter" data-fun-league-filter="Main">🌍 Main</button><button class="fun-league-filter" data-fun-league-filter="LEGO">🧱 LEGO</button><button class="fun-league-filter" data-fun-league-filter="Family">🏡 Family</button><button class="fun-league-filter" data-fun-league-filter="HFC">⚽ HFC</button></div><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
+  <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button><button class="league-filter" data-league-filter="HFC">⚽ HFC League</button></div><div class="status-ticker" id="lbStatusTicker"><div class="st-label"><span id="lbDot" style="width:8px;height:8px;border-radius:50%;background:#f8c84a;display:inline-block;box-shadow:0 0 6px rgba(248,200,74,.5)"></span>Live Status</div><div class="st-track"><div class="st-marquee" id="lbTickerMarquee"><span class="st-item gold">⏳ Scores updating shortly</span><span class="st-dot">•</span><span class="st-item">Leaderboard refreshes automatically every 2 minutes</span><span class="st-dot">•</span><span class="st-item cyan">Check back after each match</span></div></div></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div><p class="scores-updated-note" id="scoresUpdatedNote"></p><div style="text-align:center;margin-top:8px"><button onclick="fetchFirebaseData(true)" style="background:rgba(55,212,255,.15);border:1px solid rgba(55,212,255,.35);color:#b9f3ff;border-radius:999px;padding:8px 18px;font-size:12px;font-weight:900;cursor:pointer">🔄 Refresh Scores Now</button></div><div style="text-align:center;margin-top:12px"><button id="fbRefreshBtn" style="background:rgba(55,212,255,.14);border:1px solid rgba(55,212,255,.32);color:#b9f3ff;border-radius:999px;padding:10px 20px;font-weight:1000;font-size:13px;cursor:pointer;">🔄 Refresh</button></div></div></section>
+  <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">👤 Player View</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="world-cup-ticker" id="worldCupNewsTicker" aria-label="World Cup 2026 news ticker"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest World Cup 2026 headlines…</span></div></div></div><div class="card live-results-card"><div class="status-ticker" id="rcStatusTicker"><div class="st-label"><span id="rcDot" style="width:8px;height:8px;border-radius:50%;background:#f8c84a;display:inline-block;box-shadow:0 0 6px rgba(248,200,74,.5)"></span>Live Status</div><div class="st-track"><div class="st-marquee" id="rcTickerMarquee"><span class="st-item gold">⏳ Scores updating shortly</span><span class="st-dot">•</span><span class="st-item">Results update automatically every 2 minutes</span><span class="st-dot">•</span><span class="st-item cyan">Check back after each match</span></div></div></div><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
+  <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="league-controls upgraded fun-league-controls" id="funLeagueControls"><button class="fun-league-filter active" data-fun-league-filter="All">🏆 All Leagues</button><button class="fun-league-filter" data-fun-league-filter="Main">🌍 Main</button><button class="fun-league-filter" data-fun-league-filter="LEGO">🧱 LEGO</button><button class="fun-league-filter" data-fun-league-filter="Family">🏡 Family</button><button class="fun-league-filter" data-fun-league-filter="HFC">⚽ HFC</button></div><h3 class="fun-section-heading" id="inTournamentHeading">🔴 In Tournament Fun Stats</h3><div class="fun-stats-grid" id="inTournamentStatsGrid"><div class="stat-bubble stat-bubble-v64" style="grid-column:1/-1"><div class="stat-icon">⏳</div><div class="stat-title">Loading Match Data</div><div class="stat-value" style="font-size:16px;color:#b8c9e8">In-tournament stats will appear here once games have been played and results are entered.</div></div></div><h3 class="fun-section-heading" id="preTournamentHeading">📋 Pre Tournament Fun Stats</h3><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
   <section id="how" class="panel how-built-page v83-how-built-page">
     <div class="page-head unified-final-head build-story-head v83-build-head">
       <h2 class="premium-page-title">🚀 How I Built This</h2>
@@ -4646,6 +4646,135 @@ function renderFunStats(){
     {icon:'🧘',title:'Cautious Conservative',desc:'The player predicting the fewest group-stage goals.',value:lowGoalRows[0]?lowGoalRows[0].name:'Waiting',copy:lowGoalRows[0]?goalsAndDiffCopy(lowGoalRows[0].goals):'Expecting a lot of cagey football'}
   ];
   grid.innerHTML=statCards.map(c=>`<article class="stat-bubble stat-bubble-v69 stat-bubble-v71 stat-bubble-v77 ${c.title.includes('Optimist')?'optimist-stat':c.title.includes('Conservative')?'pessimist-stat':''}"><div class="stat-icon">${c.icon}</div><div class="stat-title">${c.title}</div><div class="stat-desc">${c.desc}</div><div class="stat-value">${c.value}</div><div class="stat-copy">${c.copy}</div></article>`).join('');
+  renderInTournamentStats(filteredSubmissions);
+}
+
+function renderInTournamentStats(filteredSubmissions){
+  const grid=document.getElementById('inTournamentStatsGrid');
+  if(!grid) return;
+  const rows=filteredSubmissions||(typeof getEntryRows==='function'?getEntryRows():[]);
+  // Gather all match breakdown data across all players
+  const matchPointTotals={}; // matchId -> {totalPts, playerCount, home, away, actualHome, actualAway}
+  const exactScoresByMatch={}; // matchId -> [{name, score}]
+  const playerExactCounts={}; // playerName -> count
+  const playerCorrectResultCounts={}; // playerName -> count
+  const allExactScores=[]; // [{name, match, score, goals}]
+  let totalGamesWithResults=0;
+  let totalExactScores=0;
+  let totalCorrectResults=0;
+
+  rows.forEach(r=>{
+    const bd=r.groupMatchBreakdown||{};
+    let playerExact=0;
+    let playerCorrect=0;
+    Object.entries(bd).forEach(([mid,data])=>{
+      if(!data||data.reason==='pending'||data.reason==='invalid') return;
+      const fx=window.WCP_FIXTURES&&window.WCP_FIXTURES.find(f=>String(f.id)===String(mid));
+      const matchName=fx?fx.home+' v '+fx.away:'Match '+mid;
+      const pts=Number(data.points||0);
+      if(!matchPointTotals[mid]){
+        matchPointTotals[mid]={totalPts:0,playerCount:0,matchName,actualHome:data.actualHome,actualAway:data.actualAway};
+      }
+      matchPointTotals[mid].totalPts+=pts;
+      matchPointTotals[mid].playerCount++;
+      if(data.reason==='exact_score'){
+        playerExact++;
+        totalExactScores++;
+        exactScoresByMatch[mid]??=[];
+        exactScoresByMatch[mid].push({name:r.name,score:data.actualHome+'-'+data.actualAway});
+        allExactScores.push({name:r.name,matchName,score:data.actualHome+'-'+data.actualAway,goals:(Number(data.actualHome||0)+Number(data.actualAway||0))});
+      }
+      if(data.reason==='correct_result'){
+        playerCorrect++;
+        totalCorrectResults++;
+      }
+    });
+    if(playerExact>0) playerExactCounts[r.name]=(playerExactCounts[r.name]||0)+playerExact;
+    if(playerCorrect>0) playerCorrectResultCounts[r.name]=(playerCorrectResultCounts[r.name]||0)+playerCorrect;
+    if(Object.keys(bd).length>0) totalGamesWithResults=Math.max(totalGamesWithResults,Object.keys(bd).filter(k=>bd[k]&&bd[k].reason&&bd[k].reason!=='pending').length);
+  });
+
+  // Build per-player running streaks (correct results or exact in a row)
+  const playerStreaks={};
+  rows.forEach(r=>{
+    const bd=r.groupMatchBreakdown||{};
+    const scored=Object.entries(bd).filter(([,d])=>d&&d.reason&&d.reason!=='pending'&&d.reason!=='invalid')
+      .sort(([a],[b])=>Number(a)-Number(b));
+    let cur=0,best=0;
+    scored.forEach(([,d])=>{
+      if(d.reason==='exact_score'||d.reason==='correct_result'){cur++;best=Math.max(best,cur);}
+      else cur=0;
+    });
+    if(best>=2) playerStreaks[r.name]=best;
+  });
+
+  // Best and worst scoring games
+  const matchList=Object.values(matchPointTotals).filter(m=>m.playerCount>0);
+  const bestGame=matchList.slice().sort((a,b)=>b.totalPts-a.totalPts||a.matchName.localeCompare(b.matchName))[0];
+  const worstGame=matchList.slice().sort((a,b)=>a.totalPts-b.totalPts||a.matchName.localeCompare(b.matchName))[0];
+
+  // Top exact score artist
+  const topExact=Object.entries(playerExactCounts).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))[0];
+  // Highest-goals exact score
+  const highestGoalExact=allExactScores.slice().sort((a,b)=>b.goals-a.goals||a.matchName.localeCompare(b.matchName))[0];
+  // Top streak
+  const topStreak=Object.entries(playerStreaks).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))[0];
+  // Most correct results (non-exact) — already computed in playerCorrectResultCounts
+  const topCorrect=Object.entries(playerCorrectResultCounts).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))[0];
+  // How many games have had ANY result
+  const gamesWithData=Object.keys(matchPointTotals).length;
+
+  if(gamesWithData===0){
+    grid.innerHTML='<div class="stat-bubble stat-bubble-v64" style="grid-column:1/-1"><div class="stat-icon">⏳</div><div class="stat-title">No Results Yet</div><div class="stat-value" style="font-size:16px;color:#b8c9e8">In-tournament stats will appear here once games have been played and scores are entered.</div></div>';
+    return;
+  }
+
+  const statCards=[
+    {
+      icon:'⭐',
+      title:'Exact Score Leader',
+      desc:'The player with the most exact scoreline predictions so far.',
+      value:topExact?topExact[0]:'None Yet',
+      copy:topExact?`<span>${topExact[1]} Exact Score${topExact[1]===1?'':'s'} — 10 pts each</span>`:'First exact score not yet in'
+    },
+    {
+      icon:'🔥',
+      title:'Best Scoring Game',
+      desc:'The match that generated the most combined points across all players.',
+      value:bestGame?bestGame.matchName:'Waiting',
+      copy:bestGame?`<span>${bestGame.totalPts} Total Points Earned</span><span>Across ${bestGame.playerCount} Players</span>`:'Awarded once results are in'
+    },
+    {
+      icon:'😬',
+      title:'Toughest Game',
+      desc:'The match where players earned the fewest combined points.',
+      value:worstGame&&worstGame!==bestGame?worstGame.matchName:worstGame?worstGame.matchName:'Waiting',
+      copy:worstGame?`<span>${worstGame.totalPts} Total Points Earned</span><span>Across ${worstGame.playerCount} Players</span>`:'Still being calculated'
+    },
+    {
+      icon:'🎯',
+      title:'Total Exact Scores',
+      desc:'How many exact scoreline predictions have come true across all players.',
+      value:String(totalExactScores),
+      copy:`<span>Across ${gamesWithData} Match${gamesWithData===1?'':'es} with Results</span>`
+    },
+    {
+      icon:'⚡',
+      title:'Best Streak',
+      desc:'The player on the longest run of correct results or exact scores.',
+      value:topStreak?topStreak[0]:'None Yet',
+      copy:topStreak?`<span>${topStreak[1]} Correct in a Row</span>`:'Streaks start from the first correct call'
+    },
+    {
+      icon:'🎪',
+      title:'Highest-Goal Exact Score',
+      desc:'The exact scoreline prediction with the most combined goals.',
+      value:highestGoalExact?highestGoalExact.score:'—',
+      copy:highestGoalExact?`<span>${highestGoalExact.name} nailed it in</span><span>${highestGoalExact.matchName}</span>`:'Waiting for a goalfest result'
+    }
+  ];
+
+  grid.innerHTML=statCards.map(c=>`<article class="stat-bubble stat-bubble-v69 stat-bubble-v71 stat-bubble-v77"><div class="stat-icon">${c.icon}</div><div class="stat-title">${c.title}</div><div class="stat-desc">${c.desc}</div><div class="stat-value">${c.value}</div><div class="stat-copy">${c.copy}</div></article>`).join('');
 }
 
 
@@ -4767,7 +4896,87 @@ function latestEntriesForTicker(rows){
     return (bd||0)-(ad||0);
   }).slice(0,3);
 }
-function buildPredictionTickerHeadlines(){
+function buildPlayerResultsHeadlines(){
+  // Player-results focused Wire — highlights from last 3 completed matches
+  const rows=(window.firebaseSubmissions&&window.firebaseSubmissions.length)?window.firebaseSubmissions:[];
+  const locked=rows.filter(r=>r&&(r.predictedWinner||r.groupPredictions));
+  if(!locked.length) return ['🔴 World Cup Wire: Player points updates will appear here after the first results are in','🏆 Check back after each game — exact scores, winning streaks and leaderboard moves all reported here'];
+
+  const headlines=[];
+
+  // Find the last 3 matches that have results
+  const allMatchIds=new Set();
+  locked.forEach(r=>{
+    Object.entries(r.groupMatchBreakdown||{}).forEach(([mid,d])=>{
+      if(d&&d.reason&&d.reason!=='pending'&&d.reason!=='invalid') allMatchIds.add(String(mid));
+    });
+  });
+
+  // Get last 3 match IDs by fixture order
+  const recentMatchIds=[...allMatchIds].sort((a,b)=>Number(a)-Number(b)).slice(-3);
+
+  // For each recent match, build headlines
+  recentMatchIds.forEach(mid=>{
+    const fx=window.WCP_FIXTURES&&window.WCP_FIXTURES.find(f=>String(f.id)===String(mid));
+    const matchName=fx?fx.home+' v '+fx.away:'a recent match';
+    const exactPlayers=[],correctPlayers=[],wrongPlayers=[];
+    let actualScore='';
+    locked.forEach(r=>{
+      const bd=r.groupMatchBreakdown&&(r.groupMatchBreakdown[mid]||r.groupMatchBreakdown[String(mid)]);
+      if(!bd||bd.reason==='pending') return;
+      if(!actualScore&&(bd.actualHome!==undefined)) actualScore=`${bd.actualHome}-${bd.actualAway}`;
+      if(bd.reason==='exact_score') exactPlayers.push(r.name);
+      else if(bd.reason==='correct_result') correctPlayers.push(r.name);
+      else wrongPlayers.push(r.name);
+    });
+    if(exactPlayers.length===1) headlines.push(`⭐ ${exactPlayers[0]} nailed the exact score in ${matchName} (${actualScore}) — 10 points banked!`);
+    else if(exactPlayers.length===2) headlines.push(`⭐ ${exactPlayers[0]} and ${exactPlayers[1]} both called the exact score in ${matchName} — 10 points each!`);
+    else if(exactPlayers.length>=3) headlines.push(`⭐ ${exactPlayers.length} players nailed the exact score in ${matchName} — ${exactPlayers.slice(0,2).join(', ')} among those banking 10 points!`);
+    if(correctPlayers.length>=2) headlines.push(`✅ ${correctPlayers.slice(0,2).join(' and ')} both got the correct result in ${matchName} — 5 points each on the board`);
+    else if(correctPlayers.length===1) headlines.push(`✅ ${correctPlayers[0]} got the result right in ${matchName} — 5 points earned`);
+    if(wrongPlayers.length===1) headlines.push(`😬 Tough one for ${wrongPlayers[0]} in ${matchName} — the scorers will be looking to bounce back`);
+    else if(wrongPlayers.length>1) headlines.push(`😬 ${wrongPlayers.length} players missed out in ${matchName} — the leaderboard gaps are starting to open`);
+  });
+
+  // Streak highlights
+  const ranked=[...locked].sort((a,b)=>(Number(b.totalPoints)||0)-(Number(a.totalPoints)||0));
+  const streaks={};
+  ranked.forEach(r=>{
+    const bd=r.groupMatchBreakdown||{};
+    const scored=Object.entries(bd).filter(([,d])=>d&&d.reason&&d.reason!=='pending'&&d.reason!=='invalid').sort(([a],[b])=>Number(a)-Number(b));
+    let cur=0,best=0;
+    scored.forEach(([,d])=>{if(d.reason==='exact_score'||d.reason==='correct_result'){cur++;best=Math.max(best,cur);}else cur=0;});
+    if(best>=2) streaks[r.name]=best;
+  });
+  Object.entries(streaks).sort((a,b)=>b[1]-a[1]).slice(0,3).forEach(([name,n])=>{
+    if(n===2) headlines.push(`🔥 ${name} has back-to-back correct calls — two in a row and building momentum!`);
+    else if(n===3) headlines.push(`🔥 ${name} on a hat-trick of correct results — three in a row, this is heating up!`);
+    else if(n>=4) headlines.push(`🔥 ${name} is on fire with ${n} correct results in a row — is anyone stopping them?`);
+  });
+
+  // Leaderboard position headlines
+  if(ranked[0]&&Number(ranked[0].totalPoints||0)>0){
+    headlines.push(`🥇 ${ranked[0].name} tops the leaderboard with ${Number(ranked[0].totalPoints||0)} pts — the early pace-setter`);
+    if(ranked[1]&&Number(ranked[1].totalPoints||0)>0){
+      const gap=Number(ranked[0].totalPoints||0)-Number(ranked[1].totalPoints||0);
+      if(gap===0) headlines.push(`🤝 Dead heat at the top — ${ranked[0].name} and ${ranked[1].name} level on points!`);
+      else headlines.push(`📈 ${ranked[1].name} just ${gap} point${gap===1?'':'s'} behind the leader — the chase is on`);
+    }
+  }
+
+  // Zero scorers (after games played)
+  const zeros=ranked.filter(r=>Number(r.totalPoints||0)===0&&Object.keys(r.groupMatchBreakdown||{}).length>0);
+  if(zeros.length===1) headlines.push(`💪 ${zeros[0].name} yet to score — but the World Cup is long and anything can happen`);
+  else if(zeros.length>1) headlines.push(`💪 ${zeros.map(r=>r.name).join(' and ')} still chasing their first points — it only takes one exact score to change the story`);
+
+  if(!headlines.length) headlines.push('🔴 World Cup Wire: Player stats will update after each match — stay close!');
+
+  // Shuffle for variety
+  for(var i=headlines.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=headlines[i];headlines[i]=headlines[j];headlines[j]=t;}
+  return headlines;
+}
+
+
   const rows=(window.firebaseSubmissions&&window.firebaseSubmissions.length)?window.firebaseSubmissions:[];
   const locked=rows.filter(r=>r&&(r.predictedWinner||r.groupPredictions));
   if(!locked.length) return ['Champion Watch: the most popular winner pick will update from live submissions','Big scorelines, dark horses and champion picks will appear here as entries lock in'];
@@ -4900,12 +5109,16 @@ function mixTickerHeadlines(worldCupItems){
   return mixed.slice(0,50);
 }
 function renderWorldCupTicker(items){
-  const ticker=document.getElementById('worldCupNewsTicker');
-  if(!ticker) return;
-  const track=ticker.querySelector('.ticker-track');
-  const headlines=mixTickerHeadlines((items||[]).map(cleanTickerTitle));
-  const repeated=[...headlines,...headlines];
-  track.innerHTML='<div class="ticker-marquee">'+repeated.map(h=>`<span class="ticker-item ${tickerClass(h)}">${h}</span><span class="ticker-dot">•</span>`).join('')+'</div>';
+  const tickerIds=['worldCupNewsTicker','fvWorldCupTicker'];
+  const headlines=buildPlayerResultsHeadlines();
+  const repeated=[...headlines,...headlines,...headlines];
+  const markup='<div class="ticker-marquee">'+repeated.map(h=>`<span class="ticker-item ${tickerClass(h)}">${h}</span><span class="ticker-dot">•</span>`).join('')+'</div>';
+  tickerIds.forEach(id=>{
+    const ticker=document.getElementById(id);
+    if(!ticker) return;
+    const track=ticker.querySelector('.ticker-track');
+    if(track) track.innerHTML=markup;
+  });
 }
 async function loadWorldCupTicker(){
   try{
@@ -5255,7 +5468,7 @@ function renderLandingFixtures_local(){
 
 
 // ── Newspaper (Claude API) ────────────────────────────────────────────
-const LP_NP_CACHE_KEY = 'wcp-newspaper-cache-v3'; // v3 forces cache bust with 3-per-league prompt
+const LP_NP_CACHE_KEY = 'wcp-newspaper-cache-v4'; // v4 forces cache bust with per-league tone variation
 const LP_NP_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours - regenerates regularly during tournament
 
 function buildNewspaperPrompt(){
@@ -5279,17 +5492,18 @@ function buildNewspaperPrompt(){
     ).join('\n') + '\n\n' +
     'Write a newspaper sports page with:\n' +
     '1. A punchy HEADLINE (one sentence, under 15 words, about the current leader or a standout moment)\n' +
-    '2. A BYLINE (short, fun)\n' +
+    '2. A BYLINE (short, fun — e.g. "By Our Chief Predictions Correspondent" or "From the Pressbox")\n' +
     '3. LEAD paragraph (2-3 sentences, fun sports journalism style, mention the leader and any exact score heroes by name in bold using <b>name</b>)\n' +
-    '4. MAIN LEAGUE section (1-2 sentences, mention players by name in <b>bold</b>)\n' +
-    '5. LEGO LEAGUE section (1-2 sentences)\n' +
-    '6. FAMILY LEAGUE section (1-2 sentences, mention players in <b>bold</b>)\n' +
-    '7. HFC LEAGUE section (1-2 sentences)\n\n' +
+    '4. MAIN LEAGUE section — write in an authoritative broadsheet style, like The Times or Telegraph. Cover the current leader, a standout moment, and the chasing pack. 3 punchy sentences.\n' +
+    '5. LEGO LEAGUE section — write in an excitable tabloid style, like The Sun or Daily Mirror. Brick puns, bold claims, drama. 3 punchy sentences.\n' +
+    '6. FAMILY LEAGUE section — write in a warm, slightly chaotic family newsletter style. Mention sibling rivalries or family drama humorously. 3 punchy sentences.\n' +
+    '7. HFC LEAGUE section — write in a gritty football terrace style, like a fan forum or fanzine. Short, punchy, laddish. 3 punchy sentences.\n\n' +
+    'CRITICAL: Each league section MUST have a completely different tone, vocabulary and style from all other sections. Do NOT reuse the same sentence structures or phrases across sections.\n\n' +
     'Format as JSON only, no markdown:\n' +
     '{"headline":"...","byline":"...","lead":"...","main":"...","lego":"...","family":"...","hfc":"..."}\n' +
     'IMPORTANT NOTE: If \"Barney\" appears near the top of any league, note playfully that this is ONLY because the leaderboard sorts alphabetically when scores are tied — the scores are moving rapidly and this could change at any second. Make this funny!\n' +
-    'For EACH league section, write exactly 3 varied, punchy comments covering: (a) who is currently leading that league, (b) someone who got max points on a specific result or called 2 in a row, (c) someone who has yet to score their first points or is struggling. Bold all player names with <b>name</b> tags. If a league has no entries, write a fun placeholder instead.\n\n' +
-    'Under 450 words total. Bold ALL player names. Do NOT include the name Blane McKie in any section.';
+    'For EACH league section, cover: (a) who is currently leading that league, (b) someone who got max points on a specific result or called 2 in a row, (c) someone who has yet to score their first points or is struggling. Bold all player names with <b>name</b> tags. If a league has no entries, write a fun placeholder in the correct style for that league.\n\n' +
+    'Under 500 words total. Bold ALL player names. Do NOT include the name Blane McKie in any section.';
 }
 
 async function renderLandingNewspaper(){
@@ -5644,16 +5858,16 @@ function updateStatusBars(){
   var minsAway=Math.max(1,minsToNext);
   var hasResults=latestUpdate!==null;
   var timeStr=hasResults?latestUpdate.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+' on '+latestUpdate.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):null;
-  ['lb','rc'].forEach(function(p){
+  ['lb','rc','fv'].forEach(function(p){
     var dot=document.getElementById(p+'Dot');
     var marquee=document.getElementById(p+'TickerMarquee');
     if(!marquee)return;
     if(hasResults){
       if(dot){dot.style.background='#32d17f';dot.style.boxShadow='0 0 6px rgba(50,209,127,.7)';}
-      marquee.innerHTML='<span class="st-item" style="color:#32d17f">🟢 Scores last updated: '+timeStr+'</span><span class="st-dot">•</span><span class="st-item cyan">Next auto-refresh in ~'+minsAway+' min'+(minsAway!==1?'s':'')+'</span><span class="st-dot">•</span><span class="st-item gold">Leaderboard updates automatically — check back after every match</span><span class="st-dot">•</span><span class="st-item" style="color:#32d17f">🟢 Scores last updated: '+timeStr+'</span><span class="st-dot">•</span><span class="st-item cyan">Next auto-refresh in ~'+minsAway+' min'+(minsAway!==1?'s':'')+'</span><span class="st-dot">•</span><span class="st-item gold">Leaderboard updates automatically — check back after every match</span><span class="st-dot">•</span>';
+      marquee.innerHTML='<span class="st-item" style="color:#32d17f">🟢 Scores last updated: '+timeStr+'</span><span class="st-dot">•</span><span class="st-item cyan">Next auto-refresh in ~'+minsAway+' min'+(minsAway!==1?'s':'')+'</span><span class="st-dot">•</span><span class="st-item gold">Leaderboard updates automatically — check back after every match</span>';
     }else{
       if(dot){dot.style.background='#f8c84a';dot.style.boxShadow='0 0 6px rgba(248,200,74,.5)';}
-      marquee.innerHTML='<span class="st-item gold">⏳ Data refresh pending</span><span class="st-dot">•</span><span class="st-item">First results and league table update expected by end of day Friday 12 June</span><span class="st-dot">•</span><span class="st-item cyan">Check back soon — the leaderboard will come to life automatically</span><span class="st-dot">•</span><span class="st-item gold">⏳ Data refresh pending</span><span class="st-dot">•</span><span class="st-item">First results and league table update expected by end of day Friday 12 June</span><span class="st-dot">•</span><span class="st-item cyan">Check back soon — the leaderboard will come to life automatically</span><span class="st-dot">•</span>';
+      marquee.innerHTML='<span class="st-item gold">⏳ Scores updating shortly</span><span class="st-dot">•</span><span class="st-item">Next auto-refresh in ~'+minsAway+' min'+(minsAway!==1?'s':'')+'</span><span class="st-dot">•</span><span class="st-item cyan">Leaderboard updates automatically after each match</span>';
     }
   });
   var old=document.getElementById('scoresUpdatedNote');
@@ -6070,6 +6284,11 @@ document.addEventListener('click', function(e){
 @media(max-width:560px){.fun-stats-grid{grid-template-columns:1fr!important}.stat-bubble-v64,.stat-bubble{min-height:132px!important;padding:14px 12px!important}.stat-bubble-v64 .stat-title,.stat-bubble .stat-title{min-height:auto!important}.stat-bubble-v64 .stat-value,.stat-bubble .stat-value{font-size:22px!important}}
 
 
+/* Fun Stats section headings (V98) */
+.fun-section-heading{display:block;text-align:center;color:#fff3a2;font-size:clamp(15px,2vw,22px);letter-spacing:.04em;margin:20px auto 14px;font-weight:1000;padding:10px 20px;border-radius:14px;background:linear-gradient(135deg,rgba(248,200,74,.14),rgba(255,255,255,.05));border:1px solid rgba(248,200,74,.28);width:max-content;max-width:100%;text-transform:uppercase}
+#inTournamentHeading{background:linear-gradient(135deg,rgba(255,59,92,.16),rgba(248,200,74,.12));border-color:rgba(255,59,92,.42);color:#fff;}
+@media(max-width:560px){.fun-section-heading{font-size:13px!important;padding:8px 14px!important;}}
+
 /* V67: global header centring, centred player selector and champion-first summary */
 .page-head.unified-final-head,
 .unified-final-head,
@@ -6443,47 +6662,65 @@ document.addEventListener('click', function(e){
 }
 
 /* ===== LB Mobile Cards v96b ===== */
-.lb-mobile-list{display:flex;flex-direction:column;gap:8px;width:100%;}
+.lb-mobile-list{display:flex;flex-direction:column;gap:6px;width:100%;}
 .lb-mobile-card{
   background:linear-gradient(135deg,rgba(255,255,255,.11),rgba(255,255,255,.055));
   border:1px solid rgba(255,255,255,.14);
-  border-radius:16px;
-  padding:12px 12px 10px;
-  box-shadow:0 4px 14px rgba(0,0,0,.16);
+  border-radius:14px;
+  padding:9px 10px 8px;
+  box-shadow:0 3px 10px rgba(0,0,0,.14);
 }
 .lb-mc-top{
   display:grid;
-  grid-template-columns:32px 1fr auto;
+  grid-template-columns:28px 1fr auto;
   align-items:center;
-  gap:10px;
-  margin-bottom:8px;
+  gap:8px;
+  margin-bottom:6px;
 }
-.lb-mc-info{display:flex;flex-direction:column;gap:3px;min-width:0;}
-.lb-mc-entry{margin-top:2px;}
-.lb-mc-pts{font-size:15px!important;padding:5px 10px!important;min-width:56px!important;border-radius:10px!important;white-space:nowrap;}
+.lb-mc-info{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.lb-mc-entry{margin-top:1px;}
+.lb-mc-pts{font-size:14px!important;padding:4px 8px!important;min-width:50px!important;border-radius:9px!important;white-space:nowrap;}
 .lb-mc-stats{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:6px;
+  gap:5px;
   border-top:1px solid rgba(255,255,255,.09);
-  padding-top:8px;
+  padding-top:6px;
 }
 .lb-mc-stat{
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:2px;
+  gap:1px;
   background:rgba(55,212,255,.08);
   border:1px solid rgba(55,212,255,.18);
-  border-radius:10px;
-  padding:5px 4px;
+  border-radius:8px;
+  padding:4px 3px;
 }
 .lb-mc-stat-exact{
   background:rgba(248,200,74,.10);
   border-color:rgba(248,200,74,.28);
 }
-.lb-mc-val{font-size:16px;font-weight:1000;color:#37d4ff;line-height:1;}
+.lb-mc-val{font-size:14px;font-weight:1000;color:#37d4ff;line-height:1;}
 .lb-mc-val-gold{color:#f8c84a;}
-.lb-mc-lbl{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#8899bb;line-height:1;}
+.lb-mc-lbl{font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#8899bb;line-height:1;}
+
+/* ===== Extra compact Live Table on mobile ===== */
+@media(max-width:480px){
+  .lb-mobile-list{gap:5px;}
+  .lb-mobile-card{padding:8px 9px 7px;border-radius:12px;}
+  .lb-mc-top{grid-template-columns:26px 1fr auto;gap:7px;margin-bottom:5px;}
+  .lb-mc-pts{font-size:13px!important;padding:3px 7px!important;min-width:44px!important;}
+  .lb-mc-val{font-size:13px;}
+  .lb-mc-lbl{font-size:7.5px;}
+  .lb-mc-stats{gap:4px;padding-top:5px;}
+  .lb-mc-stat{padding:3px 2px;border-radius:7px;}
+  .leader-player{font-size:13px!important;}
+  .league-type{font-size:8px!important;padding:2px 4px!important;}
+  .rank-badge{width:26px!important;height:26px!important;font-size:11px!important;}
+  /* Summary tiles even more compact */
+  .live-table-summary .summary-tile b{font-size:15px!important;}
+  .live-table-summary .summary-tile span{font-size:7px!important;}
+}
 
 </style>
