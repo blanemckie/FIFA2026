@@ -5739,6 +5739,7 @@ window.logVisitorView = async function(playerName){
   if(!playerName || playerName === 'Loading players…' || playerName === 'No submissions yet') return;
   const sessionKey = 'visitLogged';
   if(sessionStorage.getItem(sessionKey)) return;
+  sessionStorage.setItem(sessionKey, '1');
   try {
     await addDoc(collection(db, "visitorLog"), {
       playerName: playerName,
@@ -5746,7 +5747,6 @@ window.logVisitorView = async function(playerName){
       viewedAtLocal: new Date().toISOString(),
       userAgent: navigator.userAgent.slice(0,150)
     });
-    sessionStorage.setItem(sessionKey, '1');
   } catch(e){ console.error('visitorLog write failed:', e); }
 };
 
