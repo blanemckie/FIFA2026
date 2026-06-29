@@ -3867,12 +3867,13 @@ function enterBrowseMode(){
   state.browseMode=true;
   state.user=null;
   showMainApp();
+  setTab('submissions'); // Set tab BEFORE renderAll so the correct panel is active from the start
   $('#welcomeTitle').textContent='🎯 Prediction Centre';
   const sub=$('#welcomeSubtitle');
   if(sub) sub.innerHTML='Explore the game, preview the journey, and register when you are ready to save your picks.';
   const banner=$('#browseBanner'); if(banner) banner.classList.remove('hidden');
   renderAll();
-  setTab('submissions');
+  setTab('submissions'); // Set again after renderAll in case anything inside reset it
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function requireRegistration(){
@@ -4183,8 +4184,9 @@ function goToResultsForPlayer(rowOrName){
   const dropdown=document.getElementById('playerDropdown');
   if(dropdown) dropdown.value=currentSubmissionKey;
   window._pendingPlayerSelect = null;
-  // Force Player View tab last — after renderAll() inside enterBrowseMode() has settled
-  setTimeout(()=>{ setTab('submissions'); window.scrollTo({top:0,behavior:'smooth'}); }, 50);
+  // Force Player View tab last — use longer delay to beat any async Firebase callbacks
+  setTab('submissions');
+  setTimeout(()=>{ setTab('submissions'); window.scrollTo({top:0,behavior:'smooth'}); }, 200);
 }
 window.selectResultsPlayer = selectResultsPlayer;
 window.goToResultsForPlayer = goToResultsForPlayer;
