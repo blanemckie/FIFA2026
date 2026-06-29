@@ -3439,6 +3439,54 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
       </div>
     </div>
 
+    <!-- Stage-by-stage prediction status -->
+    <div class="lp-prog-wrap" style="margin-top:0">
+      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.28);border-radius:20px;padding:16px 18px">
+        <div style="text-align:center;color:#fff3a2;font-size:12px;font-weight:1000;text-transform:uppercase;letter-spacing:.10em;margin-bottom:12px">&#x1F4CA; Prediction Points Status</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div style="background:rgba(50,209,127,.12);border:1px solid rgba(50,209,127,.38);border-radius:14px;padding:10px 8px;text-align:center">
+            <div style="font-size:17px;margin-bottom:3px">&#x2705;</div>
+            <div style="font-size:11px;font-weight:1000;color:#32d17f;margin-bottom:2px">Group Stage</div>
+            <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Complete</div>
+            <div style="font-size:9px;color:#6af0b8;font-weight:900;margin-top:3px">Points Applied &#x2713;</div>
+          </div>
+          <div style="background:rgba(248,200,74,.12);border:1.5px solid rgba(248,200,74,.50);border-radius:14px;padding:10px 8px;text-align:center">
+            <div style="font-size:17px;margin-bottom:3px">&#x1F504;</div>
+            <div style="font-size:11px;font-weight:1000;color:#fff3a2;margin-bottom:2px">Round of 32</div>
+            <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Underway</div>
+            <div style="font-size:9px;color:#fff3a2;font-weight:900;margin-top:3px">28 Jun &#8211; 4 Jul</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 8px;text-align:center">
+            <div style="font-size:17px;margin-bottom:3px">&#x23F3;</div>
+            <div style="font-size:11px;font-weight:1000;color:#dce9ff;margin-bottom:2px">Round of 16</div>
+            <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Pending</div>
+            <div style="font-size:9px;color:#8899bb;font-weight:900;margin-top:3px">Points: After 4 Jul</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 8px;text-align:center">
+            <div style="font-size:17px;margin-bottom:3px">&#x23F3;</div>
+            <div style="font-size:11px;font-weight:1000;color:#dce9ff;margin-bottom:2px">Quarter-Finals</div>
+            <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Pending</div>
+            <div style="font-size:9px;color:#8899bb;font-weight:900;margin-top:3px">Points: After 7 Jul</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 8px;text-align:center">
+            <div style="font-size:17px;margin-bottom:3px">&#x23F3;</div>
+            <div style="font-size:11px;font-weight:1000;color:#dce9ff;margin-bottom:2px">Semi-Finals</div>
+            <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Pending</div>
+            <div style="font-size:9px;color:#8899bb;font-weight:900;margin-top:3px">Points: After 11 Jul</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 8px;text-align:center">
+            <div style="font-size:17px;margin-bottom:3px">&#x1F3C6;</div>
+            <div style="font-size:11px;font-weight:1000;color:#dce9ff;margin-bottom:2px">Final &amp; Champion</div>
+            <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Pending</div>
+            <div style="font-size:9px;color:#8899bb;font-weight:900;margin-top:3px">Points: After 19 Jul</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;text-align:center;color:#b8c9e8;font-size:11px;font-weight:800;line-height:1.4">
+          10 pts per correct team in knockout rounds &middot; 25 pts for correct World Cup Champion
+        </div>
+      </div>
+    </div>
+
     <!-- Two column: Newspaper + WC Results -->
     <div class="lp-centre">
       <div class="lp-two-col">
@@ -3554,6 +3602,15 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
       </select>
     </div>
     <div id="fixtureViewContent" style="margin-top:14px"></div>
+
+    <!-- KO Stage Summaries in Fixture View -->
+    <div style="margin-top:22px">
+      <div style="text-align:center;margin-bottom:14px">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;background:rgba(248,200,74,.12);border:1px solid rgba(248,200,74,.28);color:#fff3a2;font-size:12px;font-weight:1000;text-transform:uppercase;letter-spacing:.08em">&#x1F3C6; Knockout Stage Summaries</div>
+        <p style="color:#b8c9e8;font-weight:800;font-size:13px;margin:8px 0 0">Player scores for each KO round &middot; 10 pts per correct team</p>
+      </div>
+      <div id="fvKoSummary"></div>
+    </div>
   </section>
   <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p><p style="margin:8px auto 0;max-width:560px;font-size:12px;color:#8899bb;font-weight:750;line-height:1.5;">Rankings are decided by: <span style="color:#fff3a2;font-weight:900;">① Total Points</span> → <span style="color:#37d4ff;font-weight:900;">② Correct Scores</span> → <span style="color:#f8c84a;font-weight:900;">③ Exact Scores</span> → <span style="color:#b9f3ff;font-weight:900;">④ Most Combined Goals in Correct Predictions</span></p></div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button><button class="league-filter" data-league-filter="HFC">⚽ HFC League</button></div><div class="status-ticker" id="lbStatusTicker"><div class="st-label"><span id="lbDot" style="width:8px;height:8px;border-radius:50%;background:#f8c84a;display:inline-block;box-shadow:0 0 6px rgba(248,200,74,.5)"></span>Live Status</div><div class="st-track"><div class="st-marquee" id="lbTickerMarquee"><span class="st-item gold">⏳ Scores updating shortly</span><span class="st-dot">•</span><span class="st-item">Leaderboard refreshes automatically every 2 minutes</span><span class="st-dot">•</span><span class="st-item cyan">Check back after each match</span></div></div></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div><p class="scores-updated-note" id="scoresUpdatedNote"></p><div style="text-align:center;margin-top:8px"><button onclick="fetchFirebaseData(true)" style="background:rgba(55,212,255,.15);border:1px solid rgba(55,212,255,.35);color:#b9f3ff;border-radius:999px;padding:8px 18px;font-size:12px;font-weight:900;cursor:pointer">🔄 Refresh Scores Now</button></div><div style="text-align:center;margin-top:12px"><button id="fbRefreshBtn" style="background:rgba(55,212,255,.14);border:1px solid rgba(55,212,255,.32);color:#b9f3ff;border-radius:999px;padding:10px 20px;font-weight:1000;font-size:13px;cursor:pointer;">🔄 Refresh</button></div></div></section>
   <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">👤 Player View</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="world-cup-ticker" id="worldCupNewsTicker" aria-label="World Cup 2026 news ticker"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest World Cup 2026 headlines…</span></div></div></div><div class="card live-results-card"><div class="status-ticker" id="rcStatusTicker"><div class="st-label"><span id="rcDot" style="width:8px;height:8px;border-radius:50%;background:#f8c84a;display:inline-block;box-shadow:0 0 6px rgba(248,200,74,.5)"></span>Live Status</div><div class="st-track"><div class="st-marquee" id="rcTickerMarquee"><span class="st-item gold">⏳ Scores updating shortly</span><span class="st-dot">•</span><span class="st-item">Results update automatically every 2 minutes</span><span class="st-dot">•</span><span class="st-item cyan">Check back after each match</span></div></div></div><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
@@ -3884,7 +3941,7 @@ function updateKickoffCountdown(){
 }
 updateKickoffCountdown();
 
-function renderAll(){renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();renderFixtureView();updateProgress();updateKickoffCountdown();if(window.updateStatusBars)window.updateStatusBars(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);}
+function renderAll(){renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();renderFixtureView();updateProgress();updateKickoffCountdown();if(window.updateStatusBars)window.updateStatusBars(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);if(typeof renderFvKoSummary==='function') renderFvKoSummary();}
 
 /* V61: auto-advance between group-stage score boxes after typing */
 const scoreAdvanceTimers = new WeakMap();
@@ -4007,9 +4064,9 @@ function renderLeaderboard(){
           <span class="points-badge lb-mc-pts">${Number(r.totalPoints||0)} pts</span>
         </div>
         <div class="lb-mc-stats">
-          <div class="lb-mc-stat"><span class="lb-mc-val">${played}</span><span class="lb-mc-lbl">Played</span></div>
           <div class="lb-mc-stat"><span class="lb-mc-val">${correct}</span><span class="lb-mc-lbl">Correct</span></div>
-          <div class="lb-mc-stat lb-mc-stat-exact"><span class="lb-mc-val lb-mc-val-gold">${exact}</span><span class="lb-mc-lbl">Exact Score</span></div>
+          <div class="lb-mc-stat lb-mc-stat-exact"><span class="lb-mc-val lb-mc-val-gold">${exact}</span><span class="lb-mc-lbl">Exact</span></div>
+          <div class="lb-mc-stat" style="background:rgba(50,209,127,.10)!important;border-color:rgba(50,209,127,.25)!important"><span class="lb-mc-val" style="color:#32d17f!important">${r.r32Points||0}</span><span class="lb-mc-lbl">R32 pts</span></div>
         </div>
       </div>`;
     }).join('');
@@ -4021,9 +4078,9 @@ function renderLeaderboard(){
         <th>Rank</th>
         <th>Player</th>
         <th>Entry</th>
-        <th style="text-align:center;color:#37d4ff">Played</th>
-        <th style="text-align:center;color:#37d4ff">Correct</th>
-        <th style="text-align:center;color:#37d4ff">Exact Score</th>
+        <th style="text-align:center;color:#37d4ff">GS Pts</th>
+        <th style="text-align:center;color:#32d17f">R32 Pts</th>
+        <th style="text-align:center;color:#b8c9e8">R16+</th>
         <th style="text-align:right;color:#f8c84a">Total Pts</th>
       </tr></thead>
       <tbody>${filtered.map((r,i)=>{
@@ -4032,9 +4089,9 @@ function renderLeaderboard(){
           <td><span class="rank-badge">${i+1}</span></td>
           <td><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span></td>
           <td>${entryBadgesHtml(r.league,r.name)}</td>
-          <td style="text-align:center"><span class="stat-badge-cyan">${played}</span></td>
-          <td style="text-align:center"><span class="stat-badge-cyan">${correct}</span></td>
-          <td style="text-align:center"><span class="stat-badge-cyan">${exact}</span></td>
+          <td style="text-align:center"><span class="stat-badge-cyan">${Number(r.groupStagePoints||Math.max(0,(r.totalPoints||0)-(r.r32Points||0))) } pts</span></td>
+          <td style="text-align:center"><span style="color:#32d17f;font-weight:1000;font-size:13px">${r.r32Points||0} pts</span></td>
+          <td style="text-align:center;color:#8899bb;font-size:12px;font-weight:900">—</td>
           <td style="text-align:right"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td>
         </tr>`;
       }).join('')}</tbody>
@@ -4319,26 +4376,82 @@ function renderSubmissionDetail(entry){
     const matchBreakdown = (entry.groupMatchBreakdown && (entry.groupMatchBreakdown[p.matchId] || entry.groupMatchBreakdown[String(p.matchId)] || entry.groupMatchBreakdown[Number(p.matchId)])) || null;
     rows.push(summaryRow(prediction, max, matchBreakdown));
   });
+  // === ACTUAL R32 TEAMS (confirmed after group stage, 28 Jun 2026) ===
+  const ACTUAL_R32_TEAMS = new Set([
+    'Mexico','South Africa','Switzerland','Canada','Bosnia & Herzegovina',
+    'Brazil','Morocco','USA','Australia','Paraguay',
+    'Germany','Ivory Coast','Ecuador','Netherlands','Japan','Sweden',
+    'Spain','Cape Verde','Belgium','Egypt',
+    'France','Norway','Senegal',
+    'Argentina','Austria','Algeria','Portugal','Colombia','DR Congo',
+    'England','Ghana','Croatia'
+  ]);
+  const ACTUAL_R16_TEAMS = new Set([]); // Populated after 4 Jul
+  const ACTUAL_QF_TEAMS  = new Set([]);
+  const ACTUAL_SF_TEAMS  = new Set([]);
+  const ACTUAL_FINALISTS = new Set([]);
+
+  const stageActuals = {
+    'Round of 32 Picks': { teams: ACTUAL_R32_TEAMS, complete: true,  pendingDate: '' },
+    'Round of 16 Picks': { teams: ACTUAL_R16_TEAMS, complete: false, pendingDate: 'Points update after 4 Jul' },
+    'Quarter-final Picks':{ teams: ACTUAL_QF_TEAMS,  complete: false, pendingDate: 'Points update after 7 Jul' },
+    'Semi-final Picks':  { teams: ACTUAL_SF_TEAMS,  complete: false, pendingDate: 'Points update after 11 Jul' },
+    'Finalists':         { teams: ACTUAL_FINALISTS, complete: false, pendingDate: 'Points update after 15 Jul' }
+  };
+  const koPointsBreakdown = {};
+
   ['Round of 32 Picks','Round of 16 Picks','Quarter-final Picks','Semi-final Picks','Finalists'].forEach(label=>{
     const teams=stageTeams[label]||[];
     const per=maxPerTeamForStage(label);
     const maxTeams=maxTeamsForStage(label);
     const max=stageMaxPoints(label);
     runningMax+=max;
-    const teamPills=teams.length?teams.map(t=>`<span class="stage-team-pill">${teamLabel(t)}</span>`).join(''):'<span class="stage-team-pill">Pending Picks</span>';
+    const actual=stageActuals[label];
+    let earnedPts=0, correctCount=0;
+
+    const teamPills = teams.length ? teams.map(t=>{
+      const isCorrect = actual.complete && actual.teams.has(String(t).trim());
+      if(isCorrect){ correctCount++; earnedPts+=per; }
+      const pillStyle = isCorrect
+        ? 'background:rgba(50,209,127,.22)!important;border:1px solid rgba(50,209,127,.55)!important;color:#32d17f!important;'
+        : (!actual.complete ? '' : 'opacity:.55;');
+      const tick = isCorrect ? ' ✅' : '';
+      return `<span class="stage-team-pill" style="${pillStyle}">${teamLabel(t)}${tick}</span>`;
+    }).join('') : '<span class="stage-team-pill">Pending Picks</span>';
+
+    koPointsBreakdown[label] = { earned: earnedPts, max };
     addStage(label);
-    const prediction=`<div class="stage-summary-box-v51 results-audit-v74"><div class="stage-picks-v51">${teamPills}</div><div class="summary-line-v51">0 of ${maxTeams} Teams Correct · ${per} pts per Correct Team · Max ${max} pts</div></div>`;
-    rows.push(summaryRow(prediction, max));
+
+    let summaryText;
+    if(actual.complete){
+      summaryText = `${correctCount} of ${maxTeams} Teams Correct · ${per} pts per Team · <strong style="color:#32d17f">${earnedPts} pts earned</strong> / ${max} max`;
+    } else {
+      summaryText = `${per} pts per Correct Team · Max ${max} pts · <span style="color:#fff3a2">${actual.pendingDate}</span>`;
+    }
+
+    const prediction=`<div class="stage-summary-box-v51 results-audit-v74"><div class="stage-picks-v51">${teamPills}</div><div class="summary-line-v51">${summaryText}</div></div>`;
+
+    if(actual.complete){
+      const ptColour = earnedPts===max?'var(--gold)':earnedPts>0?'var(--green)':'var(--red)';
+      const actualHtml = `<div class="actual-result-v87"><span class="actual-score-v87" style="font-size:13px;color:#b8c9e8">${actual.teams.size} teams confirmed</span><span class="actual-reason-v87" style="color:var(--green)">✓ Results Applied</span></div>`;
+      const pointsHtml = `<span style="color:${ptColour};font-weight:1000">${earnedPts} / ${max}</span>`;
+      rows.push(`<div class="results-grid-row"><div class="results-cell prediction-cell" data-label="Your Prediction">${prediction}</div><div class="results-cell actual-cell" data-label="Actual Result">${actualHtml}</div><div class="results-cell points-cell" data-label="Points">${pointsHtml}</div></div>`);
+    } else {
+      rows.push(summaryRow(prediction, max));
+    }
   });
   addStage('Champion Pick');
   runningMax+=25;
-  const champHtml = `<div class="champion-showcase">${champion==='Not selected yet'?'<span class="champion-team-name">Not selected yet</span>':teamLabel(champion)}<span class="champion-label">Champion Pick</span><div class="summary-line-v51">Correct Winner · Max 25 pts</div></div>`;
+  const champHtml = `<div class="champion-showcase">${champion==='Not selected yet'?'<span class="champion-team-name">Not selected yet</span>':teamLabel(champion)}<span class="champion-label">Champion Pick</span><div class="summary-line-v51">Correct Winner · Max 25 pts · <span style="color:#fff3a2">Points: After 19 Jul</span></div></div>`;
   rows.push(summaryRow(champHtml, 25));
   const currentPoints=Number(entry.totalPoints||0);
+  const _koR32Pts = (koPointsBreakdown['Round of 32 Picks']||{}).earned || 0;
+  const _gsPoints = Math.max(0, currentPoints - _koR32Pts);
+  const ptsBadge = `<div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:8px 0 0"><span style="background:rgba(55,212,255,.12);border:1px solid rgba(55,212,255,.28);border-radius:999px;padding:3px 9px;font-size:10px;font-weight:1000;color:#b9f3ff">GS: ${_gsPoints}pts</span><span style="background:rgba(50,209,127,.14);border:1px solid rgba(50,209,127,.30);border-radius:999px;padding:3px 9px;font-size:10px;font-weight:1000;color:#32d17f">R32: ${_koR32Pts}pts ✅</span><span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:3px 9px;font-size:10px;font-weight:900;color:#6b7a99">R16–Final: Pending</span></div>`;
   const championFactText = champion==='Not selected yet'?'Complete and lock a prediction to reveal this player’s champion story.':worldCupFact(champion);
   const championPopularityText = champion==='Not selected yet'?'Waiting for champion picks.':championPopularity(champion);
   const championTopBubble = `<div class="champion-first-bubble champion-reveal-v68"><div class="champion-stars">⭐ 🏆 ⭐</div><div class="champion-first-kicker">🏆 Champion Pick 🏆</div><div class="champion-player-line">👑 ${(entry.name||'This player').split(' ')[0]} thinks ${champion==='Not selected yet'?'their champion':'this team'} will lift the trophy 👑</div><div class="champion-first-team">${champion==='Not selected yet'?'<span>Not selected yet</span>':teamLabel(champion)}</div><div class="champion-fact-card"><strong>🌍 World Cup Fact</strong><span>${championFactText}</span></div><div class="champion-popularity">🏅 ${championPopularityText}</div></div>`;
-  box.innerHTML=`<div class="player-result-strip"><div class="selected-player-name">⚽ ${(entry.name||'Selected player').toUpperCase()}</div><div class="points-total-card"><div class="total-points">${currentPoints} / ${runningMax}</div><small>Running points / max available</small></div></div>${championTopBubble}<div class="results-grid-v51"><div class="results-grid-header"><div>Your Prediction</div><div>Actual Result</div><div>Points<small>Earned / Max</small></div></div>${rows.join('')}<div class="results-total-row"><div class="results-total-label">Total Running Points</div><div>${currentPoints} / ${runningMax}</div></div></div>`;
+  box.innerHTML=`<div class="player-result-strip"><div class="selected-player-name">⚽ ${(entry.name||'Selected player').toUpperCase()}</div><div class="points-total-card"><div class="total-points">${currentPoints} / ${runningMax}</div><small>Running points / max available</small>${ptsBadge}</div></div>${championTopBubble}<div class="results-grid-v51"><div class="results-grid-header"><div>Your Prediction</div><div>Actual Result</div><div>Points<small>Earned / Max</small></div></div>${rows.join('')}<div class="results-total-row"><div class="results-total-label">Total Running Points</div><div>${currentPoints} / ${runningMax}</div></div></div>`;
 }
 function summaryRow(prediction,maxPoints,matchData){
   // matchData = { points, reason, actualHome, actualAway } from groupMatchBreakdown
@@ -4425,6 +4538,7 @@ function renderFixtureView(){
     dropdown.onchange=renderFixtureViewContent;
   }
   renderFixtureViewContent();
+  if(typeof renderFvKoSummary==='function') renderFvKoSummary();
 }
 
 function renderFixtureViewContent(){
@@ -4540,6 +4654,88 @@ function renderFixtureViewContent(){
 
 window.renderFixtureView=renderFixtureView;
 window.renderFixtureViewContent=renderFixtureViewContent;
+
+// === KO Stage Summary for Fixture View ===
+function renderFvKoSummary(){
+  const el = document.getElementById('fvKoSummary');
+  if(!el) return;
+  const allRows = (typeof getEntryRows==='function') ? getEntryRows() : [];
+  if(!allRows.length){ el.innerHTML='<div style="text-align:center;color:#6b7a99;padding:20px">No submissions yet.</div>'; return; }
+
+  const ACTUAL_R32 = new Set([
+    'Mexico','South Africa','Switzerland','Canada','Bosnia & Herzegovina',
+    'Brazil','Morocco','USA','Australia','Paraguay',
+    'Germany','Ivory Coast','Ecuador','Netherlands','Japan','Sweden',
+    'Spain','Cape Verde','Belgium','Egypt',
+    'France','Norway','Senegal',
+    'Argentina','Austria','Algeria','Portugal','Colombia','DR Congo',
+    'England','Ghana','Croatia'
+  ]);
+
+  const stages = [
+    { key:'Round of 32 Picks', label:'Round of 32', actual: ACTUAL_R32, complete: true, max: 32, pts: 10, dateNote: '28 Jun – 4 Jul' },
+    { key:'Round of 16 Picks', label:'Round of 16', actual: new Set(), complete: false, max: 16, pts: 10, dateNote: 'Points after 4 Jul' },
+    { key:'Quarter-final Picks', label:'Quarter-Finals', actual: new Set(), complete: false, max: 8, pts: 10, dateNote: 'Points after 7 Jul' },
+    { key:'Semi-final Picks', label:'Semi-Finals', actual: new Set(), complete: false, max: 4, pts: 10, dateNote: 'Points after 11 Jul' },
+    { key:'Finalists', label:'Final', actual: new Set(), complete: false, max: 2, pts: 10, dateNote: 'Points after 15 Jul' },
+  ];
+
+  let html = '';
+  stages.forEach(stage => {
+    const stageRows = allRows.map(row => {
+      const groups = row.groupPredictions||[];
+      const rawKO  = row.knockoutPicks||[];
+      const bracket= row.bracket||row.state?.bracket||{};
+      const map = (typeof savedKnockoutMap==='function') ? savedKnockoutMap(rawKO, bracket) : {};
+      let teams = [];
+      if(stage.key === 'Round of 32 Picks'){
+        teams = (typeof roundOf32TeamsFromSubmission==='function') ? roundOf32TeamsFromSubmission(groups) : [];
+      } else {
+        const predMap = {
+          'Round of 16 Picks': id => /^M\d+$/i.test(id),
+          'Quarter-final Picks': id => /^R16-/i.test(id),
+          'Semi-final Picks': id => /^QF-/i.test(id),
+          'Finalists': id => /^SF-/i.test(id),
+        };
+        const pred = predMap[stage.key];
+        if(pred && typeof teamsFromSavedIds==='function') teams = teamsFromSavedIds(map, pred, stage.max);
+      }
+      const correct = stage.complete ? teams.filter(t => stage.actual.has(String(t).trim())).length : null;
+      const earned  = correct !== null ? correct * stage.pts : null;
+      return { name: row.name||'Unknown', league: normaliseLeague(row.league||''), correct, earned, total: teams.length };
+    }).sort((a,b) => (b.earned||0) - (a.earned||0) || a.name.localeCompare(b.name));
+
+    const statusBadge = stage.complete
+      ? '<span style="background:rgba(50,209,127,.15);border:1px solid rgba(50,209,127,.35);color:#32d17f;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:1000">&#x2705; Results Applied</span>'
+      : `<span style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#8899bb;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:900">&#x23F3; ${stage.dateNote}</span>`;
+
+    html += `<div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div style="color:#fff3a2;font-size:16px;font-weight:1000">&#x26BD; ${stage.label}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="color:#b8c9e8;font-size:12px;font-weight:900">${stage.pts} pts/team &middot; max ${stage.max * stage.pts} pts</span>
+          ${statusBadge}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px">`;
+
+    stageRows.forEach((r,i) => {
+      const medal = i===0?'&#x1F947; ':i===1?'&#x1F948; ':i===2?'&#x1F949; ':'';
+      const ptsText = stage.complete ? `${r.earned} pts (${r.correct}/${stage.max})` : `${r.total} picks`;
+      const bg = stage.complete && r.correct > 0 ? 'background:rgba(50,209,127,.10);border-color:rgba(50,209,127,.30);' : '';
+      const ptsColor = stage.complete ? (r.correct > 0 ? '#32d17f' : '#ff6b6b') : '#b8c9e8';
+      html += `<div style="${bg}border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;gap:6px">
+        <span style="font-size:13px;font-weight:1000;color:#fff;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${medal}${r.name}</span>
+        <span style="font-size:12px;font-weight:1000;color:${ptsColor};white-space:nowrap;flex-shrink:0">${ptsText}</span>
+      </div>`;
+    });
+
+    html += '</div></div>';
+  });
+
+  el.innerHTML = html;
+}
+window.renderFvKoSummary = renderFvKoSummary;
 
 window.renderLeaderboard = renderLeaderboard;
 window.renderSubmissions = renderSubmissions;
