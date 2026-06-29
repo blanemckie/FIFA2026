@@ -4178,13 +4178,13 @@ function selectResultsPlayer(rowOrName){
 function goToResultsForPlayer(rowOrName){
   window._pendingPlayerSelect = (typeof rowOrName === 'string') ? rowOrName : (rowOrName && (rowOrName.name || rowOrName.email || rowOrName.id));
   enterBrowseMode();
-  setTab('submissions');
   selectResultsPlayer(rowOrName);
   renderSubmissions();
   const dropdown=document.getElementById('playerDropdown');
   if(dropdown) dropdown.value=currentSubmissionKey;
   window._pendingPlayerSelect = null;
-  window.scrollTo({top:0,behavior:'smooth'});
+  // Force Player View tab last — after renderAll() inside enterBrowseMode() has settled
+  setTimeout(()=>{ setTab('submissions'); window.scrollTo({top:0,behavior:'smooth'}); }, 50);
 }
 window.selectResultsPlayer = selectResultsPlayer;
 window.goToResultsForPlayer = goToResultsForPlayer;
@@ -5408,7 +5408,7 @@ function initNameSearch(){
     }
     results.innerHTML = matches.map((r, i) => {
       const initials = (r.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
-      const pts = Number(r.totalPoints||0);
+      const pts = (typeof getGrandTotal==='function') ? getGrandTotal(r) : Number(r.totalPoints||0);
       return '<div class="name-search-result" data-index="' + i + '">' +
         '<span class="nsr-icon">' + initials + '</span>' +
         '<span>' + (r.name||'Unknown') + '</span>' +
@@ -5427,8 +5427,7 @@ function initNameSearch(){
         else {
           window._pendingPlayerSelect = row.name;
           enterBrowseMode();
-          setTab('submissions');
-          window.scrollTo({top:0, behavior:'smooth'});
+          setTimeout(()=>{ setTab('submissions'); window.scrollTo({top:0,behavior:'smooth'}); }, 50);
         }
       });
     });
@@ -5462,8 +5461,7 @@ function initNameSearch(){
         else {
           window._pendingPlayerSelect = match.name;
           enterBrowseMode();
-          setTab('submissions');
-          window.scrollTo({top:0, behavior:'smooth'});
+          setTimeout(()=>{ setTab('submissions'); window.scrollTo({top:0,behavior:'smooth'}); }, 50);
         }
       } else {
         input.style.border = '2px solid #ff3b5c';
