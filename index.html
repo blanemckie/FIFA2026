@@ -3416,31 +3416,8 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
       </div>
     </div>
 
-    <!-- Tournament progress -->
-    <div class="lp-prog-wrap">
-      <div class="lp-prog-card">
-        <div class="lp-prog-top">
-          <span class="lp-prog-title">Tournament Progress</span>
-          <div class="lp-prog-stats" id="lpProgStats">
-            <div class="lp-prog-stat"><b id="lpMatchesPlayed">0</b><span>Played</span></div>
-            <div class="lp-prog-stat"><b id="lpMatchesLeft">104</b><span>To Go</span></div>
-            <div class="lp-prog-stat"><b id="lpTotalGoals">0</b><span>Goals</span></div>
-            <div class="lp-prog-stat"><b id="lpTournamentDay">Day 1</b><span>of 64</span></div>
-          </div>
-        </div>
-        <div class="lp-prog-track"><div class="lp-prog-fill" id="lpProgFill"></div></div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 8px;text-align:center">
-              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.2);border-radius:12px;padding:8px 4px"><div style="font-size:16px;font-weight:1000;color:#fff3a2" id="lpStatTeams">48</div><div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.06em">⚽ Teams</div></div>
-              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.2);border-radius:12px;padding:8px 4px"><div style="font-size:16px;font-weight:1000;color:#fff3a2">16</div><div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.06em">🏟️ Venues</div></div>
-              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.2);border-radius:12px;padding:8px 4px"><div style="font-size:16px;font-weight:1000;color:#fff3a2" id="lpStatEntries">—</div><div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.06em">🎯 Predictions</div></div>
-              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.2);border-radius:12px;padding:8px 4px"><div style="font-size:16px;font-weight:1000;color:#fff3a2">1</div><div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.06em">👑 Champion</div></div>
-            </div>
-            <div class="lp-prog-sub" id="lpProgSub">Group Stage Underway… loading stats</div>
-      </div>
-    </div>
-
-    <!-- Stage-by-stage prediction status -->
-    <div class="lp-prog-wrap" style="margin-top:0">
+    <!-- Stage-by-stage prediction status (moved above tournament progress) -->
+    <div class="lp-prog-wrap" style="margin-top:0;margin-bottom:0">
       <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.28);border-radius:20px;padding:16px 18px">
         <div style="text-align:center;color:#fff3a2;font-size:12px;font-weight:1000;text-transform:uppercase;letter-spacing:.10em;margin-bottom:12px">&#x1F4CA; Prediction Points Status</div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
@@ -3484,6 +3461,29 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
         <div style="margin-top:10px;text-align:center;color:#b8c9e8;font-size:11px;font-weight:800;line-height:1.4">
           10 pts per correct team in knockout rounds &middot; 25 pts for correct World Cup Champion
         </div>
+      </div>
+    </div>
+
+    <!-- Tournament progress -->
+    <div class="lp-prog-wrap">
+      <div class="lp-prog-card">
+        <div class="lp-prog-top">
+          <span class="lp-prog-title">Tournament Progress</span>
+          <div class="lp-prog-stats" id="lpProgStats">
+            <div class="lp-prog-stat"><b id="lpMatchesPlayed">0</b><span>Played</span></div>
+            <div class="lp-prog-stat"><b id="lpMatchesLeft">104</b><span>To Go</span></div>
+            <div class="lp-prog-stat"><b id="lpTotalGoals">0</b><span>Goals</span></div>
+            <div class="lp-prog-stat"><b id="lpTournamentDay">Day 1</b><span>of 64</span></div>
+          </div>
+        </div>
+        <div class="lp-prog-track"><div class="lp-prog-fill" id="lpProgFill"></div></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 8px;text-align:center">
+              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.2);border-radius:12px;padding:8px 4px"><div style="font-size:16px;font-weight:1000;color:#fff3a2" id="lpStatTeams">48</div><div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.06em">⚽ Teams</div></div>
+              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.2);border-radius:12px;padding:8px 4px"><div style="font-size:16px;font-weight:1000;color:#fff3a2">16</div><div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.06em">🏟️ Venues</div></div>
+              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.2);border-radius:12px;padding:8px 4px"><div style="font-size:16px;font-weight:1000;color:#fff3a2" id="lpStatEntries">—</div><div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.06em">🎯 Predictions</div></div>
+              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.2);border-radius:12px;padding:8px 4px"><div style="font-size:16px;font-weight:1000;color:#fff3a2">1</div><div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.06em">👑 Champion</div></div>
+            </div>
+            <div class="lp-prog-sub" id="lpProgSub">Group Stage Underway… loading stats</div>
       </div>
     </div>
 
@@ -4213,7 +4213,7 @@ function renderSubmissions(){
   dropdown.innerHTML=sortedRows.map((r,i)=>{
     const key=entryKey(r,rows.indexOf(r));
     const name=r.name||'Unknown player';
-    const pts=Number(r.totalPoints||0); return `<option value="${key}" ${key===currentSubmissionKey?'selected':''}>⚽ ${name}${pts>0?' — '+pts+' pts':''}</option>`;
+    const pts=(typeof getGrandTotal==='function')?getGrandTotal(r):Number(r.totalPoints||0); return `<option value="${key}" ${key===currentSubmissionKey?'selected':''}>⚽ ${name}${pts>0?' — '+pts+' pts':''}</option>`;
   }).join('');
   dropdown.value=currentSubmissionKey;
   dropdown.onchange=()=>{
