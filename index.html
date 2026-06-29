@@ -3454,7 +3454,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
             <div style="font-size:17px;margin-bottom:3px">&#x1F504;</div>
             <div style="font-size:11px;font-weight:1000;color:#fff3a2;margin-bottom:2px">Round of 32</div>
             <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Underway</div>
-            <div style="font-size:9px;color:#fff3a2;font-weight:900;margin-top:3px">28 Jun &#8211; 4 Jul</div>
+            <div style="font-size:9px;color:#fff3a2;font-weight:900;margin-top:3px">✅ Points Applied</div>
           </div>
           <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 8px;text-align:center">
             <div style="font-size:17px;margin-bottom:3px">&#x23F3;</div>
@@ -4020,7 +4020,7 @@ function getEntryRows(){
     return {correct,exact,goalSum};
   }
   return [...byName.values()].filter(r=>r.name).sort((a,b)=>{
-    const ptsDiff=(b.totalPoints||0)-(a.totalPoints||0);
+    const ptsDiff=getGrandTotal(b)-getGrandTotal(a);
     if(ptsDiff!==0) return ptsDiff;
     const sa=getTiebreakStats(a),sb=getTiebreakStats(b);
     if(sb.correct!==sa.correct) return sb.correct-sa.correct;
@@ -4029,6 +4029,39 @@ function getEntryRows(){
     return String(a.name).localeCompare(String(b.name));
   });
 }
+// === KO STAGE ACTUALS — update as tournament progresses ===
+const WCP_STAGE_ACTUALS = {
+  R32:{
+    teams:new Set(['Mexico','South Africa','Switzerland','Canada','Bosnia & Herzegovina',
+      'Brazil','Morocco','USA','Australia','Paraguay','Germany','Ivory Coast','Ecuador',
+      'Netherlands','Japan','Sweden','Spain','Cape Verde','Belgium','Egypt',
+      'France','Norway','Senegal','Argentina','Austria','Algeria',
+      'Portugal','Colombia','DR Congo','England','Ghana','Croatia']),
+    complete:true, pts:10, max:32, dateNote:'Points Applied'
+  },
+  R16: {teams:new Set([]),complete:false,pts:10,max:16,dateNote:'After 4 Jul'},
+  QF:  {teams:new Set([]),complete:false,pts:10,max:8, dateNote:'After 7 Jul'},
+  SF:  {teams:new Set([]),complete:false,pts:10,max:4, dateNote:'After 11 Jul'},
+  FIN: {teams:new Set([]),complete:false,pts:10,max:2, dateNote:'After 15 Jul'},
+  CHAMP:{teams:new Set([]),complete:false,pts:25,max:1, dateNote:'After 19 Jul'}
+};
+function computeKoPoints(row){
+  const grp=row.groupPredictions||[],rawKO=row.knockoutPicks||[];
+  const bkt=row.bracket||row.state?.bracket||{};
+  const m=(typeof savedKnockoutMap==='function')?savedKnockoutMap(rawKO,bkt):{};
+  const r32T=(typeof roundOf32TeamsFromSubmission==='function')?roundOf32TeamsFromSubmission(grp):[];
+  const r16T=(typeof teamsFromSavedIds==='function')?teamsFromSavedIds(m,id=>/^M\d+$/i.test(id),16):[];
+  const qfT=(typeof teamsFromSavedIds==='function')?teamsFromSavedIds(m,id=>/^R16-/i.test(id),8):[];
+  const sfT=(typeof teamsFromSavedIds==='function')?teamsFromSavedIds(m,id=>/^QF-/i.test(id),4):[];
+  const finT=(typeof teamsFromSavedIds==='function')?teamsFromSavedIds(m,id=>/^SF-/i.test(id),2):[];
+  const sc=(pred,act)=>act.complete?pred.filter(t=>act.teams.has(String(t).trim())).length*act.pts:0;
+  return {r32Pts:sc(r32T,WCP_STAGE_ACTUALS.R32),r16Pts:sc(r16T,WCP_STAGE_ACTUALS.R16),
+    qfPts:sc(qfT,WCP_STAGE_ACTUALS.QF),sfPts:sc(sfT,WCP_STAGE_ACTUALS.SF),
+    finPts:sc(finT,WCP_STAGE_ACTUALS.FIN),champPts:0};
+}
+function getGsPts(row){return Number(row.groupStagePoints||row.totalPoints||0);}
+function getGrandTotal(row){const ko=computeKoPoints(row);return getGsPts(row)+ko.r32Pts+ko.r16Pts+ko.qfPts+ko.sfPts+ko.finPts+ko.champPts;}
+
 function renderLeaderboard(){
   const allRows=getEntryRows();
   const filtered=currentLeagueFilter==='All'?allRows:allRows.filter(r=>r.allLeagues || (currentLeagueFilter==='HFC' && r.hfcLeague) || normaliseLeague(r.league)===currentLeagueFilter);
@@ -4043,59 +4076,65 @@ function renderLeaderboard(){
   function getMatchStats(r){
     const bd=r.groupMatchBreakdown||{};
     const entries=Object.values(bd);
-    const played=entries.filter(m=>m&&m.reason&&m.reason!=='pending'&&m.reason!=='invalid').length;
     const correct=entries.filter(m=>m&&(m.reason==='correct_result'||m.reason==='exact_score')).length;
     const exact=entries.filter(m=>m&&m.reason==='exact_score').length;
-    return {played,correct,exact};
+    return {correct,exact};
   }
-  const isMobile = window.innerWidth <= 650;
+  // Pre-compute KO breakdown
+  filtered.forEach(r=>{
+    r._ko=computeKoPoints(r);
+    r._gs=getGsPts(r);
+    r._tot=r._gs+r._ko.r32Pts+r._ko.r16Pts+r._ko.qfPts+r._ko.sfPts+r._ko.finPts;
+  });
+  const isMobile=window.innerWidth<=650;
   if(isMobile){
-    // Mobile: clean self-contained cards — no table
-    const cards = filtered.map((r,i)=>{
-      const {played,correct,exact}=getMatchStats(r);
-      const medal = i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':'';
-      return `<div class="lb-mobile-card">
-        <div class="lb-mc-top">
-          <span class="rank-badge">${i+1}</span>
-          <div class="lb-mc-info">
-            <span class="leader-player">${medal}${r.name||'Unknown player'}</span>
-            <div class="lb-mc-entry">${entryBadgesHtml(r.league,r.name)}</div>
-          </div>
-          <span class="points-badge lb-mc-pts">${Number(r.totalPoints||0)} pts</span>
-        </div>
-        <div class="lb-mc-stats">
-          <div class="lb-mc-stat"><span class="lb-mc-val">${correct}</span><span class="lb-mc-lbl">Correct</span></div>
-          <div class="lb-mc-stat lb-mc-stat-exact"><span class="lb-mc-val lb-mc-val-gold">${exact}</span><span class="lb-mc-lbl">Exact</span></div>
-          <div class="lb-mc-stat" style="background:rgba(50,209,127,.10)!important;border-color:rgba(50,209,127,.25)!important"><span class="lb-mc-val" style="color:#32d17f!important">${r.r32Points||0}</span><span class="lb-mc-lbl">R32 pts</span></div>
-        </div>
-      </div>`;
+    const cards=filtered.map((r,i)=>{
+      const {correct,exact}=getMatchStats(r);
+      const ko=r._ko||{};
+      const medal=i===0?'\ud83e\udd47 ':i===1?'\ud83e\udd48 ':i===2?'\ud83e\udd49 ':'';
+      return `<div class="lb-mobile-card">`
+        +`<div class="lb-mc-top"><span class="rank-badge">${i+1}</span>`
+        +`<div class="lb-mc-info"><span class="leader-player">${medal}${r.name||'?'}</span>`
+        +`<div class="lb-mc-entry">${entryBadgesHtml(r.league,r.name)}</div></div>`
+        +`<span class="points-badge lb-mc-pts">${r._tot} pts</span></div>`
+        +`<div class="lb-mc-stats">`
+        +`<div class="lb-mc-stat"><span class="lb-mc-val" style="color:#37d4ff">${r._gs}</span><span class="lb-mc-lbl">GS pts</span></div>`
+        +`<div class="lb-mc-stat" style="background:rgba(50,209,127,.10)!important;border-color:rgba(50,209,127,.28)!important">`
+        +`<span class="lb-mc-val" style="color:#32d17f">${ko.r32Pts}</span><span class="lb-mc-lbl">R32 \u2705</span></div>`
+        +`<div class="lb-mc-stat"><span class="lb-mc-val" style="color:#6b7a99">\u2014</span><span class="lb-mc-lbl">R16+</span></div>`
+        +`</div></div>`;
     }).join('');
     $('#leaderboardList').innerHTML=summary+`<div class="lb-mobile-list">${cards}</div>`;
   } else {
-    // Desktop: full table with all columns
-    const table=`<table class="league-table upgraded-table lb-expanded">
-      <thead><tr>
-        <th>Rank</th>
-        <th>Player</th>
-        <th>Entry</th>
-        <th style="text-align:center;color:#37d4ff">GS Pts</th>
-        <th style="text-align:center;color:#32d17f">R32 Pts</th>
-        <th style="text-align:center;color:#b8c9e8">R16+</th>
-        <th style="text-align:right;color:#f8c84a">Total Pts</th>
-      </tr></thead>
-      <tbody>${filtered.map((r,i)=>{
-        const {played,correct,exact}=getMatchStats(r);
-        return `<tr>
-          <td><span class="rank-badge">${i+1}</span></td>
-          <td><span class="leader-player">${i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':''}${r.name||'Unknown player'}</span></td>
-          <td>${entryBadgesHtml(r.league,r.name)}</td>
-          <td style="text-align:center"><span class="stat-badge-cyan">${Number(r.groupStagePoints||Math.max(0,(r.totalPoints||0)-(r.r32Points||0))) } pts</span></td>
-          <td style="text-align:center"><span style="color:#32d17f;font-weight:1000;font-size:13px">${r.r32Points||0} pts</span></td>
-          <td style="text-align:center;color:#8899bb;font-size:12px;font-weight:900">—</td>
-          <td style="text-align:right"><span class="points-badge">${Number(r.totalPoints||0)} pts</span></td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table>`;
+    const av=WCP_STAGE_ACTUALS;
+    const pend=(v,act)=>act.complete
+      ?`<span style="font-weight:1000;font-size:13px;color:#32d17f">${v}</span>`
+      :'<span style="color:#6b7a99;font-size:12px">\u2014</span>';
+    const hdr=(lbl,act)=>`<th style="text-align:center;font-size:11px;padding:6px 8px;color:${act.complete?'#32d17f':'#8899bb'}">`
+      +`${lbl}<br><span style="font-size:9px;font-weight:800;opacity:.8">${act.complete?'\u2705 Applied':act.dateNote}</span></th>`;
+    const table=`<div style="overflow-x:auto"><table class="league-table upgraded-table lb-expanded" style="min-width:700px">`
+      +`<thead><tr>`
+      +`<th style="width:36px">Rank</th><th>Player</th><th>Entry</th>`
+      +`<th style="text-align:center;font-size:11px;color:#37d4ff">GS<br><span style="font-size:9px;opacity:.8">\u2705 Applied</span></th>`
+      +hdr('R32',av.R32)+hdr('R16',av.R16)+hdr('QF',av.QF)+hdr('SF',av.SF)+hdr('Final',av.FIN)
+      +`<th style="text-align:right;color:#f8c84a">Total</th></tr></thead><tbody>`
+      +filtered.map((r,i)=>{
+        const ko=r._ko||{};
+        const medal=i===0?'\ud83e\udd47 ':i===1?'\ud83e\udd48 ':i===2?'\ud83e\udd49 ':'';
+        return `<tr>`
+          +`<td><span class="rank-badge">${i+1}</span></td>`
+          +`<td><span class="leader-player">${medal}${r.name||'?'}</span></td>`
+          +`<td>${entryBadgesHtml(r.league,r.name)}</td>`
+          +`<td style="text-align:center"><span style="color:#37d4ff;font-weight:1000;font-size:13px">${r._gs}</span></td>`
+          +`<td style="text-align:center">${pend(ko.r32Pts,av.R32)}</td>`
+          +`<td style="text-align:center">${pend(ko.r16Pts,av.R16)}</td>`
+          +`<td style="text-align:center">${pend(ko.qfPts, av.QF)}</td>`
+          +`<td style="text-align:center">${pend(ko.sfPts, av.SF)}</td>`
+          +`<td style="text-align:center">${pend(ko.finPts,av.FIN)}</td>`
+          +`<td style="text-align:right"><span class="points-badge">${r._tot} pts</span></td>`
+          +`</tr>`;
+      }).join('')
+      +`</tbody></table></div>`;
     $('#leaderboardList').innerHTML=summary+table;
   }
 }
@@ -4376,27 +4415,13 @@ function renderSubmissionDetail(entry){
     const matchBreakdown = (entry.groupMatchBreakdown && (entry.groupMatchBreakdown[p.matchId] || entry.groupMatchBreakdown[String(p.matchId)] || entry.groupMatchBreakdown[Number(p.matchId)])) || null;
     rows.push(summaryRow(prediction, max, matchBreakdown));
   });
-  // === ACTUAL R32 TEAMS (confirmed after group stage, 28 Jun 2026) ===
-  const ACTUAL_R32_TEAMS = new Set([
-    'Mexico','South Africa','Switzerland','Canada','Bosnia & Herzegovina',
-    'Brazil','Morocco','USA','Australia','Paraguay',
-    'Germany','Ivory Coast','Ecuador','Netherlands','Japan','Sweden',
-    'Spain','Cape Verde','Belgium','Egypt',
-    'France','Norway','Senegal',
-    'Argentina','Austria','Algeria','Portugal','Colombia','DR Congo',
-    'England','Ghana','Croatia'
-  ]);
-  const ACTUAL_R16_TEAMS = new Set([]); // Populated after 4 Jul
-  const ACTUAL_QF_TEAMS  = new Set([]);
-  const ACTUAL_SF_TEAMS  = new Set([]);
-  const ACTUAL_FINALISTS = new Set([]);
-
-  const stageActuals = {
-    'Round of 32 Picks': { teams: ACTUAL_R32_TEAMS, complete: true,  pendingDate: '' },
-    'Round of 16 Picks': { teams: ACTUAL_R16_TEAMS, complete: false, pendingDate: 'Points update after 4 Jul' },
-    'Quarter-final Picks':{ teams: ACTUAL_QF_TEAMS,  complete: false, pendingDate: 'Points update after 7 Jul' },
-    'Semi-final Picks':  { teams: ACTUAL_SF_TEAMS,  complete: false, pendingDate: 'Points update after 11 Jul' },
-    'Finalists':         { teams: ACTUAL_FINALISTS, complete: false, pendingDate: 'Points update after 15 Jul' }
+  // Use global WCP_STAGE_ACTUALS (single source of truth)
+  const stageActuals={
+    'Round of 32 Picks': WCP_STAGE_ACTUALS.R32,
+    'Round of 16 Picks': WCP_STAGE_ACTUALS.R16,
+    'Quarter-final Picks': WCP_STAGE_ACTUALS.QF,
+    'Semi-final Picks': WCP_STAGE_ACTUALS.SF,
+    'Finalists': WCP_STAGE_ACTUALS.FIN
   };
   const koPointsBreakdown = {};
 
@@ -4424,7 +4449,7 @@ function renderSubmissionDetail(entry){
 
     let summaryText;
     if(actual.complete){
-      summaryText = `${correctCount} of ${maxTeams} Teams Correct · ${per} pts per Team · <strong style="color:#32d17f">${earnedPts} pts earned</strong> / ${max} max`;
+      summaryText = `${correctCount} of ${maxTeams} Teams Correct · ${per} pts per Team · <strong style="color:#32d17f">${earnedPts} pts earned</strong> / ${max} max · <span style="color:#32d17f;font-size:11px">✅ Points Applied</span>`;
     } else {
       summaryText = `${per} pts per Correct Team · Max ${max} pts · <span style="color:#fff3a2">${actual.pendingDate}</span>`;
     }
@@ -4433,7 +4458,7 @@ function renderSubmissionDetail(entry){
 
     if(actual.complete){
       const ptColour = earnedPts===max?'var(--gold)':earnedPts>0?'var(--green)':'var(--red)';
-      const actualHtml = `<div class="actual-result-v87"><span class="actual-score-v87" style="font-size:13px;color:#b8c9e8">${actual.teams.size} teams confirmed</span><span class="actual-reason-v87" style="color:var(--green)">✓ Results Applied</span></div>`;
+      const actualHtml = `<div class="actual-result-v87"><span class="actual-score-v87" style="font-size:13px;color:#b8c9e8">${actual.teams.size} teams confirmed</span><span class="actual-reason-v87" style="color:var(--green)">✓ Points Applied</span></div>`;
       const pointsHtml = `<span style="color:${ptColour};font-weight:1000">${earnedPts} / ${max}</span>`;
       rows.push(`<div class="results-grid-row"><div class="results-cell prediction-cell" data-label="Your Prediction">${prediction}</div><div class="results-cell actual-cell" data-label="Actual Result">${actualHtml}</div><div class="results-cell points-cell" data-label="Points">${pointsHtml}</div></div>`);
     } else {
@@ -4444,10 +4469,23 @@ function renderSubmissionDetail(entry){
   runningMax+=25;
   const champHtml = `<div class="champion-showcase">${champion==='Not selected yet'?'<span class="champion-team-name">Not selected yet</span>':teamLabel(champion)}<span class="champion-label">Champion Pick</span><div class="summary-line-v51">Correct Winner · Max 25 pts · <span style="color:#fff3a2">Points: After 19 Jul</span></div></div>`;
   rows.push(summaryRow(champHtml, 25));
-  const currentPoints=Number(entry.totalPoints||0);
-  const _koR32Pts = (koPointsBreakdown['Round of 32 Picks']||{}).earned || 0;
-  const _gsPoints = Math.max(0, currentPoints - _koR32Pts);
-  const ptsBadge = `<div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:8px 0 0"><span style="background:rgba(55,212,255,.12);border:1px solid rgba(55,212,255,.28);border-radius:999px;padding:3px 9px;font-size:10px;font-weight:1000;color:#b9f3ff">GS: ${_gsPoints}pts</span><span style="background:rgba(50,209,127,.14);border:1px solid rgba(50,209,127,.30);border-radius:999px;padding:3px 9px;font-size:10px;font-weight:1000;color:#32d17f">R32: ${_koR32Pts}pts ✅</span><span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:3px 9px;font-size:10px;font-weight:900;color:#6b7a99">R16–Final: Pending</span></div>`;
+  // Grand total = GS + all earned KO pts
+  const _gs2=getGsPts(entry);
+  const _koR32Pts=koPointsBreakdown['Round of 32 Picks']?.earned??0;
+  const _koR16Pts=koPointsBreakdown['Round of 16 Picks']?.earned??0;
+  const _koQFPts=koPointsBreakdown['Quarter-final Picks']?.earned??0;
+  const _koSFPts=koPointsBreakdown['Semi-final Picks']?.earned??0;
+  const _koFinPts=koPointsBreakdown['Finalists']?.earned??0;
+  const currentPoints=_gs2+_koR32Pts+_koR16Pts+_koQFPts+_koSFPts+_koFinPts;
+  const _av2=WCP_STAGE_ACTUALS;
+  function _b(lbl,pts,act){return act.complete
+    ?`<span style="background:rgba(50,209,127,.14);border:1px solid rgba(50,209,127,.30);border-radius:999px;padding:3px 9px;font-size:10px;font-weight:1000;color:#32d17f">${lbl}: ${pts}pts ✅</span>`
+    :`<span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:3px 9px;font-size:10px;font-weight:900;color:#6b7a99">${lbl}: ${act.dateNote}</span>`;}
+  const ptsBadge=`<div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:8px 0 0">`
+    +`<span style="background:rgba(55,212,255,.12);border:1px solid rgba(55,212,255,.28);border-radius:999px;padding:3px 9px;font-size:10px;font-weight:1000;color:#b9f3ff">GS: ${_gs2}pts ✅</span>`
+    +_b('R32',_koR32Pts,_av2.R32)+_b('R16',_koR16Pts,_av2.R16)
+    +_b('QF',_koQFPts,_av2.QF)+_b('SF',_koSFPts,_av2.SF)+_b('Final',_koFinPts,_av2.FIN)
+    +'</div>';
   const championFactText = champion==='Not selected yet'?'Complete and lock a prediction to reveal this player’s champion story.':worldCupFact(champion);
   const championPopularityText = champion==='Not selected yet'?'Waiting for champion picks.':championPopularity(champion);
   const championTopBubble = `<div class="champion-first-bubble champion-reveal-v68"><div class="champion-stars">⭐ 🏆 ⭐</div><div class="champion-first-kicker">🏆 Champion Pick 🏆</div><div class="champion-player-line">👑 ${(entry.name||'This player').split(' ')[0]} thinks ${champion==='Not selected yet'?'their champion':'this team'} will lift the trophy 👑</div><div class="champion-first-team">${champion==='Not selected yet'?'<span>Not selected yet</span>':teamLabel(champion)}</div><div class="champion-fact-card"><strong>🌍 World Cup Fact</strong><span>${championFactText}</span></div><div class="champion-popularity">🏅 ${championPopularityText}</div></div>`;
@@ -4662,22 +4700,12 @@ function renderFvKoSummary(){
   const allRows = (typeof getEntryRows==='function') ? getEntryRows() : [];
   if(!allRows.length){ el.innerHTML='<div style="text-align:center;color:#6b7a99;padding:20px">No submissions yet.</div>'; return; }
 
-  const ACTUAL_R32 = new Set([
-    'Mexico','South Africa','Switzerland','Canada','Bosnia & Herzegovina',
-    'Brazil','Morocco','USA','Australia','Paraguay',
-    'Germany','Ivory Coast','Ecuador','Netherlands','Japan','Sweden',
-    'Spain','Cape Verde','Belgium','Egypt',
-    'France','Norway','Senegal',
-    'Argentina','Austria','Algeria','Portugal','Colombia','DR Congo',
-    'England','Ghana','Croatia'
-  ]);
-
-  const stages = [
-    { key:'Round of 32 Picks', label:'Round of 32', actual: ACTUAL_R32, complete: true, max: 32, pts: 10, dateNote: '28 Jun – 4 Jul' },
-    { key:'Round of 16 Picks', label:'Round of 16', actual: new Set(), complete: false, max: 16, pts: 10, dateNote: 'Points after 4 Jul' },
-    { key:'Quarter-final Picks', label:'Quarter-Finals', actual: new Set(), complete: false, max: 8, pts: 10, dateNote: 'Points after 7 Jul' },
-    { key:'Semi-final Picks', label:'Semi-Finals', actual: new Set(), complete: false, max: 4, pts: 10, dateNote: 'Points after 11 Jul' },
-    { key:'Finalists', label:'Final', actual: new Set(), complete: false, max: 2, pts: 10, dateNote: 'Points after 15 Jul' },
+  const stages=[
+    {key:'Round of 32 Picks',label:'Round of 32',actual:WCP_STAGE_ACTUALS.R32,complete:WCP_STAGE_ACTUALS.R32.complete,max:32,pts:10,dateNote:WCP_STAGE_ACTUALS.R32.dateNote},
+    {key:'Round of 16 Picks',label:'Round of 16',actual:WCP_STAGE_ACTUALS.R16,complete:WCP_STAGE_ACTUALS.R16.complete,max:16,pts:10,dateNote:WCP_STAGE_ACTUALS.R16.dateNote},
+    {key:'Quarter-final Picks',label:'Quarter-Finals',actual:WCP_STAGE_ACTUALS.QF,complete:WCP_STAGE_ACTUALS.QF.complete,max:8,pts:10,dateNote:WCP_STAGE_ACTUALS.QF.dateNote},
+    {key:'Semi-final Picks',label:'Semi-Finals',actual:WCP_STAGE_ACTUALS.SF,complete:WCP_STAGE_ACTUALS.SF.complete,max:4,pts:10,dateNote:WCP_STAGE_ACTUALS.SF.dateNote},
+    {key:'Finalists',label:'Final',actual:WCP_STAGE_ACTUALS.FIN,complete:WCP_STAGE_ACTUALS.FIN.complete,max:2,pts:10,dateNote:WCP_STAGE_ACTUALS.FIN.dateNote},
   ];
 
   let html = '';
@@ -4706,7 +4734,7 @@ function renderFvKoSummary(){
     }).sort((a,b) => (b.earned||0) - (a.earned||0) || a.name.localeCompare(b.name));
 
     const statusBadge = stage.complete
-      ? '<span style="background:rgba(50,209,127,.15);border:1px solid rgba(50,209,127,.35);color:#32d17f;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:1000">&#x2705; Results Applied</span>'
+      ? '<span style="background:rgba(50,209,127,.15);border:1px solid rgba(50,209,127,.35);color:#32d17f;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:1000">&#x2705; Points Applied</span>'
       : `<span style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#8899bb;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:900">&#x23F3; ${stage.dateNote}</span>`;
 
     html += `<div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:16px;margin-bottom:14px">
