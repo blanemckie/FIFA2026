@@ -3617,7 +3617,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
       <div id="fvKoSummary"></div>
     </div>
   </section>
-  <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table</h2><p>Track every submitted entry, switch league views, and watch the leaderboard come to life.</p><p style="margin:8px auto 0;max-width:560px;font-size:12px;color:#8899bb;font-weight:750;line-height:1.5;">Rankings are decided by: <span style="color:#fff3a2;font-weight:900;">① Total Points</span> → <span style="color:#37d4ff;font-weight:900;">② Correct Scores</span> → <span style="color:#f8c84a;font-weight:900;">③ Exact Scores</span> → <span style="color:#b9f3ff;font-weight:900;">④ Most Combined Goals in Correct Predictions</span></p>
+  <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table</h2></div>
 <div style="margin:12px auto 0;max-width:700px;background:rgba(255,255,255,.055);border:1px solid rgba(248,200,74,.26);border-radius:16px;padding:11px 14px">
   <div style="text-align:center;color:#fff3a2;font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:.10em;margin-bottom:8px">📊 Scoring Rules</div>
   <div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center">
@@ -4066,10 +4066,10 @@ const WCP_STAGE_ACTUALS = {
 };
 function currentTournamentStage(){
   if(!WCP_STAGE_ACTUALS.R32.complete) return 'Group Stage';
-  if(!WCP_STAGE_ACTUALS.R16.complete) return 'Round of 16';
-  if(!WCP_STAGE_ACTUALS.QF.complete) return 'Quarter-Finals';
-  if(!WCP_STAGE_ACTUALS.SF.complete) return 'Semi-Finals';
-  if(!WCP_STAGE_ACTUALS.FIN.complete) return 'The Final';
+  if(!WCP_STAGE_ACTUALS.R16.complete) return 'Round of 32';
+  if(!WCP_STAGE_ACTUALS.QF.complete) return 'Round of 16';
+  if(!WCP_STAGE_ACTUALS.SF.complete) return 'Quarter-Finals';
+  if(!WCP_STAGE_ACTUALS.FIN.complete) return 'Semi-Finals';
   return 'Champion Crowned';
 }
 function computeKoPoints(row){
@@ -4115,8 +4115,15 @@ function renderLeaderboard(){
   });
   const isMobile=window.innerWidth<=650;
   if(isMobile){
+    const av=WCP_STAGE_ACTUALS;
+    const stageChip=(label,val,act)=>{
+      const applied=act.complete;
+      const valDisplay = applied ? val : '\u2014';
+      const color = applied ? '#32d17f' : '#6b7a99';
+      const style = applied ? ' style="background:rgba(50,209,127,.10)!important;border-color:rgba(50,209,127,.28)!important"' : '';
+      return `<div class="lb-mc-stat"${style}><span class="lb-mc-val" style="color:${color}">${valDisplay}</span><span class="lb-mc-lbl">${label}</span></div>`;
+    };
     const cards=filtered.map((r,i)=>{
-      const {correct,exact}=getMatchStats(r);
       const ko=r._ko||{};
       const medal=i===0?'\ud83e\udd47 ':i===1?'\ud83e\udd48 ':i===2?'\ud83e\udd49 ':'';
       return `<div class="lb-mobile-card">`
@@ -4125,10 +4132,12 @@ function renderLeaderboard(){
         +`<div class="lb-mc-entry">${entryBadgesHtml(r.league,r.name)}</div></div>`
         +`<span class="points-badge lb-mc-pts">${r._tot} pts</span></div>`
         +`<div class="lb-mc-stats">`
-        +`<div class="lb-mc-stat"><span class="lb-mc-val" style="color:#37d4ff">${r._gs}</span><span class="lb-mc-lbl">GS pts</span></div>`
-        +`<div class="lb-mc-stat" style="background:rgba(50,209,127,.10)!important;border-color:rgba(50,209,127,.28)!important">`
-        +`<span class="lb-mc-val" style="color:#32d17f">${ko.r32Pts}</span><span class="lb-mc-lbl">R32 \u2705</span></div>`
-        +`<div class="lb-mc-stat"><span class="lb-mc-val" style="color:#6b7a99">\u2014</span><span class="lb-mc-lbl">R16+</span></div>`
+        +`<div class="lb-mc-stat"><span class="lb-mc-val" style="color:#37d4ff">${r._gs}</span><span class="lb-mc-lbl">GS</span></div>`
+        +stageChip('R32',ko.r32Pts,av.R32)
+        +stageChip('R16',ko.r16Pts,av.R16)
+        +stageChip('QF',ko.qfPts,av.QF)
+        +stageChip('SF',ko.sfPts,av.SF)
+        +stageChip('Final',ko.finPts,av.FIN)
         +`</div></div>`;
     }).join('');
     $('#leaderboardList').innerHTML=summary+`<div class="lb-mobile-list">${cards}</div>`;
@@ -5775,7 +5784,7 @@ function renderLandingFixtures_local(){
 
 
 // ── Newspaper (Claude API) ────────────────────────────────────────────
-const LP_NP_CACHE_KEY = 'wcp-newspaper-cache-v5'; // v5 forces cache bust - knockout stage commentary
+const LP_NP_CACHE_KEY = 'wcp-newspaper-cache-v6'; // v6 forces cache bust - corrected stage (R32 underway, not R16)
 const LP_NP_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours - regenerates regularly during tournament
 
 function buildNewspaperPrompt(){
