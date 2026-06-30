@@ -49,10 +49,21 @@
   .badge-today{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(50,209,127,.2);border:1px solid rgba(50,209,127,.4);color:var(--green);font-size:11px;font-weight:900;margin-left:6px}
   .badge-count{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(55,212,255,.15);border:1px solid rgba(55,212,255,.35);color:var(--cyan);font-size:11px;font-weight:900;margin-left:6px}
   .hidden{display:none}
+  .r32-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .r32-row:last-child{border-bottom:0}
+  .r32-info{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+  .r32-date{color:var(--muted);font-size:11px;font-weight:800;min-width:62px}
+  .r32-teams{color:#fff;font-weight:900;font-size:14px}
+  .r32-teams .vs{color:var(--muted);font-weight:700;font-size:12px}
+  .r32-btns{display:flex;flex-wrap:wrap;gap:6px}
+  .r32-btn{padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.05);color:#dce9ff;font-weight:900;font-size:12px;cursor:pointer}
+  .r32-btn:hover{background:rgba(255,255,255,.10)}
+  .r32-btn.active{border-color:var(--green);background:rgba(50,209,127,.18);color:#aef7cf}
   @media(max-width:600px){
     td.device{display:none}
     thead th.device-h{display:none}
     .filters input{width:140px}
+    .r32-row{flex-direction:column;align-items:flex-start}
   }
 </style>
 </head>
@@ -105,11 +116,20 @@
     </table>
     <div class="empty hidden" id="emptyState">No visits logged yet — check back after players start clicking through.</div>
   </div>
+
+  <div class="header" style="margin-top:36px">
+    <h1 style="font-size:clamp(20px,3.4vw,28px)">🏆 Round of <span>32</span> Results</h1>
+    <button class="refresh-btn" id="r32RefreshBtn">🔄 Refresh</button>
+  </div>
+  <p style="color:var(--muted);font-weight:700;font-size:13px;margin:-12px 0 16px">Tap a result the moment a match finishes — Fixture View, the AI Predictor, and the Live Table on the main site all update instantly, no code or deploy needed.</p>
+  <div class="table-wrap" style="padding:6px 0" id="r32Wrap">
+    <div id="r32List" class="empty">Loading fixtures…</div>
+  </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import { getFirestore, collection, getDocs, query } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDgiFVKBAXtxQPSTygPfC2PR8Zjb4n_vZE",
@@ -145,6 +165,7 @@ function checkPassword(){
     document.getElementById('lockScreen').style.display = 'none';
     document.getElementById('adminContent').style.display = 'block';
     loadVisits();
+    loadR32Results();
   } else {
     document.getElementById('pwError').textContent = 'Wrong password. Try again.';
     document.getElementById('pwInput').value = '';
@@ -289,6 +310,81 @@ function formatDateTime(date){
   const opts = { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' };
   return date.toLocaleDateString('en-GB', opts);
 }
+
+// ── Round of 32 results (writes to the same Firestore doc the live site reads from) ──
+// Keep this list in sync with WCP_R32_MATCH_RESULTS in index.html if the bracket ever changes.
+const WCP_R32_FIXTURES = [
+  {home:'Canada',      away:'South Africa',         date:'2026-06-28'},
+  {home:'Brazil',      away:'Japan',                date:'2026-06-29'},
+  {home:'Germany',     away:'Paraguay',             date:'2026-06-29'},
+  {home:'Netherlands', away:'Morocco',              date:'2026-06-29'},
+  {home:'Ivory Coast', away:'Norway',               date:'2026-06-30'},
+  {home:'France',      away:'Sweden',               date:'2026-06-30'},
+  {home:'Mexico',      away:'Ecuador',              date:'2026-06-30'},
+  {home:'England',     away:'DR Congo',             date:'2026-07-01'},
+  {home:'Belgium',     away:'Senegal',              date:'2026-07-01'},
+  {home:'USA',         away:'Bosnia & Herzegovina', date:'2026-07-01'},
+  {home:'Spain',       away:'Austria',              date:'2026-07-02'},
+  {home:'Switzerland', away:'Algeria',              date:'2026-07-02'},
+  {home:'Portugal',    away:'Croatia',              date:'2026-07-02'},
+  {home:'Australia',   away:'Egypt',                date:'2026-07-03'},
+  {home:'Argentina',   away:'Cape Verde',           date:'2026-07-03'},
+  {home:'Colombia',    away:'Ghana',                date:'2026-07-03'},
+];
+const R32_DOC = () => doc(db, 'tournamentData', 'r32Results');
+const r32Key = (home,away) => home+'|'+away;
+let r32Winners = {};
+
+document.getElementById('r32RefreshBtn').addEventListener('click', loadR32Results);
+
+async function loadR32Results(){
+  const box = document.getElementById('r32List');
+  box.textContent = 'Loading fixtures…';
+  try{
+    const snap = await getDoc(R32_DOC());
+    r32Winners = snap.exists() ? (snap.data().results||{}) : {};
+  }catch(e){
+    console.error('Failed to load R32 results', e);
+    box.textContent = 'Error loading fixtures: ' + e.message;
+    return;
+  }
+  renderR32List();
+}
+
+function escAttr(s){ return String(s).replace(/'/g,"\\'"); }
+
+function renderR32List(){
+  const box = document.getElementById('r32List');
+  const niceDate = d => new Date(d+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+  box.className = '';
+  box.innerHTML = WCP_R32_FIXTURES.map(f=>{
+    const key = r32Key(f.home,f.away);
+    const w = r32Winners[key];
+    const pill = w ? '<span class="badge-today">✅ Played</span>' : '<span class="badge-count">⏳ Not played</span>';
+    const btn = (label,val,active) => `<button class="r32-btn${active?' active':''}" onclick="setR32Result('${escAttr(f.home)}','${escAttr(f.away)}',${val===null?'null':"'"+val+"'"})">${label}</button>`;
+    return `<div class="r32-row">
+        <div class="r32-info"><span class="r32-date">${niceDate(f.date)}</span><span class="r32-teams">${f.home} <span class="vs">vs</span> ${f.away}</span>${pill}</div>
+        <div class="r32-btns">${btn(f.home+' won','home',w==='home')}${btn(f.away+' won','away',w==='away')}${btn('Reset',null,!w)}</div>
+      </div>`;
+  }).join('');
+}
+
+window.setR32Result = async function(home, away, winner){
+  const key = r32Key(home,away);
+  r32Winners[key] = winner;
+  renderR32List();
+  try{
+    const ref = R32_DOC();
+    const snap = await getDoc(ref);
+    const existing = snap.exists() ? (snap.data().results||{}) : {};
+    existing[key] = winner;
+    await setDoc(ref, {results: existing, updatedAt: serverTimestamp()}, {merge:true});
+    r32Winners = existing;
+  }catch(e){
+    console.error('Failed to save R32 result', e);
+    alert('Saved on this screen, but failed to save to the database — check your connection and try again, or other visitors won\'t see this result.');
+  }
+};
 </script>
 </body>
 </html>
