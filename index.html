@@ -3590,7 +3590,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     </div>
   </div>
 </section>
-<nav class="tabs hidden" id="tabs"><button data-tab="submissions" class="active">Player View</button><button data-tab="fixture-view">Fixture View</button><button data-tab="leaderboard">Live Table</button><button data-tab="fun">Fun Stats</button><button data-tab="how">How I Built This</button></nav>
+<nav class="tabs hidden" id="tabs"><button data-tab="submissions" class="active">Player View</button><button data-tab="fixture-view">Fixture View</button><button data-tab="leaderboard">Live Table</button><button data-tab="predictor">🤖 AI Predictor</button><button data-tab="fun">Fun Stats</button><button data-tab="how">How I Built This</button></nav>
 <div id="adminPanel" class="hidden" style="max-width:960px;margin:30px auto;padding:0 16px 60px">
   <div style="text-align:center;margin-bottom:22px;padding:22px;border-radius:24px;background:linear-gradient(135deg,rgba(248,200,74,.18),rgba(55,212,255,.10));border:1px solid rgba(248,200,74,.42)">
     <div style="font-size:28px;margin-bottom:8px">🔐 Admin: Visitor Log</div>
@@ -3689,6 +3689,13 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 </div><div class="card live-table-card"><div class="league-controls upgraded"><button class="league-filter active" data-league-filter="All">🏆 All Leagues</button><button class="league-filter" data-league-filter="Main">🌍 Main League</button><button class="league-filter" data-league-filter="LEGO">🧱 LEGO League</button><button class="league-filter" data-league-filter="Family">🏡 Family League</button><button class="league-filter" data-league-filter="HFC">⚽ HFC League</button></div><div class="status-ticker" id="lbStatusTicker"><div class="st-label"><span id="lbDot" style="width:8px;height:8px;border-radius:50%;background:#f8c84a;display:inline-block;box-shadow:0 0 6px rgba(248,200,74,.5)"></span>Live Status</div><div class="st-track"><div class="st-marquee" id="lbTickerMarquee"><span class="st-item gold">⏳ Scores updating shortly</span><span class="st-dot">•</span><span class="st-item">Leaderboard refreshes automatically every 2 minutes</span><span class="st-dot">•</span><span class="st-item cyan">Check back after each match</span></div></div></div><div id="leaderboardList"><div class="empty-state">Loading Firebase submissions…</div></div><p class="scores-updated-note" id="scoresUpdatedNote"></p><div style="text-align:center;margin-top:8px"><button onclick="fetchFirebaseData(true)" style="background:rgba(55,212,255,.15);border:1px solid rgba(55,212,255,.35);color:#b9f3ff;border-radius:999px;padding:8px 18px;font-size:12px;font-weight:900;cursor:pointer">🔄 Refresh Scores Now</button></div><div style="text-align:center;margin-top:12px"><button id="fbRefreshBtn" style="background:rgba(55,212,255,.14);border:1px solid rgba(55,212,255,.32);color:#b9f3ff;border-radius:999px;padding:10px 20px;font-weight:1000;font-size:13px;cursor:pointer;">🔄 Refresh</button></div></div></section>
   <section id="submissions" class="panel live-results-submissions"><div class="page-head unified-final-head results-head"><h2 class="premium-page-title">👤 Player View</h2><p class="live-results-tagline">Track predictions, results and points throughout the tournament.</p></div><div class="world-cup-ticker" id="worldCupNewsTicker" aria-label="World Cup 2026 news ticker"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest World Cup 2026 headlines…</span></div></div></div><div class="card live-results-card"><div class="status-ticker" id="rcStatusTicker"><div class="st-label"><span id="rcDot" style="width:8px;height:8px;border-radius:50%;background:#f8c84a;display:inline-block;box-shadow:0 0 6px rgba(248,200,74,.5)"></span>Live Status</div><div class="st-track"><div class="st-marquee" id="rcTickerMarquee"><span class="st-item gold">⏳ Scores updating shortly</span><span class="st-dot">•</span><span class="st-item">Results update automatically every 2 minutes</span><span class="st-dot">•</span><span class="st-item cyan">Check back after each match</span></div></div></div><div class="submission-shell player-selector-mode"><aside class="submission-picker player-picker"><div class="picker-card player-selector-card"><label class="picker-label" for="playerDropdown">⚽ Select Player</label><div class="player-select-wrap"><select id="playerDropdown" class="player-dropdown"><option>Loading players…</option></select></div></div></aside><section class="submission-summary" id="submissionSummary"><div class="empty-state">Choose a player to view their live results summary.</div></section></div></div></section>
   <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="league-controls upgraded fun-league-controls" id="funLeagueControls"><button class="fun-league-filter active" data-fun-league-filter="All">🏆 All Leagues</button><button class="fun-league-filter" data-fun-league-filter="Main">🌍 Main</button><button class="fun-league-filter" data-fun-league-filter="LEGO">🧱 LEGO</button><button class="fun-league-filter" data-fun-league-filter="Family">🏡 Family</button><button class="fun-league-filter" data-fun-league-filter="HFC">⚽ HFC</button></div><h3 class="fun-section-heading" id="inTournamentHeading">🔴 In Tournament Fun Stats</h3><div class="fun-stats-grid" id="inTournamentStatsGrid"><div class="stat-bubble stat-bubble-v64" style="grid-column:1/-1"><div class="stat-icon">⏳</div><div class="stat-title">Loading Match Data</div><div class="stat-value" style="font-size:16px;color:#b8c9e8">In-tournament stats will appear here once games have been played and results are entered.</div></div></div><h3 class="fun-section-heading" id="preTournamentHeading">📋 Pre Tournament Fun Stats</h3><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
+  <section id="predictor" class="panel ai-predictor-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🤖 AI Probability Predictor</h2></div>
+    <div class="card" style="padding:16px 18px;margin-bottom:14px;line-height:1.55">
+      <p style="margin:0 0 8px;font-size:13px;color:#b9c4dd"><b style="color:#f8c84a">How this works:</b> Each team's strength rating is built from how it actually performed in the group stage (points won, goal difference). The real Round of 32 draw is then resolved from the final group standings, and the bracket is simulated forward hundreds of times — each simulated match decided by the two teams' relative strength, not a coin flip. For any round that's already been played, the real result is used instead of a simulation. Every player's picks are scored against each simulated bracket, and their average score across all simulations becomes their share of the field's total expected points — that's the probability shown. It's a statistical estimate based on form and the picks made, not a guarantee.</p>
+      <p style="margin:0;font-size:11px;color:#6b7a99">Recalculates automatically every time the Live Table refreshes with new results — so these percentages move daily as the tournament unfolds.</p>
+    </div>
+    <div class="live-table-card card" style="padding:14px"><div id="aiPredictorList"><div class="empty-state">Loading predictions…</div></div></div>
+  </section>
   <section id="how" class="panel how-built-page v83-how-built-page">
     <div class="page-head unified-final-head build-story-head v83-build-head">
       <h2 class="premium-page-title">🚀 How I Built This</h2>
@@ -4016,7 +4023,7 @@ function updateKickoffCountdown(){
 }
 updateKickoffCountdown();
 
-function renderAll(){renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();renderFixtureView();updateProgress();updateKickoffCountdown();if(window.updateStatusBars)window.updateStatusBars(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);if(typeof renderFvKoSummary==='function') renderFvKoSummary();}
+function renderAll(){if(typeof refreshAiProbabilities==='function') refreshAiProbabilities();renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();renderFixtureView();updateProgress();updateKickoffCountdown();if(window.updateStatusBars)window.updateStatusBars(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);if(typeof renderFvKoSummary==='function') renderFvKoSummary();if(typeof renderAiPredictor==='function') renderAiPredictor();}
 
 /* V61: auto-advance between group-stage score boxes after typing */
 const scoreAdvanceTimers = new WeakMap();
@@ -4170,6 +4177,7 @@ function renderLeaderboard(){
     r._tot=r._gs+r._ko.r32Pts+r._ko.r16Pts+r._ko.qfPts+r._ko.sfPts+r._ko.finPts;
   });
   const isMobile=window.innerWidth<=650;
+  const aiProbMap=new Map([..._aiProbByName.entries()].map(([name,p])=>[name,p.prob]));
   if(isMobile){
     const av=WCP_STAGE_ACTUALS;
     const stageChip=(label,val,act)=>{
@@ -4182,6 +4190,8 @@ function renderLeaderboard(){
     const cards=filtered.map((r,i)=>{
       const ko=r._ko||{};
       const medal=i===0?'\ud83e\udd47 ':i===1?'\ud83e\udd48 ':i===2?'\ud83e\udd49 ':'';
+      const aiP=aiProbMap.get(r.name);
+      const aiChip=aiP!==undefined?`<div class="lb-mc-stat" style="background:rgba(179,136,255,.10)!important;border-color:rgba(179,136,255,.28)!important"><span class="lb-mc-val" style="color:#b388ff">${aiP.toFixed(1)}%</span><span class="lb-mc-lbl">🤖 AI Win</span></div>`:'';
       return `<div class="lb-mobile-card">`
         +`<div class="lb-mc-top"><span class="rank-badge">${i+1}</span>`
         +`<div class="lb-mc-info"><span class="leader-player">${medal}${r.name||'?'}</span>`
@@ -4194,6 +4204,7 @@ function renderLeaderboard(){
         +stageChip('QF',ko.qfPts,av.QF)
         +stageChip('SF',ko.sfPts,av.SF)
         +stageChip('Final',ko.finPts,av.FIN)
+        +aiChip
         +`</div></div>`;
     }).join('');
     $('#leaderboardList').innerHTML=summary+`<div class="lb-mobile-list">${cards}</div>`;
@@ -4204,15 +4215,18 @@ function renderLeaderboard(){
       :'<span style="color:#6b7a99;font-size:12px">\u2014</span>';
     const hdr=(lbl,act)=>`<th style="text-align:center;font-size:11px;padding:6px 8px;color:${act.complete?'#32d17f':'#8899bb'}">`
       +`${lbl}<br><span style="font-size:9px;font-weight:800;opacity:.8">${act.complete?'\u2705 Applied':act.dateNote}</span></th>`;
-    const table=`<div style="overflow-x:auto"><table class="league-table upgraded-table lb-expanded" style="min-width:700px">`
+    const table=`<div style="overflow-x:auto"><table class="league-table upgraded-table lb-expanded" style="min-width:780px">`
       +`<thead><tr>`
       +`<th style="width:36px">Rank</th><th>Player</th><th>Entry</th>`
       +`<th style="text-align:center;font-size:11px;color:#37d4ff">GS<br><span style="font-size:9px;opacity:.8">\u2705 Applied</span></th>`
       +hdr('R32',av.R32)+hdr('R16',av.R16)+hdr('QF',av.QF)+hdr('SF',av.SF)+hdr('Final',av.FIN)
-      +`<th style="text-align:right;color:#f8c84a">Total</th></tr></thead><tbody>`
+      +`<th style="text-align:right;color:#f8c84a">Total</th>`
+      +`<th style="text-align:center;font-size:11px;color:#b388ff">🤖 AI Win %</th></tr></thead><tbody>`
       +filtered.map((r,i)=>{
         const ko=r._ko||{};
         const medal=i===0?'\ud83e\udd47 ':i===1?'\ud83e\udd48 ':i===2?'\ud83e\udd49 ':'';
+        const aiP=aiProbMap.get(r.name);
+        const aiCell=aiP!==undefined?`<span style="font-weight:1000;font-size:13px;color:#b388ff">${aiP.toFixed(1)}%</span>`:'<span style="color:#6b7a99;font-size:12px">—</span>';
         return `<tr>`
           +`<td><span class="rank-badge">${i+1}</span></td>`
           +`<td><span class="leader-player">${medal}${r.name||'?'}</span></td>`
@@ -4224,11 +4238,195 @@ function renderLeaderboard(){
           +`<td style="text-align:center">${pend(ko.sfPts, av.SF)}</td>`
           +`<td style="text-align:center">${pend(ko.finPts,av.FIN)}</td>`
           +`<td style="text-align:right"><span class="points-badge">${r._tot} pts</span></td>`
+          +`<td style="text-align:center">${aiCell}</td>`
           +`</tr>`;
       }).join('')
       +`</tbody></table></div>`;
     $('#leaderboardList').innerHTML=summary+table;
   }
+}
+// === AI Probability Predictor (Monte Carlo bracket simulation) ===
+// Pulls real group-stage results from each entry's groupMatchBreakdown (actualHome/actualAway),
+// builds a team strength rating from those results, resolves the real Round of 32 matchups from
+// final group standings, then simulates the rest of the bracket forward from wherever actual
+// results stop. Already-completed rounds use the real outcome, not a coin flip.
+function getActualGroupResults(){
+  const allRows=getEntryRows();
+  const byMatch={};
+  allRows.forEach(r=>{
+    const bd=r.groupMatchBreakdown||{};
+    Object.keys(bd).forEach(mid=>{
+      const d=bd[mid];
+      if(d && d.actualHome!==undefined && d.actualHome!==null && d.actualHome!=='' && !(mid in byMatch)){
+        byMatch[mid]={actualHome:d.actualHome,actualAway:d.actualAway};
+      }
+    });
+  });
+  return fixtures.map(f=>{
+    const a=byMatch[f.id]||byMatch[String(f.id)];
+    const hs=a?Number(a.actualHome):null, as=a?Number(a.actualAway):null;
+    return {group:f.group,homeTeam:f.home,awayTeam:f.away,homeScore:Number.isFinite(hs)?hs:null,awayScore:Number.isFinite(as)?as:null};
+  });
+}
+function computeTeamStrengths(groupResults){
+  const stats={};
+  groupResults.forEach(g=>{
+    if(g.homeScore===null||g.awayScore===null) return;
+    [g.homeTeam,g.awayTeam].forEach(t=>{stats[t]??={p:0,gf:0,ga:0,pts:0};});
+    const H=stats[g.homeTeam],A=stats[g.awayTeam];
+    H.p++;A.p++;H.gf+=g.homeScore;A.gf+=g.awayScore;H.ga+=g.awayScore;A.ga+=g.homeScore;
+    if(g.homeScore>g.awayScore){H.pts+=3;}
+    else if(g.homeScore<g.awayScore){A.pts+=3;}
+    else{H.pts++;A.pts++;}
+  });
+  const ratings={};
+  Object.keys(stats).forEach(t=>{
+    const s=stats[t], ppg=s.p?s.pts/s.p:1, gdpg=s.p?(s.gf-s.ga)/s.p:0;
+    ratings[t]=1500+ppg*150+gdpg*60; // Elo-style baseline, nudged by group-stage form
+  });
+  return ratings;
+}
+function resolveActualR32Matchups(groupResults){
+  const tables=buildGroupTablesFromSubmission(groupResults);
+  const groupKeys=Object.keys(tables);
+  const groupsComplete=groupKeys.length>0 && groupKeys.every(g=>(tables[g]||[]).length>=3 && tables[g].every(row=>row.p>=2));
+  if(!groupsComplete) return null;
+  const thirds=groupKeys.map(g=>(tables[g]||[])[2]).filter(Boolean).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf).slice(0,8);
+  const pool=[...thirds];
+  const matchups={};
+  (window.WCP_KNOCKOUTS||[]).filter(m=>m.round==='R32').forEach(m=>{
+    matchups[m.id]={home:teamFromSlotForSubmission(m.homeSlot,tables,pool),away:teamFromSlotForSubmission(m.awaySlot,tables,pool)};
+  });
+  return matchups;
+}
+function matchWinProb(rA,rB){return 1/(1+Math.pow(10,(rB-rA)/400));}
+function simulateMatch(teamA,teamB,ratings){
+  const rA=ratings[teamA]??1500, rB=ratings[teamB]??1500;
+  return Math.random()<matchWinProb(rA,rB)?teamA:teamB;
+}
+function getMatchWinnerFromActual(teamA,teamB,actualSet){
+  if(!actualSet) return null;
+  const aIn=actualSet.has(teamA), bIn=actualSet.has(teamB);
+  if(aIn && !bIn) return teamA;
+  if(bIn && !aIn) return teamB;
+  return null; // unknown/ambiguous — caller falls back to simulation
+}
+// Runs the bracket forward once: real results are used for any round already marked complete,
+// everything after that point is simulated using team strength.
+function simulateBracketOnce(matchups,ratings){
+  const av=WCP_STAGE_ACTUALS;
+  const r16={};
+  Object.keys(matchups).forEach(id=>{
+    const {home,away}=matchups[id];
+    r16[id]=(av.R16.complete?getMatchWinnerFromActual(home,away,av.R16.teams):null)||simulateMatch(home,away,ratings);
+  });
+  const qf={};
+  flows.R16.forEach((pair,i)=>{
+    const key='R16-'+(i+1), t1=r16[pair[0]], t2=r16[pair[1]];
+    qf[key]=(av.QF.complete?getMatchWinnerFromActual(t1,t2,av.QF.teams):null)||simulateMatch(t1,t2,ratings);
+  });
+  const sf={};
+  flows.QF.forEach((pair,i)=>{
+    const key='QF-'+(i+1), t1=qf[pair[0]], t2=qf[pair[1]];
+    sf[key]=(av.SF.complete?getMatchWinnerFromActual(t1,t2,av.SF.teams):null)||simulateMatch(t1,t2,ratings);
+  });
+  const fin={};
+  flows.SF.forEach((pair,i)=>{
+    const key='SF-'+(i+1), t1=sf[pair[0]], t2=sf[pair[1]];
+    fin[key]=(av.FIN.complete?getMatchWinnerFromActual(t1,t2,av.FIN.teams):null)||simulateMatch(t1,t2,ratings);
+  });
+  const fp=flows.FINAL[0], t1=fin[fp[0]], t2=fin[fp[1]];
+  const champion=(av.CHAMP.complete?getMatchWinnerFromActual(t1,t2,av.CHAMP.teams):null)||simulateMatch(t1,t2,ratings);
+  return {r16:new Set(Object.values(r16)),qf:new Set(Object.values(qf)),sf:new Set(Object.values(sf)),fin:new Set(Object.values(fin)),champion};
+}
+function buildPlayerPickSets(rows){
+  return rows.map(r=>{
+    const rawKO=r.knockoutPicks||[];
+    const bkt=r.bracket||r.state?.bracket||{};
+    const m=savedKnockoutMap(rawKO,bkt);
+    return {
+      row:r,
+      r16T:teamsFromSavedIds(m,id=>/^M\d+$/i.test(id),16),
+      qfT:teamsFromSavedIds(m,id=>/^R16-/i.test(id),8),
+      sfT:teamsFromSavedIds(m,id=>/^QF-/i.test(id),4),
+      finT:teamsFromSavedIds(m,id=>/^SF-/i.test(id),2),
+      champPick:pickValueFromSaved(m['FINAL-1']||{})
+    };
+  });
+}
+const AI_SIM_TRIALS=400;
+function computeAiProbabilities(rows){
+  const av=WCP_STAGE_ACTUALS;
+  const lockedFor=(r)=>{
+    const ko=r._ko||computeKoPoints(r);
+    return getGsPts(r)+(av.R16.complete?ko.r16Pts:0)+(av.QF.complete?ko.qfPts:0)+(av.SF.complete?ko.sfPts:0)+(av.FIN.complete?ko.finPts:0);
+  };
+  const groupResults=getActualGroupResults();
+  const matchups=av.R32.complete?resolveActualR32Matchups(groupResults):null;
+  const canSimulate=!!matchups;
+  let expectedScores;
+  if(canSimulate){
+    const ratings=computeTeamStrengths(groupResults);
+    const picks=buildPlayerPickSets(rows);
+    const totals=new Array(picks.length).fill(0);
+    for(let t=0;t<AI_SIM_TRIALS;t++){
+      const sim=simulateBracketOnce(matchups,ratings);
+      picks.forEach((p,i)=>{
+        let pts=0;
+        if(!av.R16.complete) pts+=p.r16T.filter(team=>sim.r16.has(team)).length*av.R16.pts;
+        if(!av.QF.complete) pts+=p.qfT.filter(team=>sim.qf.has(team)).length*av.QF.pts;
+        if(!av.SF.complete) pts+=p.sfT.filter(team=>sim.sf.has(team)).length*av.SF.pts;
+        if(!av.FIN.complete) pts+=p.finT.filter(team=>sim.fin.has(team)).length*av.FIN.pts;
+        if(!av.CHAMP.complete && p.champPick && p.champPick===sim.champion) pts+=av.CHAMP.pts;
+        totals[i]+=pts;
+      });
+    }
+    expectedScores=picks.map((p,i)=>lockedFor(p.row)+totals[i]/AI_SIM_TRIALS);
+  } else {
+    // Group stage still in progress — not enough real data yet to resolve actual R32 matchups,
+    // so fall back to a simple confidence-weighted estimate of each player's own remaining picks.
+    const W={r16Pts:1.0,qfPts:0.8,sfPts:0.6,finPts:0.45};
+    expectedScores=rows.map(r=>{
+      const ko=r._ko||computeKoPoints(r);
+      let upside=0;
+      if(!av.R16.complete) upside+=ko.r16Pts*W.r16Pts;
+      if(!av.QF.complete) upside+=ko.qfPts*W.qfPts;
+      if(!av.SF.complete) upside+=ko.sfPts*W.sfPts;
+      if(!av.FIN.complete) upside+=ko.finPts*W.finPts;
+      return lockedFor(r)+upside;
+    });
+  }
+  const totalExp=expectedScores.reduce((s,v)=>s+Math.max(v,0.01),0)||1;
+  const scored=rows.map((r,i)=>({name:r.name,league:r.league,expected:expectedScores[i],prob:Math.max(expectedScores[i],0.01)/totalExp*100,row:r}));
+  scored.sort((a,b)=>b.prob-a.prob);
+  return scored;
+}
+// Computed once per data refresh so the % doesn't re-roll every time a filter or resize re-renders the table.
+let _aiProbByName=new Map();
+function refreshAiProbabilities(){
+  const allRows=getEntryRows();
+  allRows.forEach(r=>{if(!r._ko)r._ko=computeKoPoints(r);if(r._gs===undefined)r._gs=getGsPts(r);});
+  if(!allRows.length){_aiProbByName=new Map();return;}
+  const probs=computeAiProbabilities(allRows);
+  _aiProbByName=new Map(probs.map(p=>[p.name,p]));
+}
+function renderAiPredictor(){
+  const box=$('#aiPredictorList');
+  if(!box) return;
+  if(!_aiProbByName.size){box.innerHTML='<div class="empty-state">No entries yet.</div>';return;}
+  const probs=[..._aiProbByName.values()].sort((a,b)=>b.prob-a.prob);
+  const maxProb=probs[0]?.prob||1;
+  const rows=probs.map((p,i)=>{
+    const medal=i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':'';
+    const barWidth=Math.max((p.prob/maxProb)*100,3).toFixed(1);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid rgba(255,255,255,.06)">`
+      +`<span class="rank-badge">${i+1}</span>`
+      +`<div style="flex:1;min-width:0">`
+      +`<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:900;margin-bottom:4px"><span>${medal}${p.name||'?'}</span><span style="color:#f8c84a">${p.prob.toFixed(1)}%</span></div>`
+      +`<div style="height:7px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden"><div style="height:100%;width:${barWidth}%;border-radius:999px;background:linear-gradient(90deg,#37d4ff,#32d17f)"></div></div>`
+      +`</div></div>`;
+  }).join('');
+  box.innerHTML=rows;
 }
 $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagueFilter=btn.dataset.leagueFilter;renderLeaderboard();}));
 // Re-render leaderboard on resize so mobile/desktop layout switches correctly
