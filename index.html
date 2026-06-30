@@ -1977,6 +1977,10 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 .fv-summary-pill.s-wrong{background:rgba(255,80,80,.10);color:#ff6b6b;border-color:rgba(255,80,80,.25)}
 .fv-summary-pill.s-pending{background:rgba(255,255,255,.06);color:#8899aa;border-color:rgba(255,255,255,.15)}
 @media(max-width:600px){.fv-table td,.fv-table th{padding:7px 9px}.fv-table{font-size:12px}}
+.fv-team-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px 9px;font-size:11px;font-weight:900;color:#dce9ff;margin:2px}
+.fv-team-chip.correct{background:rgba(50,209,127,.14);border-color:rgba(50,209,127,.36);color:#6af0b8}
+.fv-team-chip.wrong{background:rgba(255,107,107,.10);border-color:rgba(255,107,107,.28);color:#ff9b9b;opacity:.75}
+.fv-stage-toggle .league-filter{font-size:13px}
 </style>
 <!-- V49 emergency layout repair: restore fixture/result row alignment after header changes -->
 <style>
@@ -3594,6 +3598,10 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     <div class="status-ticker" id="fvStatusTicker" style="margin-bottom:10px"><div class="st-label"><span id="fvDot" style="width:8px;height:8px;border-radius:50%;background:#f8c84a;display:inline-block;box-shadow:0 0 6px rgba(248,200,74,.5)"></span>Live Status</div><div class="st-track"><div class="st-marquee" id="fvTickerMarquee"><span class="st-item gold">⏳ Scores updating shortly</span><span class="st-dot">•</span><span class="st-item">Fixture data refreshes automatically</span><span class="st-dot">•</span><span class="st-item cyan">Select a game to compare all predictions</span></div></div></div>
     <div class="world-cup-ticker" id="fvWorldCupTicker" aria-label="World Cup Wire - Fixture View" style="margin-bottom:14px"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest player points updates…</span></div></div></div>
     <div class="card" style="padding:18px 20px 14px">
+      <div class="fv-stage-toggle" id="fvStageToggle" style="display:flex;gap:8px;margin-bottom:14px;justify-content:center;flex-wrap:wrap">
+        <button class="league-filter active" data-fv-stage="group">⚽ Group Stage</button>
+        <button class="league-filter" data-fv-stage="knockout">🏆 Knockout Stages</button>
+      </div>
       <div class="league-controls upgraded" id="fvLeagueControls" style="margin-bottom:14px">
         <button class="league-filter active" data-fv-league="All">🏆 All Leagues</button>
         <button class="league-filter" data-fv-league="Main">🌍 Main</button>
@@ -3601,21 +3609,20 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
         <button class="league-filter" data-fv-league="Family">🏡 Family</button>
         <button class="league-filter" data-fv-league="HFC">⚽ HFC</button>
       </div>
-      <label class="picker-label" for="fixtureDropdown" style="display:block;margin-bottom:8px;color:#fff3a2;font-weight:1000;font-size:12px;text-transform:uppercase;letter-spacing:.08em">Select Fixture</label>
-      <select id="fixtureDropdown" class="player-dropdown" style="width:100%;margin-bottom:0">
-        <option>Loading fixtures…</option>
-      </select>
+      <div id="fvGroupControls">
+        <label class="picker-label" for="fixtureDropdown" style="display:block;margin-bottom:8px;color:#fff3a2;font-weight:1000;font-size:12px;text-transform:uppercase;letter-spacing:.08em">Select Fixture</label>
+        <select id="fixtureDropdown" class="player-dropdown" style="width:100%;margin-bottom:0">
+          <option>Loading fixtures…</option>
+        </select>
+      </div>
+      <div id="fvKoControls" style="display:none">
+        <label class="picker-label" for="fvKoRoundDropdown" style="display:block;margin-bottom:8px;color:#fff3a2;font-weight:1000;font-size:12px;text-transform:uppercase;letter-spacing:.08em">Select Knockout Round</label>
+        <select id="fvKoRoundDropdown" class="player-dropdown" style="width:100%;margin-bottom:0">
+          <option>Loading rounds…</option>
+        </select>
+      </div>
     </div>
     <div id="fixtureViewContent" style="margin-top:14px"></div>
-
-    <!-- KO Stage Summaries in Fixture View -->
-    <div style="margin-top:22px">
-      <div style="text-align:center;margin-bottom:14px">
-        <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;background:rgba(248,200,74,.12);border:1px solid rgba(248,200,74,.28);color:#fff3a2;font-size:12px;font-weight:1000;text-transform:uppercase;letter-spacing:.08em">&#x1F3C6; Knockout Stage Summaries</div>
-        <p style="color:#b8c9e8;font-weight:800;font-size:13px;margin:8px 0 0">Points per correct KO team: R32 10 · R16 20 · QF 30 · SF 40 · Final 50 · Champion 100</p>
-      </div>
-      <div id="fvKoSummary"></div>
-    </div>
   </section>
   <section id="leaderboard" class="panel live-table-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🏆 Live Table</h2></div>
 <div style="margin:12px auto 0;max-width:700px;background:rgba(255,255,255,.055);border:1px solid rgba(248,200,74,.26);border-radius:16px;padding:11px 14px">
@@ -4587,6 +4594,12 @@ function renderResults(){
 
 // ── Fixture View ──────────────────────────────────────────────────────
 let fvLeagueFilter = 'All';
+let fvStageMode = 'group';
+
+function renderActiveFixtureContent(){
+  if(fvStageMode==='knockout' && typeof renderFixtureViewContentKO==='function') renderFixtureViewContentKO();
+  else renderFixtureViewContent();
+}
 
 function renderFixtureView(){
   const dropdown = document.getElementById('fixtureDropdown');
@@ -4597,9 +4610,31 @@ function renderFixtureView(){
     btn.onclick=()=>{
       fvLeagueFilter=btn.dataset.fvLeague;
       document.querySelectorAll('[data-fv-league]').forEach(b=>b.classList.toggle('active',b===btn));
-      renderFixtureViewContent();
+      renderActiveFixtureContent();
     };
   });
+
+  document.querySelectorAll('[data-fv-stage]').forEach(btn=>{
+    btn.onclick=()=>{
+      fvStageMode=btn.dataset.fvStage;
+      document.querySelectorAll('[data-fv-stage]').forEach(b=>b.classList.toggle('active',b===btn));
+      const groupCtl=document.getElementById('fvGroupControls');
+      const koCtl=document.getElementById('fvKoControls');
+      if(groupCtl) groupCtl.style.display = fvStageMode==='group' ? '' : 'none';
+      if(koCtl) koCtl.style.display = fvStageMode==='knockout' ? '' : 'none';
+      renderActiveFixtureContent();
+    };
+  });
+
+  const koRoundSel=document.getElementById('fvKoRoundDropdown');
+  if(koRoundSel && koRoundSel.options[0] && koRoundSel.options[0].text==='Loading rounds…'){
+    const order=[['R32','Round of 32'],['R16','Round of 16'],['QF','Quarter-Finals'],['SF','Semi-Finals'],['FIN','Final']];
+    koRoundSel.innerHTML=order.map(([k,label])=>{
+      const act=WCP_STAGE_ACTUALS[k];
+      return `<option value="${k}">${act&&act.complete?'\u2705':'\u23f3'} ${label}</option>`;
+    }).join('');
+    koRoundSel.onchange=renderActiveFixtureContent;
+  }
 
   const allRows=(typeof getEntryRows==='function')?getEntryRows():[];
   const sortedFixtures=(window.WCP_FIXTURES||[]).slice().sort((a,b)=>
@@ -4614,10 +4649,9 @@ function renderFixtureView(){
       }
       return `<option value="${f.id}">${hasResult?'\u2705':'\u23f3'} ${f.home} v ${f.away} \u2014 ${niceDate(f.date)} ${ukToCet(f.date,f.ukTime)}</option>`;
     }).join('');
-    dropdown.onchange=renderFixtureViewContent;
+    dropdown.onchange=renderActiveFixtureContent;
   }
-  renderFixtureViewContent();
-  if(typeof renderFvKoSummary==='function') renderFvKoSummary();
+  renderActiveFixtureContent();
 }
 
 function renderFixtureViewContent(){
@@ -4733,6 +4767,93 @@ function renderFixtureViewContent(){
 
 window.renderFixtureView=renderFixtureView;
 window.renderFixtureViewContent=renderFixtureViewContent;
+
+// ── Fixture View: Knockout round selector ──────────────────────────────
+const FV_KO_STAGES = {
+  R32:{key:'Round of 32 Picks',label:'Round of 32',max:32,pts:10},
+  R16:{key:'Round of 16 Picks',label:'Round of 16',max:16,pts:20},
+  QF: {key:'Quarter-final Picks',label:'Quarter-Finals',max:8,pts:30},
+  SF: {key:'Semi-final Picks',label:'Semi-Finals',max:4,pts:40},
+  FIN:{key:'Finalists',label:'Final',max:2,pts:50},
+};
+const FV_KO_PRED_MAP = {
+  'Round of 16 Picks': id => /^M\d+$/i.test(id),
+  'Quarter-final Picks': id => /^R16-/i.test(id),
+  'Semi-final Picks': id => /^QF-/i.test(id),
+  'Finalists': id => /^SF-/i.test(id),
+};
+
+function renderFixtureViewContentKO(){
+  const content=document.getElementById('fixtureViewContent');
+  const roundSel=document.getElementById('fvKoRoundDropdown');
+  if(!content||!roundSel) return;
+  const roundKey=roundSel.value||'R32';
+  const stage=FV_KO_STAGES[roundKey];
+  const actual=WCP_STAGE_ACTUALS[roundKey];
+  if(!stage||!actual){content.innerHTML='<div class="fv-no-data">No data available.</div>';return;}
+
+  const allRows=(typeof getEntryRows==='function')?getEntryRows():[];
+  const filteredRows=allRows.filter(row=>{
+    if(fvLeagueFilter==='All') return true;
+    if(fvLeagueFilter==='HFC') return row.hfcLeague;
+    return normaliseLeague(row.league)===fvLeagueFilter&&!row.allLeagues;
+  });
+
+  const playerRows=filteredRows.map(row=>{
+    const groups=row.groupPredictions||[];
+    const rawKO=row.knockoutPicks||[];
+    const bracket=row.bracket||row.state?.bracket||{};
+    const map=(typeof savedKnockoutMap==='function')?savedKnockoutMap(rawKO,bracket):{};
+    let teams=[];
+    if(stage.key==='Round of 32 Picks'){
+      teams=(typeof roundOf32TeamsFromSubmission==='function')?roundOf32TeamsFromSubmission(groups):[];
+    } else {
+      const pred=FV_KO_PRED_MAP[stage.key];
+      if(pred && typeof teamsFromSavedIds==='function') teams=teamsFromSavedIds(map,pred,stage.max);
+    }
+    const correctTeams = actual.complete ? teams.filter(t=>actual.teams.has(String(t).trim())) : [];
+    const pts = actual.complete ? correctTeams.length*stage.pts : null;
+    return {name:row.name||'Unknown',league:row.league||'',teams,correctTeams,pts};
+  }).sort((a,b)=>(b.pts??-1)-(a.pts??-1) || a.name.localeCompare(b.name));
+
+  const leagueBadge=l=>l&&fvLeagueFilter==='All'?`<span class="fv-league-badge">${l}</span>`:'';
+  const teamChip=(team,isCorrect)=>{
+    const label=typeof teamLabel==='function'?teamLabel(team):team;
+    const cls = actual.complete ? (isCorrect?'fv-team-chip correct':'fv-team-chip wrong') : 'fv-team-chip';
+    return `<span class="${cls}">${label}</span>`;
+  };
+
+  const resultHtml = actual.complete
+    ?`<div class="fv-actual-result result-known">\u2705 ${stage.label} confirmed: ${[...actual.teams].join(', ')}</div>`
+    :`<div class="fv-actual-result result-pending">\u23f3 ${actual.dateNote||'Result Pending'}</div>`;
+
+  content.innerHTML=`
+    <div class="fv-fixture-header">
+      <div class="fv-teams" style="font-size:18px;color:#fff3a2;font-weight:1000">\ud83c\udfc6 ${stage.label}</div>
+      <div class="fv-meta"><span>${stage.pts} pts per correct team</span><span>Max ${stage.max*stage.pts} pts</span></div>
+      ${resultHtml}
+    </div>
+    ${playerRows.length===0?`<div class="fv-no-data">No entries for this league filter.</div>`:`
+    <div class="fv-table-wrap">
+      <table class="fv-table">
+        <thead><tr>
+          <th>Player</th>
+          <th class="th-center">Picks</th>
+          ${actual.complete?'<th class="th-center">Pts</th>':''}
+        </tr></thead>
+        <tbody>
+          ${playerRows.map(r=>`
+          <tr>
+            <td class="fv-name-cell">${r.name}${leagueBadge(r.league)}</td>
+            <td class="td-center">${r.teams.length?r.teams.map(t=>teamChip(t,r.correctTeams.includes(t))).join(''):'No picks'}</td>
+            ${actual.complete?`<td class="fv-pts-cell"><span class="fv-pts-badge ${r.pts>0?'pts-10':'pts-0'}">${r.pts}</span></td>`:''}
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`}
+  `;
+}
+window.renderFixtureViewContentKO=renderFixtureViewContentKO;
 
 // === KO Stage Summary for Fixture View ===
 function renderFvKoSummary(){
