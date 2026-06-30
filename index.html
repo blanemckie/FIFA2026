@@ -1624,6 +1624,43 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 
 
 
+/* AI Predictor: 3-way slicer + predicted path bracket */
+.ai-slicer-group{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ai-slicer-btn{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:14px 10px;border-radius:16px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.14);color:#dce9ff;cursor:pointer;transition:.15s ease}
+.ai-slicer-btn .ai-slicer-icon{font-size:22px;line-height:1}
+.ai-slicer-btn .ai-slicer-text b{display:block;font-size:12.5px;font-weight:1000;color:#fff;letter-spacing:.01em}
+.ai-slicer-btn .ai-slicer-text small{display:block;margin-top:3px;font-size:10px;font-weight:700;color:#8899bb;line-height:1.3}
+.ai-slicer-btn:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.24)}
+.ai-slicer-btn.active{background:linear-gradient(180deg,rgba(248,200,74,.20),rgba(255,255,255,.06));border-color:rgba(248,200,74,.55);box-shadow:0 0 0 1px rgba(248,200,74,.18) inset}
+.ai-slicer-btn.active .ai-slicer-text b{color:#fff3a2}
+@media(max-width:760px){
+  .ai-slicer-group{grid-template-columns:1fr}
+  .ai-slicer-btn{flex-direction:row;text-align:left;padding:12px}
+  .ai-slicer-btn .ai-slicer-text{flex:1}
+}
+.ai-path-round{margin-bottom:16px}
+.ai-path-round-title{font-size:11px;font-weight:1000;text-transform:uppercase;letter-spacing:.08em;color:#fff3a2;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.ai-path-round-title .ai-path-round-tag{font-size:9px;font-weight:900;padding:2px 8px;border-radius:999px;background:rgba(50,209,127,.14);color:#6af0b8;border:1px solid rgba(50,209,127,.32);text-transform:none;letter-spacing:0}
+.ai-path-round-title .ai-path-round-tag.projected{background:rgba(248,200,74,.14);color:#fff3a2;border-color:rgba(248,200,74,.32)}
+.ai-path-matches{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.ai-path-match{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);border-radius:12px;padding:9px 11px}
+.ai-path-team{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0;font-size:12.5px;font-weight:800;color:#cdd9f2}
+.ai-path-team.winner{color:#fff;font-weight:1000}
+.ai-path-team .ai-path-team-name{display:flex;align-items:center;gap:6px}
+.ai-path-team .ai-path-prob{font-size:11px;font-weight:900;color:#8899bb}
+.ai-path-team.winner .ai-path-prob{color:#32d17f}
+.ai-path-champion{margin-top:4px;text-align:center;padding:22px 16px;border-radius:18px;background:linear-gradient(135deg,rgba(248,200,74,.18),rgba(10,31,74,.70));border:2px solid rgba(248,200,74,.55)}
+.ai-path-champion .ai-path-champ-label{font-size:11px;font-weight:1000;letter-spacing:.1em;text-transform:uppercase;color:#fff3a2;margin-bottom:8px}
+.ai-path-champion .ai-path-champ-team{font-size:clamp(22px,4vw,32px);font-weight:1000;color:#fff}
+.ai-pred-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.ai-pred-table th{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#8899bb;font-weight:900;padding:6px 6px;text-align:center;white-space:nowrap}
+.ai-pred-table th:first-child,.ai-pred-table td:first-child{text-align:left}
+.ai-pred-table td{padding:8px 6px;text-align:center;border-top:1px solid rgba(255,255,255,.07);white-space:nowrap}
+.ai-pred-table tr:hover td{background:rgba(255,255,255,.03)}
+@media(max-width:640px){
+  .ai-pred-table{font-size:11px}
+  .ai-pred-table th,.ai-pred-table td{padding:6px 4px}
+}
 /* V69: champion flag integrity, animated glow and expanded fun facts */
 .champion-reveal-v68{
   padding:18px 16px!important;
@@ -3694,13 +3731,27 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
       <p style="margin:0 0 8px;font-size:13px;color:#b9c4dd"><b style="color:#f8c84a">How this works:</b> Each team's strength rating is built from how it actually performed in the group stage (points won, goal difference). The real Round of 32 draw is then resolved from the final group standings, and the bracket is simulated forward hundreds of times — each simulated match decided by the two teams' relative strength, not a coin flip. For any round that's already been played, the real result is used instead of a simulation. In every single simulation, each player's locked-in points are added to whatever they'd score from that simulated outcome, and whoever has the highest total in that simulation is the "winner" of that run. The percentage shown is simply how often a player comes out on top across all the simulations — so a real points lead carries its full weight, it isn't diluted just because there are still a lot of points left on the table.</p>
       <p style="margin:0;font-size:11px;color:#6b7a99">Recalculates automatically every time the Live Table refreshes with new results — so these percentages move daily as the tournament unfolds.</p>
     </div>
-    <div class="predictor-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;align-items:start">
-      <div class="live-table-card card" style="padding:14px">
-        <h3 style="margin:0 0 10px;font-size:15px;color:#fff3a2">🏆 Live Standings</h3>
+    <div class="ai-slicer-wrap card" style="padding:14px 14px 12px;margin-bottom:14px">
+      <div style="text-align:center;color:#fff3a2;font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:.10em;margin-bottom:10px">👇 Choose what you want to see</div>
+      <div class="ai-slicer-group" id="aiSlicerGroup">
+        <button class="ai-slicer-btn active" data-ai-view="path" type="button"><span class="ai-slicer-icon">🔮</span><span class="ai-slicer-text"><b>AI Predicted Tournament Path</b><small>Default view — fixtures through to the Final &amp; Champion</small></span></button>
+        <button class="ai-slicer-btn" data-ai-view="table" type="button"><span class="ai-slicer-icon">📊</span><span class="ai-slicer-text"><b>AI Predicted Final Live Table</b><small>Projected final standings &amp; win probability</small></span></button>
+        <button class="ai-slicer-btn" data-ai-view="player" type="button"><span class="ai-slicer-icon">👤</span><span class="ai-slicer-text"><b>Your AI Predicted Tournament Path</b><small>Pick your name to see your bracket &amp; probability</small></span></button>
+      </div>
+    </div>
+    <div class="predictor-grid" style="display:grid;grid-template-columns:1fr;gap:16px;align-items:start">
+      <div class="live-table-card card ai-view-pane" id="aiViewPath" style="padding:14px">
+        <h3 style="margin:0 0 4px;font-size:15px;color:#fff3a2">🔮 AI Predicted Tournament Path</h3>
+        <p style="margin:0 0 14px;font-size:11.5px;color:#8899bb">The single most-likely winner of every remaining fixture, based on team strength — real results are used wherever a round has already been played.</p>
+        <div id="aiPredictedPathBox"><div class="empty-state">Loading…</div></div>
+      </div>
+      <div class="live-table-card card ai-view-pane" id="aiViewTable" style="padding:14px;display:none">
+        <h3 style="margin:0 0 4px;font-size:15px;color:#fff3a2">📊 AI Predicted Final Live Table</h3>
+        <p style="margin:0 0 14px;font-size:11.5px;color:#8899bb">Ranked by current real points, with the AI's projection for the rest of the tournament and each player's probability of winning the league overall.</p>
         <div id="predictorLeagueTable"><div class="empty-state">Loading…</div></div>
       </div>
-      <div class="live-table-card card" style="padding:14px">
-        <h3 style="margin:0 0 10px;font-size:15px;color:#fff3a2">🔮 Predicted Path</h3>
+      <div class="live-table-card card ai-view-pane" id="aiViewPlayer" style="padding:14px;display:none">
+        <h3 style="margin:0 0 10px;font-size:15px;color:#fff3a2">👤 Your AI Predicted Tournament Path &amp; Probability</h3>
         <select id="predictorPlayerSelect" style="width:100%;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:#fff;font-weight:800;font-size:13px;margin-bottom:14px"></select>
         <div id="predictorPlayerDetail"><div class="empty-state">Select a player above to see exactly why they have the win % they have.</div></div>
       </div>
@@ -4361,7 +4412,12 @@ function buildPlayerPickSets(rows){
       qfT:teamsFromSavedIds(m,id=>/^R16-/i.test(id),8),
       sfT:teamsFromSavedIds(m,id=>/^QF-/i.test(id),4),
       finT:teamsFromSavedIds(m,id=>/^SF-/i.test(id),2),
-      champPick:pickValueFromSaved(m['FINAL-1']||{})
+      // BUGFIX: m values are already resolved team-name strings (savedKnockoutMap already
+      // ran pickValueFromSaved on each raw pick), so re-wrapping m['FINAL-1'] in
+      // pickValueFromSaved() again was always returning '' for every player. Also fall back to
+      // predictedWinner/champion/winner fields, same as championFromSubmission(), so a champion
+      // pick stored only on the entry (not in the bracket id map) is still picked up.
+      champPick: m['FINAL-1'] || m['FINAL'] || r.predictedWinner || r.champion || r.winner || ''
     };
   });
 }
@@ -4456,22 +4512,40 @@ function refreshAiProbabilities(){
 function renderAiPredictor(){
   renderPredictorStandings();
   renderPredictorPlayerSelect();
+  renderAiPredictedPath();
 }
 function renderPredictorStandings(){
   const box=$('#predictorLeagueTable');
   if(!box) return;
   if(!_aiProbByName.size){box.innerHTML='<div class="empty-state">No entries yet.</div>';return;}
-  const ranked=[..._aiProbByName.values()].sort((a,b)=>(b.row._tot||0)-(a.row._tot||0));
-  const rows=ranked.map((p,i)=>{
-    const medal=i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':'';
+  const ranked=[..._aiProbByName.values()];
+  // Current Rank = ordered by real points currently on the board today.
+  const byCurrent=[...ranked].sort((a,b)=>(b.row._tot||0)-(a.row._tot||0));
+  const currentRankByName=new Map(byCurrent.map((p,i)=>[p.name,i+1]));
+  // AI Predicted Final Ranking = ordered by AI expected final score (locked + projected remainder),
+  // tie-broken by win probability so it lines up with the headline win% order.
+  const byPredicted=[...ranked].sort((a,b)=>(b.expected-a.expected)||(b.prob-a.prob));
+  const predictedRankByName=new Map(byPredicted.map((p,i)=>[p.name,i+1]));
+  const rows=byCurrent.map(p=>{
+    const curRank=currentRankByName.get(p.name);
+    const predRank=predictedRankByName.get(p.name);
+    const remainder=Math.max(0,p.expected-p.locked);
+    const medal=curRank===1?'🥇 ':curRank===2?'🥈 ':curRank===3?'🥉 ':'';
+    const predMedal=predRank===1?'🥇 ':predRank===2?'🥈 ':predRank===3?'🥉 ':'';
+    const moveUp=predRank<curRank, moveDown=predRank>curRank;
+    const moveTag=moveUp?`<span style="color:#32d17f;font-size:10px;font-weight:1000">▲${curRank-predRank}</span>`:moveDown?`<span style="color:#ff8a8a;font-size:10px;font-weight:1000">▼${predRank-curRank}</span>`:`<span style="color:#8899bb;font-size:10px;font-weight:900">–</span>`;
     return `<tr>`
-      +`<td><span class="rank-badge">${i+1}</span></td>`
-      +`<td><span class="leader-player" style="font-size:14px">${medal}${p.name||'?'}</span></td>`
-      +`<td style="text-align:right"><span class="points-badge" style="width:64px;text-align:center;font-variant-numeric:tabular-nums">${p.row._tot||0} pts</span></td>`
-      +`<td style="text-align:center"><span style="font-weight:1000;font-size:13px;color:#b388ff">${p.prob.toFixed(1)}%</span></td>`
+      +`<td><span class="rank-badge">${curRank}</span></td>`
+      +`<td style="text-align:left"><span class="leader-player" style="font-size:13.5px">${medal}${p.name||'?'}</span></td>`
+      +`<td><span class="points-badge" style="min-width:56px;display:inline-block;text-align:center;font-variant-numeric:tabular-nums">${p.row._tot||0}</span></td>`
+      +`<td style="color:#b9f3ff;font-weight:900">+${remainder.toFixed(1)}</td>`
+      +`<td>${predMedal}<b style="color:#fff3a2">#${predRank}</b> ${moveTag}</td>`
+      +`<td><span style="font-weight:1000;font-size:13px;color:#b388ff">${p.prob.toFixed(1)}%</span></td>`
       +`</tr>`;
   }).join('');
-  box.innerHTML=`<div style="overflow-x:auto"><table class="league-table upgraded-table lb-expanded" style="min-width:0"><thead><tr><th style="width:36px">Rank</th><th>Player</th><th style="text-align:right">Total</th><th style="text-align:center;color:#b388ff">🤖 Win %</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  box.innerHTML=`<div style="overflow-x:auto"><table class="ai-pred-table league-table upgraded-table lb-expanded"><thead><tr>`
+    +`<th>Current<br>Rank</th><th style="text-align:left">Player</th><th>Current<br>Total Pts</th><th>AI Pts<br>Remainder</th><th>AI Predicted<br>Final Rank</th><th style="color:#b388ff">🤖 Win %</th>`
+    +`</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 function renderPredictorPlayerSelect(){
   const sel=$('#predictorPlayerSelect');
@@ -4538,6 +4612,91 @@ function renderPredictorPlayerDetail(name){
     +`</div></div>`
     +`<div>${roundBlocks}${champBlock}</div>`;
 }
+// Deterministic "chalk" path: walks the bracket forward picking the stronger team in every
+// remaining match (real results are used for any round already complete), then renders it as
+// a round-by-round path through to the predicted Champion. This is the single most-likely
+// outcome, distinct from the Monte-Carlo win% used for the league table/player views.
+function buildAiChalkPath(){
+  const av=WCP_STAGE_ACTUALS;
+  const groupResults=getActualGroupResults();
+  const matchups=resolveActualR32Matchups(groupResults);
+  if(!matchups) return null;
+  const ratings=computeTeamStrengths(groupResults);
+  const flag=t=>(window.WCP_FLAGS&&window.WCP_FLAGS[t])||'';
+  const chalkWinner=(t1,t2,actualSet)=>{
+    const real=actualSet?.complete?getMatchWinnerFromActual(t1,t2,actualSet.teams):null;
+    if(real) return {team:real,isReal:true};
+    const r1=ratings[t1]??1500, r2=ratings[t2]??1500;
+    return {team:r1>=r2?t1:t2,isReal:false};
+  };
+  const probFor=(stageKey,team)=>_aiTeamAdvanceProb?.[stageKey]?.[team];
+  const rounds=[];
+  // Round of 32
+  const r32Matches=(window.WCP_KNOCKOUTS||[]).filter(m=>m.round==='R32');
+  const r16={};
+  rounds.push({key:'R32',label:'Round of 32',complete:!!av.R32.complete,matches:r32Matches.map(m=>{
+    const {home,away}=matchups[m.id]||{};
+    const res=chalkWinner(home,away,av.R32);
+    r16[m.id]=res.team;
+    return {id:m.id,t1:home,t2:away,winner:res.team,isReal:res.isReal,p1:probFor('r16',home),p2:probFor('r16',away)};
+  })});
+  // Round of 16
+  const qf={};
+  rounds.push({key:'R16',label:'Round of 16',complete:!!av.R16.complete,matches:flows.R16.map((pair,i)=>{
+    const t1=r16[pair[0]], t2=r16[pair[1]];
+    const res=chalkWinner(t1,t2,av.R16);
+    const key='R16-'+(i+1); qf[key]=res.team;
+    return {id:key,t1,t2,winner:res.team,isReal:res.isReal,p1:probFor('qf',t1),p2:probFor('qf',t2)};
+  })});
+  // Quarter-finals
+  const sf={};
+  rounds.push({key:'QF',label:'Quarter-Finals',complete:!!av.QF.complete,matches:flows.QF.map((pair,i)=>{
+    const t1=qf[pair[0]], t2=qf[pair[1]];
+    const res=chalkWinner(t1,t2,av.QF);
+    const key='QF-'+(i+1); sf[key]=res.team;
+    return {id:key,t1,t2,winner:res.team,isReal:res.isReal,p1:probFor('sf',t1),p2:probFor('sf',t2)};
+  })});
+  // Semi-finals
+  const fin={};
+  rounds.push({key:'SF',label:'Semi-Finals',complete:!!av.SF.complete,matches:flows.SF.map((pair,i)=>{
+    const t1=sf[pair[0]], t2=sf[pair[1]];
+    const res=chalkWinner(t1,t2,av.SF);
+    const key='SF-'+(i+1); fin[key]=res.team;
+    return {id:key,t1,t2,winner:res.team,isReal:res.isReal,p1:probFor('fin',t1),p2:probFor('fin',t2)};
+  })});
+  // Final
+  const fp=flows.FINAL[0], ft1=fin[fp[0]], ft2=fin[fp[1]];
+  const finalRes=chalkWinner(ft1,ft2,av.FIN);
+  rounds.push({key:'FIN',label:'Final',complete:!!av.FIN.complete,matches:[{id:'FINAL-1',t1:ft1,t2:ft2,winner:finalRes.team,isReal:finalRes.isReal,p1:probFor('champion',ft1),p2:probFor('champion',ft2)}]});
+  return {rounds,champion:finalRes.team,champReal:finalRes.isReal,champProb:probFor('champion',finalRes.team)};
+}
+function renderAiPredictedPath(){
+  const box=$('#aiPredictedPathBox');
+  if(!box) return;
+  const flag=t=>(window.WCP_FLAGS&&window.WCP_FLAGS[t])||'';
+  const data=buildAiChalkPath();
+  if(!data){box.innerHTML='<div class="empty-state">The full Round of 32 draw isn\'t resolved yet — this fills in automatically once the group stage finishes.</div>';return;}
+  const roundsHtml=data.rounds.map(r=>{
+    const tag=r.complete?'<span class="ai-path-round-tag">✅ Played</span>':'<span class="ai-path-round-tag projected">🤖 Projected</span>';
+    const matches=r.matches.map(m=>{
+      const row=(team,isWinner,prob)=>`<div class="ai-path-team${isWinner?' winner':''}"><span class="ai-path-team-name">${isWinner?'👉 ':''}${flag(team)} ${team||'TBC'}</span>${(!r.complete&&prob!==undefined&&prob!==null)?`<span class="ai-path-prob">${prob.toFixed(0)}%</span>`:''}</div>`;
+      return `<div class="ai-path-match">${row(m.t1,m.winner===m.t1,m.p1)}${row(m.t2,m.winner===m.t2,m.p2)}</div>`;
+    }).join('');
+    return `<div class="ai-path-round"><div class="ai-path-round-title">${r.label} ${tag}</div><div class="ai-path-matches">${matches}</div></div>`;
+  }).join('');
+  const champTag=data.champReal?'✅ Already Crowned':`🤖 ${(data.champProb||0).toFixed(0)}% chance per the simulator`;
+  const championHtml=`<div class="ai-path-champion"><div class="ai-path-champ-label">🏆 Predicted Champion</div><div class="ai-path-champ-team">${flag(data.champion)} ${data.champion}</div><div style="margin-top:8px;font-size:11px;font-weight:900;color:#fff3a2">${champTag}</div></div>`;
+  box.innerHTML=roundsHtml+championHtml;
+}
+function setAiPredictorView(view){
+  const panes={path:'#aiViewPath',table:'#aiViewTable',player:'#aiViewPlayer'};
+  Object.entries(panes).forEach(([key,sel])=>{
+    const el=$(sel);
+    if(el) el.style.display=(key===view)?'':'none';
+  });
+  $$('#aiSlicerGroup .ai-slicer-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.aiView===view));
+}
+$$('#aiSlicerGroup .ai-slicer-btn').forEach(btn=>btn.addEventListener('click',()=>setAiPredictorView(btn.dataset.aiView)));
 $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagueFilter=btn.dataset.leagueFilter;renderLeaderboard();}));
 // Re-render leaderboard on resize so mobile/desktop layout switches correctly
 let _lbResizeTimer;
