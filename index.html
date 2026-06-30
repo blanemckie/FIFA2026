@@ -3650,6 +3650,13 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     <button onclick="loadAndRenderVisitorLog()" style="margin-top:14px;padding:11px 22px;border-radius:999px;background:linear-gradient(135deg,var(--gold),#fff3a2);color:#071633;font-weight:1000;border:0;font-size:14px;cursor:pointer">🔄 Load / Refresh Log</button>
   </div>
   <div id="adminVisitorLog" style="color:#dce9ff;font-weight:800;text-align:center;padding:20px">Click "Load / Refresh Log" to view visitor records.</div>
+
+  <div style="text-align:center;margin:32px 0 18px;padding:22px;border-radius:24px;background:linear-gradient(135deg,rgba(50,209,127,.14),rgba(55,212,255,.10));border:1px solid rgba(50,209,127,.35)">
+    <div style="font-size:28px;margin-bottom:8px">🏆 Admin: Round of 32 Results</div>
+    <p style="color:#dce9ff;font-weight:850;margin:0">Tick off a result the moment a match finishes — Fixture View, the AI Predictor, and the Live Table all update instantly for everyone, no code or deploy needed.</p>
+    <button onclick="loadR32ResultsFromFirestore()" style="margin-top:14px;padding:11px 22px;border-radius:999px;background:linear-gradient(135deg,#32d17f,#9af7c4);color:#071633;font-weight:1000;border:0;font-size:14px;cursor:pointer">🔄 Load / Refresh Results</button>
+  </div>
+  <div id="adminR32Results" style="color:#dce9ff;font-weight:800;text-align:center;padding:20px">Loading fixtures…</div>
 </div>
 <main class="app hidden" id="app">
   <section id="predictions" class="panel active">
@@ -4125,7 +4132,7 @@ function updateKickoffCountdown(){
 }
 updateKickoffCountdown();
 
-function renderAll(){if(typeof refreshAiProbabilities==='function') refreshAiProbabilities();renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();renderFixtureView();updateProgress();updateKickoffCountdown();if(window.updateStatusBars)window.updateStatusBars(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);if(typeof renderFvKoSummary==='function') renderFvKoSummary();if(typeof renderAiPredictor==='function') renderAiPredictor();}
+function renderAll(){if(typeof syncR16FromR32==='function') syncR16FromR32();if(typeof refreshAiProbabilities==='function') refreshAiProbabilities();renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();renderFixtureView();updateProgress();updateKickoffCountdown();if(window.updateStatusBars)window.updateStatusBars(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);if(typeof renderFvKoSummary==='function') renderFvKoSummary();if(typeof renderAiPredictor==='function') renderAiPredictor();}
 
 /* V61: auto-advance between group-stage score boxes after typing */
 const scoreAdvanceTimers = new WeakMap();
@@ -4262,6 +4269,17 @@ window.r32MatchForTeam=r32MatchForTeam;
 window.r32TeamStatus=r32TeamStatus;
 window.r32AllMatchesPlayed=r32AllMatchesPlayed;
 window.r32Winners=r32Winners;
+// WCP_STAGE_ACTUALS.R16 is built once when the page first loads. If R32 results change later
+// (e.g. via the admin panel, asynchronously after that object already exists), this recomputes
+// R16's complete/teams from the current state of WCP_R32_MATCH_RESULTS so everything downstream
+// (Live Table, Player View, Final Table) stays in sync. Called automatically at the top of renderAll().
+function syncR16FromR32(){
+  if(typeof WCP_STAGE_ACTUALS==='undefined'||!WCP_STAGE_ACTUALS.R16) return;
+  const done=r32AllMatchesPlayed();
+  WCP_STAGE_ACTUALS.R16.complete=done;
+  WCP_STAGE_ACTUALS.R16.teams=new Set(done?r32Winners():[]);
+}
+window.syncR16FromR32=syncR16FromR32;
 // Maps each real R32 fixture onto the existing M73-M88 bracket skeleton (window.WCP_KNOCKOUTS).
 // That skeleton's pairing structure (flows.R16/QF/SF/FINAL below) already matches the official
 // bracket correctly — it was only ever being fed the wrong teams via slot-text guessing. This
@@ -6959,6 +6977,69 @@ document.addEventListener('click', function(e){
     fetchFirebaseData(true);
   }
 });
+
+// ── Admin: Round of 32 results (persisted in Firestore so updates show for every visitor) ──
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+const R32_RESULTS_DOC = () => doc(db, "tournamentData", "r32Results");
+const r32Key = (home,away) => home+'|'+away;
+
+function applyR32ResultsMap(map){
+  if(!map) return;
+  (window.WCP_R32_MATCH_RESULTS||[]).forEach(m=>{
+    const v = map[r32Key(m.home,m.away)];
+    if(v!==undefined) m.winner = v;
+  });
+  if(typeof window.syncR16FromR32==='function') window.syncR16FromR32();
+}
+
+window.loadR32ResultsFromFirestore = async function(){
+  try{
+    const snap = await getDoc(R32_RESULTS_DOC());
+    if(snap.exists()) applyR32ResultsMap(snap.data().results||{});
+  }catch(e){ console.error('r32Results load failed:', e); }
+  if(typeof window.renderAll==='function') window.renderAll();
+  renderAdminR32Panel();
+};
+
+window.setR32Winner = async function(home, away, winner){
+  const m = (window.WCP_R32_MATCH_RESULTS||[]).find(x=>x.home===home && x.away===away);
+  if(!m) return;
+  m.winner = winner;
+  if(typeof window.syncR16FromR32==='function') window.syncR16FromR32();
+  if(typeof window.renderAll==='function') window.renderAll();
+  renderAdminR32Panel();
+  try{
+    const ref = R32_RESULTS_DOC();
+    const snap = await getDoc(ref);
+    const existing = snap.exists() ? (snap.data().results||{}) : {};
+    existing[r32Key(home,away)] = winner;
+    await setDoc(ref, {results: existing, updatedAt: serverTimestamp()}, {merge:true});
+  }catch(e){
+    console.error('Failed to save R32 result:', e);
+    alert('Saved on your screen, but failed to save to the database — check your connection and try again, or other visitors won\'t see this result.');
+  }
+};
+
+function renderAdminR32Panel(){
+  const box = document.getElementById('adminR32Results');
+  if(!box) return;
+  const matches = window.WCP_R32_MATCH_RESULTS||[];
+  if(!matches.length){ box.innerHTML = '<div class="empty-state">No R32 fixtures found.</div>'; return; }
+  const esc = s => String(s).replace(/'/g,"\\'");
+  const btn = (home,away,label,val,active) => `<button onclick="setR32Winner('${esc(home)}','${esc(away)}',${val===null?'null':`'${val}'`})" style="padding:8px 14px;border-radius:999px;border:1px solid ${active?'#32d17f':'rgba(255,255,255,.25)'};background:${active?'rgba(50,209,127,.18)':'rgba(255,255,255,.05)'};color:${active?'#aef7cf':'#dce9ff'};font-weight:900;font-size:12px;cursor:pointer;margin:3px">${label}</button>`;
+  box.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;text-align:left">' + matches.map(m=>{
+    return `<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px">`
+      + `<div style="font-weight:900;color:#fff;min-width:200px">${m.home} <span style="color:#7d8db3">vs</span> ${m.away}</div>`
+      + `<div>${btn(m.home,m.away,m.home+' won','home',m.winner==='home')}${btn(m.home,m.away,m.away+' won','away',m.winner==='away')}${btn(m.home,m.away,'Not played yet',null,!m.winner)}</div>`
+      + `</div>`;
+  }).join('') + '</div>';
+}
+window.renderAdminR32Panel = renderAdminR32Panel;
+
+if(window.location.hash === '#admin'){
+  renderAdminR32Panel();
+  window.loadR32ResultsFromFirestore();
+}
 
 </script>
 </body></html>
