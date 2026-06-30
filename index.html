@@ -1979,8 +1979,55 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 @media(max-width:600px){.fv-table td,.fv-table th{padding:7px 9px}.fv-table{font-size:12px}}
 .fv-team-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px 9px;font-size:11px;font-weight:900;color:#dce9ff;margin:2px}
 .fv-team-chip.correct{background:rgba(50,209,127,.14);border-color:rgba(50,209,127,.36);color:#6af0b8}
-.fv-team-chip.wrong{background:rgba(255,107,107,.10);border-color:rgba(255,107,107,.28);color:#ff9b9b;opacity:.75}
+.fv-team-chip.wrong{background:rgba(255,107,107,.13);border-color:rgba(255,107,107,.38);color:#ffb3b3}
 .fv-stage-toggle .league-filter{font-size:13px}
+
+/* ── Fixture View: clearer slicer/filter affordance ── */
+.fv-control-label{text-align:center;font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:.12em;color:#8899bb;margin-bottom:7px}
+#fixture-view .fv-stage-toggle .league-filter,
+#fixture-view #fvLeagueControls.league-controls.upgraded .league-filter{
+  background:rgba(255,255,255,.05)!important;border:1.5px solid rgba(255,255,255,.16)!important;color:#b8c9e8!important;box-shadow:none!important;
+}
+#fixture-view .fv-stage-toggle .league-filter:after,
+#fixture-view #fvLeagueControls .league-filter:after{content:'';}
+#fixture-view .fv-stage-toggle .league-filter:not(.active):hover,
+#fixture-view #fvLeagueControls .league-filter:not(.active):hover{
+  background:rgba(255,255,255,.11)!important;border-color:rgba(255,255,255,.30)!important;color:#fff!important;
+}
+#fixture-view .fv-stage-toggle .league-filter.active,
+#fixture-view #fvLeagueControls .league-filter.active{
+  background:linear-gradient(135deg,#fff3a2,#f8c84a)!important;border-color:transparent!important;color:#071633!important;
+  box-shadow:0 8px 20px rgba(248,200,74,.38)!important;transform:translateY(-1px);
+}
+
+/* ── Fixture View: confirmed-teams badge chips ── */
+.fv-confirmed-label{color:#32d17f;font-weight:1000;font-size:13px;margin-bottom:8px;text-align:center}
+.fv-qualified-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+
+/* ── Fixture View: compact KO results table ── */
+.fv-score-frac{font-weight:1000;font-size:13px;color:#b9f3ff}
+.fv-score-frac.perfect{color:#32d17f}
+.fv-perfect-tag{color:#32d17f;font-weight:900;font-size:12px}
+.fv-picks-details summary{cursor:pointer;color:#37d4ff;font-weight:900;font-size:12px;list-style:none}
+.fv-picks-details summary::-webkit-details-marker{display:none}
+.fv-picks-details summary:before{content:'\25B8 ';color:#37d4ff}
+.fv-picks-details[open] summary:before{content:'\25BE ';}
+.fv-picks-details .fv-qualified-chips{margin-top:6px;justify-content:flex-start}
+.fv-missed-cell{max-width:340px}
+
+@media(max-width:650px){
+  .fv-ko-table thead{display:none!important;}
+  .fv-ko-table,.fv-ko-table tbody,.fv-ko-table tr,.fv-ko-table td{display:block!important;width:100%!important;}
+  .fv-ko-table{border-spacing:0!important;}
+  .fv-ko-table tbody{display:flex!important;flex-direction:column!important;gap:8px!important;}
+  .fv-ko-table tr{background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.13)!important;border-radius:14px!important;padding:10px 12px!important;}
+  .fv-ko-table td{padding:4px 0!important;text-align:left!important;border:none!important;background:transparent!important;}
+  .fv-ko-table td.fv-name-cell{font-size:14px;border-bottom:1px solid rgba(255,255,255,.09)!important;padding-bottom:6px!important;margin-bottom:4px;}
+  .fv-ko-table td:before{content:attr(data-label);display:block;color:#8899bb;font-size:9px;text-transform:uppercase;letter-spacing:.07em;font-weight:900;margin-bottom:2px;}
+  .fv-ko-table td.fv-name-cell:before{display:none;}
+  .fv-ko-table td.td-center{text-align:left!important;}
+  .fv-missed-cell{max-width:none;}
+}
 </style>
 <!-- V49 emergency layout repair: restore fixture/result row alignment after header changes -->
 <style>
@@ -3598,10 +3645,12 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     <div class="status-ticker" id="fvStatusTicker" style="margin-bottom:10px"><div class="st-label"><span id="fvDot" style="width:8px;height:8px;border-radius:50%;background:#f8c84a;display:inline-block;box-shadow:0 0 6px rgba(248,200,74,.5)"></span>Live Status</div><div class="st-track"><div class="st-marquee" id="fvTickerMarquee"><span class="st-item gold">⏳ Scores updating shortly</span><span class="st-dot">•</span><span class="st-item">Fixture data refreshes automatically</span><span class="st-dot">•</span><span class="st-item cyan">Select a game to compare all predictions</span></div></div></div>
     <div class="world-cup-ticker" id="fvWorldCupTicker" aria-label="World Cup Wire - Fixture View" style="margin-bottom:14px"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest player points updates…</span></div></div></div>
     <div class="card" style="padding:18px 20px 14px">
-      <div class="fv-stage-toggle" id="fvStageToggle" style="display:flex;gap:8px;margin-bottom:14px;justify-content:center;flex-wrap:wrap">
+      <div class="fv-control-label">View</div>
+      <div class="fv-stage-toggle" id="fvStageToggle" style="display:flex;gap:8px;margin-bottom:16px;justify-content:center;flex-wrap:wrap">
         <button class="league-filter active" data-fv-stage="group">⚽ Group Stage</button>
         <button class="league-filter" data-fv-stage="knockout">🏆 Knockout Stages</button>
       </div>
+      <div class="fv-control-label">Filter by League</div>
       <div class="league-controls upgraded" id="fvLeagueControls" style="margin-bottom:14px">
         <button class="league-filter active" data-fv-league="All">🏆 All Leagues</button>
         <button class="league-filter" data-fv-league="Main">🌍 Main</button>
@@ -4812,20 +4861,48 @@ function renderFixtureViewContentKO(){
       if(pred && typeof teamsFromSavedIds==='function') teams=teamsFromSavedIds(map,pred,stage.max);
     }
     const correctTeams = actual.complete ? teams.filter(t=>actual.teams.has(String(t).trim())) : [];
+    const missedTeams  = actual.complete ? teams.filter(t=>!actual.teams.has(String(t).trim())) : [];
     const pts = actual.complete ? correctTeams.length*stage.pts : null;
-    return {name:row.name||'Unknown',league:row.league||'',teams,correctTeams,pts};
-  }).sort((a,b)=>(b.pts??-1)-(a.pts??-1) || a.name.localeCompare(b.name));
+    return {name:row.name||'Unknown',league:row.league||'',teams,correctTeams,missedTeams,pts};
+  }).sort((a,b)=>(b.pts??-1)-(a.pts??-1) || (b.teams.length-a.teams.length) || a.name.localeCompare(b.name));
 
   const leagueBadge=l=>l&&fvLeagueFilter==='All'?`<span class="fv-league-badge">${l}</span>`:'';
-  const teamChip=(team,isCorrect)=>{
+  const teamChip=(team,variant)=>{
     const label=typeof teamLabel==='function'?teamLabel(team):team;
-    const cls = actual.complete ? (isCorrect?'fv-team-chip correct':'fv-team-chip wrong') : 'fv-team-chip';
+    const cls = variant ? `fv-team-chip ${variant}` : 'fv-team-chip';
     return `<span class="${cls}">${label}</span>`;
   };
 
   const resultHtml = actual.complete
-    ?`<div class="fv-actual-result result-known">\u2705 ${stage.label} confirmed: ${[...actual.teams].join(', ')}</div>`
+    ?`<div class="fv-actual-result result-known">
+        <div class="fv-confirmed-label">\u2705 ${stage.label} \u2014 Confirmed Teams</div>
+        <div class="fv-qualified-chips">${[...actual.teams].map(t=>teamChip(t,'correct')).join('')}</div>
+      </div>`
     :`<div class="fv-actual-result result-pending">\u23f3 ${actual.dateNote||'Result Pending'}</div>`;
+
+  const tableHead = actual.complete
+    ? `<tr><th>Player</th><th class="th-center">Correct</th><th class="th-center">Pts</th><th>Missed Picks</th></tr>`
+    : `<tr><th>Player</th><th class="th-center">Picks Submitted</th><th>Their Picks</th></tr>`;
+
+  const tableRows = playerRows.map(r=>{
+    if(actual.complete){
+      const fracClass = r.teams.length && r.correctTeams.length===r.teams.length ? 'fv-score-frac perfect' : 'fv-score-frac';
+      const missedHtml = r.missedTeams.length
+        ? r.missedTeams.map(t=>teamChip(t,'wrong')).join('')
+        : `<span class="fv-perfect-tag">\ud83c\udfaf Perfect round!</span>`;
+      return `<tr>
+        <td class="fv-name-cell" data-label="Player">${r.name}${leagueBadge(r.league)}</td>
+        <td class="td-center" data-label="Correct"><span class="${fracClass}">${r.correctTeams.length}/${stage.max}</span></td>
+        <td class="fv-pts-cell" data-label="Pts"><span class="fv-pts-badge ${r.pts>0?'pts-10':'pts-0'}">${r.pts}</span></td>
+        <td class="fv-missed-cell" data-label="Missed Picks">${missedHtml}</td>
+      </tr>`;
+    }
+    return `<tr>
+      <td class="fv-name-cell" data-label="Player">${r.name}${leagueBadge(r.league)}</td>
+      <td class="td-center" data-label="Picks Submitted"><span class="fv-score-frac">${r.teams.length}/${stage.max}</span></td>
+      <td class="fv-missed-cell" data-label="Their Picks">${r.teams.length?`<details class="fv-picks-details"><summary>View ${r.teams.length} picks</summary><div class="fv-qualified-chips">${r.teams.map(t=>teamChip(t)).join('')}</div></details>`:'No picks yet'}</td>
+    </tr>`;
+  }).join('');
 
   content.innerHTML=`
     <div class="fv-fixture-header">
@@ -4835,20 +4912,9 @@ function renderFixtureViewContentKO(){
     </div>
     ${playerRows.length===0?`<div class="fv-no-data">No entries for this league filter.</div>`:`
     <div class="fv-table-wrap">
-      <table class="fv-table">
-        <thead><tr>
-          <th>Player</th>
-          <th class="th-center">Picks</th>
-          ${actual.complete?'<th class="th-center">Pts</th>':''}
-        </tr></thead>
-        <tbody>
-          ${playerRows.map(r=>`
-          <tr>
-            <td class="fv-name-cell">${r.name}${leagueBadge(r.league)}</td>
-            <td class="td-center">${r.teams.length?r.teams.map(t=>teamChip(t,r.correctTeams.includes(t))).join(''):'No picks'}</td>
-            ${actual.complete?`<td class="fv-pts-cell"><span class="fv-pts-badge ${r.pts>0?'pts-10':'pts-0'}">${r.pts}</span></td>`:''}
-          </tr>`).join('')}
-        </tbody>
+      <table class="fv-table fv-ko-table">
+        <thead>${tableHead}</thead>
+        <tbody>${tableRows}</tbody>
       </table>
     </div>`}
   `;
