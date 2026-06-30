@@ -3691,7 +3691,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="league-controls upgraded fun-league-controls" id="funLeagueControls"><button class="fun-league-filter active" data-fun-league-filter="All">🏆 All Leagues</button><button class="fun-league-filter" data-fun-league-filter="Main">🌍 Main</button><button class="fun-league-filter" data-fun-league-filter="LEGO">🧱 LEGO</button><button class="fun-league-filter" data-fun-league-filter="Family">🏡 Family</button><button class="fun-league-filter" data-fun-league-filter="HFC">⚽ HFC</button></div><h3 class="fun-section-heading" id="inTournamentHeading">🔴 In Tournament Fun Stats</h3><div class="fun-stats-grid" id="inTournamentStatsGrid"><div class="stat-bubble stat-bubble-v64" style="grid-column:1/-1"><div class="stat-icon">⏳</div><div class="stat-title">Loading Match Data</div><div class="stat-value" style="font-size:16px;color:#b8c9e8">In-tournament stats will appear here once games have been played and results are entered.</div></div></div><h3 class="fun-section-heading" id="preTournamentHeading">📋 Pre Tournament Fun Stats</h3><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
   <section id="predictor" class="panel ai-predictor-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🤖 AI Probability Predictor</h2></div>
     <div class="card" style="padding:16px 18px;margin-bottom:14px;line-height:1.55">
-      <p style="margin:0 0 8px;font-size:13px;color:#b9c4dd"><b style="color:#f8c84a">How this works:</b> Each team's strength rating is built from how it actually performed in the group stage (points won, goal difference). The real Round of 32 draw is then resolved from the final group standings, and the bracket is simulated forward hundreds of times — each simulated match decided by the two teams' relative strength, not a coin flip. For any round that's already been played, the real result is used instead of a simulation. Every player's picks are scored against each simulated bracket, and their average score across all simulations becomes their share of the field's total expected points — that's the probability shown. It's a statistical estimate based on form and the picks made, not a guarantee.</p>
+      <p style="margin:0 0 8px;font-size:13px;color:#b9c4dd"><b style="color:#f8c84a">How this works:</b> Each team's strength rating is built from how it actually performed in the group stage (points won, goal difference). The real Round of 32 draw is then resolved from the final group standings, and the bracket is simulated forward hundreds of times — each simulated match decided by the two teams' relative strength, not a coin flip. For any round that's already been played, the real result is used instead of a simulation. In every single simulation, each player's locked-in points are added to whatever they'd score from that simulated outcome, and whoever has the highest total in that simulation is the "winner" of that run. The percentage shown is simply how often a player comes out on top across all the simulations — so a real points lead carries its full weight, it isn't diluted just because there are still a lot of points left on the table.</p>
       <p style="margin:0;font-size:11px;color:#6b7a99">Recalculates automatically every time the Live Table refreshes with new results — so these percentages move daily as the tournament unfolds.</p>
     </div>
     <div class="live-table-card card" style="padding:14px"><div id="aiPredictorList"><div class="empty-state">Loading predictions…</div></div></div>
@@ -4354,50 +4354,65 @@ function buildPlayerPickSets(rows){
     };
   });
 }
-const AI_SIM_TRIALS=400;
+const AI_SIM_TRIALS=600;
 function computeAiProbabilities(rows){
   const av=WCP_STAGE_ACTUALS;
   const lockedFor=(r)=>{
     const ko=r._ko||computeKoPoints(r);
     return getGsPts(r)+(av.R16.complete?ko.r16Pts:0)+(av.QF.complete?ko.qfPts:0)+(av.SF.complete?ko.sfPts:0)+(av.FIN.complete?ko.finPts:0);
   };
+  const lockedScores=rows.map(lockedFor);
   const groupResults=getActualGroupResults();
   const matchups=av.R32.complete?resolveActualR32Matchups(groupResults):null;
   const canSimulate=!!matchups;
-  let expectedScores;
+  let probs, expectedScores;
   if(canSimulate){
     const ratings=computeTeamStrengths(groupResults);
     const picks=buildPlayerPickSets(rows);
-    const totals=new Array(picks.length).fill(0);
+    const winCounts=new Array(picks.length).fill(0);
+    const upsideTotals=new Array(picks.length).fill(0);
     for(let t=0;t<AI_SIM_TRIALS;t++){
       const sim=simulateBracketOnce(matchups,ratings);
-      picks.forEach((p,i)=>{
-        let pts=0;
-        if(!av.R16.complete) pts+=p.r16T.filter(team=>sim.r16.has(team)).length*av.R16.pts;
-        if(!av.QF.complete) pts+=p.qfT.filter(team=>sim.qf.has(team)).length*av.QF.pts;
-        if(!av.SF.complete) pts+=p.sfT.filter(team=>sim.sf.has(team)).length*av.SF.pts;
-        if(!av.FIN.complete) pts+=p.finT.filter(team=>sim.fin.has(team)).length*av.FIN.pts;
-        if(!av.CHAMP.complete && p.champPick && p.champPick===sim.champion) pts+=av.CHAMP.pts;
-        totals[i]+=pts;
+      const trialTotals=picks.map((p,i)=>{
+        let upside=0;
+        if(!av.R16.complete) upside+=p.r16T.filter(team=>sim.r16.has(team)).length*av.R16.pts;
+        if(!av.QF.complete) upside+=p.qfT.filter(team=>sim.qf.has(team)).length*av.QF.pts;
+        if(!av.SF.complete) upside+=p.sfT.filter(team=>sim.sf.has(team)).length*av.SF.pts;
+        if(!av.FIN.complete) upside+=p.finT.filter(team=>sim.fin.has(team)).length*av.FIN.pts;
+        if(!av.CHAMP.complete && p.champPick && p.champPick===sim.champion) upside+=av.CHAMP.pts;
+        upsideTotals[i]+=upside;
+        return lockedScores[i]+upside;
       });
+      // Real win probability: who is actually top of the table in THIS simulated outcome.
+      // The locked score is the same fixed offset in every trial, so a real points lead
+      // carries through directly instead of being diluted by the size of the remaining prize pool.
+      const maxScore=Math.max(...trialTotals);
+      const winnersThisTrial=trialTotals.reduce((arr,s,i)=>{if(s===maxScore)arr.push(i);return arr;},[]);
+      winnersThisTrial.forEach(i=>{winCounts[i]+=1/winnersThisTrial.length;});
     }
-    expectedScores=picks.map((p,i)=>lockedFor(p.row)+totals[i]/AI_SIM_TRIALS);
+    probs=winCounts.map(w=>w/AI_SIM_TRIALS*100);
+    expectedScores=picks.map((p,i)=>lockedScores[i]+upsideTotals[i]/AI_SIM_TRIALS);
   } else {
     // Group stage still in progress — not enough real data yet to resolve actual R32 matchups,
-    // so fall back to a simple confidence-weighted estimate of each player's own remaining picks.
+    // so fall back to a simple confidence-weighted estimate, with locked points given full weight
+    // and a softmax over the combined total so an existing lead is reflected properly.
     const W={r16Pts:1.0,qfPts:0.8,sfPts:0.6,finPts:0.45};
-    expectedScores=rows.map(r=>{
+    expectedScores=rows.map((r,i)=>{
       const ko=r._ko||computeKoPoints(r);
       let upside=0;
       if(!av.R16.complete) upside+=ko.r16Pts*W.r16Pts;
       if(!av.QF.complete) upside+=ko.qfPts*W.qfPts;
       if(!av.SF.complete) upside+=ko.sfPts*W.sfPts;
       if(!av.FIN.complete) upside+=ko.finPts*W.finPts;
-      return lockedFor(r)+upside;
+      return lockedScores[i]+upside;
     });
+    const maxScore=Math.max(...expectedScores,1);
+    const temperature=Math.max(maxScore*0.12,5); // keeps the spread realistic rather than near-uniform
+    const weights=expectedScores.map(v=>Math.exp((v-maxScore)/temperature));
+    const wSum=weights.reduce((s,v)=>s+v,0)||1;
+    probs=weights.map(w=>w/wSum*100);
   }
-  const totalExp=expectedScores.reduce((s,v)=>s+Math.max(v,0.01),0)||1;
-  const scored=rows.map((r,i)=>({name:r.name,league:r.league,expected:expectedScores[i],prob:Math.max(expectedScores[i],0.01)/totalExp*100,row:r}));
+  const scored=rows.map((r,i)=>({name:r.name,league:r.league,expected:expectedScores[i],prob:probs[i],row:r}));
   scored.sort((a,b)=>b.prob-a.prob);
   return scored;
 }
