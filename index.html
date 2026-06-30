@@ -3694,9 +3694,20 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
       <p style="margin:0 0 8px;font-size:13px;color:#b9c4dd"><b style="color:#f8c84a">How this works:</b> Each team's strength rating is built from how it actually performed in the group stage (points won, goal difference). The real Round of 32 draw is then resolved from the final group standings, and the bracket is simulated forward hundreds of times — each simulated match decided by the two teams' relative strength, not a coin flip. For any round that's already been played, the real result is used instead of a simulation. In every single simulation, each player's locked-in points are added to whatever they'd score from that simulated outcome, and whoever has the highest total in that simulation is the "winner" of that run. The percentage shown is simply how often a player comes out on top across all the simulations — so a real points lead carries its full weight, it isn't diluted just because there are still a lot of points left on the table.</p>
       <p style="margin:0;font-size:11px;color:#6b7a99">Recalculates automatically every time the Live Table refreshes with new results — so these percentages move daily as the tournament unfolds.</p>
     </div>
-    <div class="live-table-card card" style="padding:14px"><div id="aiPredictorList"><div class="empty-state">Loading predictions…</div></div></div>
+    <div class="predictor-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;align-items:start">
+      <div class="live-table-card card" style="padding:14px">
+        <h3 style="margin:0 0 10px;font-size:15px;color:#fff3a2">🏆 Live Standings</h3>
+        <div id="predictorLeagueTable"><div class="empty-state">Loading…</div></div>
+      </div>
+      <div class="live-table-card card" style="padding:14px">
+        <h3 style="margin:0 0 10px;font-size:15px;color:#fff3a2">🔮 Predicted Path</h3>
+        <select id="predictorPlayerSelect" style="width:100%;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:#fff;font-weight:800;font-size:13px;margin-bottom:14px"></select>
+        <div id="predictorPlayerDetail"><div class="empty-state">Select a player above to see exactly why they have the win % they have.</div></div>
+      </div>
+    </div>
   </section>
   <section id="how" class="panel how-built-page v83-how-built-page">
+
     <div class="page-head unified-final-head build-story-head v83-build-head">
       <h2 class="premium-page-title">🚀 How I Built This</h2>
     </div>
@@ -4196,7 +4207,7 @@ function renderLeaderboard(){
         +`<div class="lb-mc-top"><span class="rank-badge">${i+1}</span>`
         +`<div class="lb-mc-info"><span class="leader-player">${medal}${r.name||'?'}</span>`
         +`<div class="lb-mc-entry">${entryBadgesHtml(r.league,r.name)}</div></div>`
-        +`<span class="points-badge lb-mc-pts">${r._tot} pts</span></div>`
+        +`<span class="points-badge lb-mc-pts" style="width:64px;text-align:center;font-variant-numeric:tabular-nums">${r._tot} pts</span></div>`
         +`<div class="lb-mc-stats">`
         +`<div class="lb-mc-stat"><span class="lb-mc-val" style="color:#37d4ff">${r._gs}</span><span class="lb-mc-lbl">GS</span></div>`
         +stageChip('R32',ko.r32Pts,av.R32)
@@ -4237,7 +4248,7 @@ function renderLeaderboard(){
           +`<td style="text-align:center">${pend(ko.qfPts, av.QF)}</td>`
           +`<td style="text-align:center">${pend(ko.sfPts, av.SF)}</td>`
           +`<td style="text-align:center">${pend(ko.finPts,av.FIN)}</td>`
-          +`<td style="text-align:right"><span class="points-badge">${r._tot} pts</span></td>`
+          +`<td style="text-align:right"><span class="points-badge" style="width:78px;text-align:center;font-variant-numeric:tabular-nums">${r._tot} pts</span></td>`
           +`<td style="text-align:center">${aiCell}</td>`
           +`</tr>`;
       }).join('')
@@ -4355,24 +4366,32 @@ function buildPlayerPickSets(rows){
   });
 }
 const AI_SIM_TRIALS=600;
+function getLockedScore(r){
+  const av=WCP_STAGE_ACTUALS;
+  const ko=r._ko||computeKoPoints(r);
+  return getGsPts(r)+(av.R16.complete?ko.r16Pts:0)+(av.QF.complete?ko.qfPts:0)+(av.SF.complete?ko.sfPts:0)+(av.FIN.complete?ko.finPts:0);
+}
 function computeAiProbabilities(rows){
   const av=WCP_STAGE_ACTUALS;
-  const lockedFor=(r)=>{
-    const ko=r._ko||computeKoPoints(r);
-    return getGsPts(r)+(av.R16.complete?ko.r16Pts:0)+(av.QF.complete?ko.qfPts:0)+(av.SF.complete?ko.sfPts:0)+(av.FIN.complete?ko.finPts:0);
-  };
-  const lockedScores=rows.map(lockedFor);
+  const lockedScores=rows.map(getLockedScore);
   const groupResults=getActualGroupResults();
   const matchups=av.R32.complete?resolveActualR32Matchups(groupResults):null;
   const canSimulate=!!matchups;
-  let probs, expectedScores;
+  let probs, expectedScores, teamAdvanceProb=null;
   if(canSimulate){
     const ratings=computeTeamStrengths(groupResults);
     const picks=buildPlayerPickSets(rows);
     const winCounts=new Array(picks.length).fill(0);
     const upsideTotals=new Array(picks.length).fill(0);
+    const teamCounts={r16:{},qf:{},sf:{},fin:{},champion:{}};
+    const bump=(obj,team)=>{obj[team]=(obj[team]||0)+1;};
     for(let t=0;t<AI_SIM_TRIALS;t++){
       const sim=simulateBracketOnce(matchups,ratings);
+      sim.r16.forEach(team=>bump(teamCounts.r16,team));
+      sim.qf.forEach(team=>bump(teamCounts.qf,team));
+      sim.sf.forEach(team=>bump(teamCounts.sf,team));
+      sim.fin.forEach(team=>bump(teamCounts.fin,team));
+      bump(teamCounts.champion,sim.champion);
       const trialTotals=picks.map((p,i)=>{
         let upside=0;
         if(!av.R16.complete) upside+=p.r16T.filter(team=>sim.r16.has(team)).length*av.R16.pts;
@@ -4392,6 +4411,11 @@ function computeAiProbabilities(rows){
     }
     probs=winCounts.map(w=>w/AI_SIM_TRIALS*100);
     expectedScores=picks.map((p,i)=>lockedScores[i]+upsideTotals[i]/AI_SIM_TRIALS);
+    teamAdvanceProb={};
+    Object.keys(teamCounts).forEach(stage=>{
+      teamAdvanceProb[stage]={};
+      Object.keys(teamCounts[stage]).forEach(team=>{teamAdvanceProb[stage][team]=teamCounts[stage][team]/AI_SIM_TRIALS*100;});
+    });
   } else {
     // Group stage still in progress — not enough real data yet to resolve actual R32 matchups,
     // so fall back to a simple confidence-weighted estimate, with locked points given full weight
@@ -4412,36 +4436,107 @@ function computeAiProbabilities(rows){
     const wSum=weights.reduce((s,v)=>s+v,0)||1;
     probs=weights.map(w=>w/wSum*100);
   }
-  const scored=rows.map((r,i)=>({name:r.name,league:r.league,expected:expectedScores[i],prob:probs[i],row:r}));
+  const scored=rows.map((r,i)=>({name:r.name,league:r.league,locked:lockedScores[i],expected:expectedScores[i],prob:probs[i],row:r}));
   scored.sort((a,b)=>b.prob-a.prob);
-  return scored;
+  return {scored,teamAdvanceProb};
 }
 // Computed once per data refresh so the % doesn't re-roll every time a filter or resize re-renders the table.
 let _aiProbByName=new Map();
+let _aiTeamAdvanceProb=null;
+let _aiPickSetByName=new Map();
 function refreshAiProbabilities(){
   const allRows=getEntryRows();
   allRows.forEach(r=>{if(!r._ko)r._ko=computeKoPoints(r);if(r._gs===undefined)r._gs=getGsPts(r);});
-  if(!allRows.length){_aiProbByName=new Map();return;}
-  const probs=computeAiProbabilities(allRows);
-  _aiProbByName=new Map(probs.map(p=>[p.name,p]));
+  if(!allRows.length){_aiProbByName=new Map();_aiTeamAdvanceProb=null;_aiPickSetByName=new Map();return;}
+  const {scored,teamAdvanceProb}=computeAiProbabilities(allRows);
+  _aiProbByName=new Map(scored.map(p=>[p.name,p]));
+  _aiTeamAdvanceProb=teamAdvanceProb;
+  _aiPickSetByName=new Map(buildPlayerPickSets(allRows).map(p=>[p.row.name,p]));
 }
 function renderAiPredictor(){
-  const box=$('#aiPredictorList');
+  renderPredictorStandings();
+  renderPredictorPlayerSelect();
+}
+function renderPredictorStandings(){
+  const box=$('#predictorLeagueTable');
   if(!box) return;
   if(!_aiProbByName.size){box.innerHTML='<div class="empty-state">No entries yet.</div>';return;}
-  const probs=[..._aiProbByName.values()].sort((a,b)=>b.prob-a.prob);
-  const maxProb=probs[0]?.prob||1;
-  const rows=probs.map((p,i)=>{
+  const ranked=[..._aiProbByName.values()].sort((a,b)=>(b.row._tot||0)-(a.row._tot||0));
+  const rows=ranked.map((p,i)=>{
     const medal=i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':'';
-    const barWidth=Math.max((p.prob/maxProb)*100,3).toFixed(1);
-    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid rgba(255,255,255,.06)">`
-      +`<span class="rank-badge">${i+1}</span>`
-      +`<div style="flex:1;min-width:0">`
-      +`<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:900;margin-bottom:4px"><span>${medal}${p.name||'?'}</span><span style="color:#f8c84a">${p.prob.toFixed(1)}%</span></div>`
-      +`<div style="height:7px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden"><div style="height:100%;width:${barWidth}%;border-radius:999px;background:linear-gradient(90deg,#37d4ff,#32d17f)"></div></div>`
-      +`</div></div>`;
+    return `<tr>`
+      +`<td><span class="rank-badge">${i+1}</span></td>`
+      +`<td><span class="leader-player" style="font-size:14px">${medal}${p.name||'?'}</span></td>`
+      +`<td style="text-align:right"><span class="points-badge" style="width:64px;text-align:center;font-variant-numeric:tabular-nums">${p.row._tot||0} pts</span></td>`
+      +`<td style="text-align:center"><span style="font-weight:1000;font-size:13px;color:#b388ff">${p.prob.toFixed(1)}%</span></td>`
+      +`</tr>`;
   }).join('');
-  box.innerHTML=rows;
+  box.innerHTML=`<div style="overflow-x:auto"><table class="league-table upgraded-table lb-expanded" style="min-width:0"><thead><tr><th style="width:36px">Rank</th><th>Player</th><th style="text-align:right">Total</th><th style="text-align:center;color:#b388ff">🤖 Win %</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function renderPredictorPlayerSelect(){
+  const sel=$('#predictorPlayerSelect');
+  if(!sel) return;
+  const ranked=[..._aiProbByName.values()].sort((a,b)=>(b.row._tot||0)-(a.row._tot||0));
+  if(!ranked.length){sel.innerHTML='<option>No entries yet</option>';return;}
+  const prevValue=sel.value;
+  sel.innerHTML=ranked.map(p=>`<option value="${p.name}">${p.name} — ${p.prob.toFixed(1)}% to win</option>`).join('');
+  const stillExists=ranked.some(p=>p.name===prevValue);
+  sel.value=stillExists?prevValue:ranked[0].name;
+  if(!sel._wired){
+    sel.addEventListener('change',()=>renderPredictorPlayerDetail(sel.value));
+    sel._wired=true;
+  }
+  renderPredictorPlayerDetail(sel.value);
+}
+function renderPredictorPlayerDetail(name){
+  const box=$('#predictorPlayerDetail');
+  if(!box) return;
+  const p=_aiProbByName.get(name);
+  const pick=_aiPickSetByName.get(name);
+  if(!p||!pick){box.innerHTML='<div class="empty-state">No data for this player yet.</div>';return;}
+  const av=WCP_STAGE_ACTUALS;
+  const flag=t=>(window.WCP_FLAGS&&window.WCP_FLAGS[t])||'';
+  const ranked=[..._aiProbByName.values()].sort((a,b)=>(b.row._tot||0)-(a.row._tot||0));
+  const rank=ranked.findIndex(r=>r.name===name)+1;
+  const leader=ranked[0];
+  const stages=[
+    {label:'Round of 16',picks:pick.r16T,actual:av.R16,probMap:_aiTeamAdvanceProb?.r16},
+    {label:'Quarter-Finals',picks:pick.qfT,actual:av.QF,probMap:_aiTeamAdvanceProb?.qf},
+    {label:'Semi-Finals',picks:pick.sfT,actual:av.SF,probMap:_aiTeamAdvanceProb?.sf},
+    {label:'Final',picks:pick.finT,actual:av.FIN,probMap:_aiTeamAdvanceProb?.fin}
+  ];
+  let totalExpectedUpside=0;
+  const roundBlocks=stages.map(s=>{
+    const rows=(s.picks||[]).map(team=>{
+      if(s.actual.complete){
+        const hit=s.actual.teams.has(String(team).trim());
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12.5px">`
+          +`<span>${flag(team)} ${team}</span><span style="font-weight:900;color:${hit?'#32d17f':'#ff6b81'}">${hit?'✅ +'+s.actual.pts:'❌ +0'}</span></div>`;
+      }
+      const prob=s.probMap?.[team]??0;
+      totalExpectedUpside+=prob/100*s.actual.pts;
+      const color=prob>=60?'#32d17f':prob>=30?'#f8c84a':'#ff8a8a';
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12.5px">`
+        +`<span>${flag(team)} ${team}</span><span style="font-weight:900;color:${color}">${prob.toFixed(0)}% → ${(prob/100*s.actual.pts).toFixed(1)} pts</span></div>`;
+    }).join('') || '<div class="empty-state" style="padding:6px 0;font-size:12px">No pick saved</div>';
+    const stageDone=s.actual.complete?' <span style="color:#32d17f;font-size:10px">✅ Played</span>':' <span style="color:#8899bb;font-size:10px">Projected</span>';
+    return `<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:1000;color:#fff3a2;margin-bottom:4px">${s.label}${stageDone}</div>${rows}</div>`;
+  }).join('');
+  const champProb=(!av.CHAMP.complete && pick.champPick)?(_aiTeamAdvanceProb?.champion?.[pick.champPick]??0):null;
+  if(champProb!==null) totalExpectedUpside+=champProb/100*av.CHAMP.pts;
+  const champBlock = av.CHAMP.complete
+    ? `<div style="font-size:12px;font-weight:1000;color:#fff3a2;margin-bottom:4px">Champion ✅ Played</div><div style="font-size:12.5px;padding:5px 0">${flag(pick.champPick)} ${pick.champPick||'No pick'} — ${pick.champPick===Array.from(av.CHAMP.teams)[0]?'✅ +'+av.CHAMP.pts:'❌ +0'}</div>`
+    : `<div style="font-size:12px;font-weight:1000;color:#fff3a2;margin-bottom:4px">Champion <span style="color:#8899bb;font-size:10px">Projected</span></div><div style="display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0"><span>${flag(pick.champPick)} ${pick.champPick||'No pick'}</span><span style="font-weight:900;color:${champProb>=15?'#32d17f':champProb>=5?'#f8c84a':'#ff8a8a'}">${(champProb||0).toFixed(0)}% → ${((champProb||0)/100*av.CHAMP.pts).toFixed(1)} pts</span></div>`;
+  const gapToLeader = leader && leader.name!==name ? (leader.row._tot||0)-(p.row._tot||0) : 0;
+  const summary = rank===1
+    ? `<b>${name}</b> currently leads the real-points table${gapToLeader<=0?'':''} and is the favourite in <b>${p.prob.toFixed(1)}%</b> of simulations.`
+    : `<b>${name}</b> is <b>${gapToLeader}</b> real points behind the current leader (${leader?.name}). Their <b>${p.prob.toFixed(1)}%</b> win chance reflects both that gap and how likely their remaining picks (below) are to actually come in.`;
+  box.innerHTML = `<div class="card" style="padding:12px 14px;margin-bottom:12px;background:rgba(179,136,255,.08);border-color:rgba(179,136,255,.25)">`
+    +`<div style="font-size:13px;line-height:1.5;color:#d8d8ff">${summary}</div>`
+    +`<div style="display:flex;gap:14px;margin-top:8px;font-size:12px;color:#b9c4dd">`
+    +`<span>Rank: <b style="color:#fff">#${rank}</b></span><span>Locked points: <b style="color:#fff">${p.locked}</b></span><span>Win probability: <b style="color:#b388ff">${p.prob.toFixed(1)}%</b></span>`
+    +`</div></div>`
+    +`<div>${roundBlocks}${champBlock}</div>`;
 }
 $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagueFilter=btn.dataset.leagueFilter;renderLeaderboard();}));
 // Re-render leaderboard on resize so mobile/desktop layout switches correctly
