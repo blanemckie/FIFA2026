@@ -2023,6 +2023,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 .fv-team-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px 9px;font-size:11px;font-weight:900;color:#dce9ff;margin:2px}
 .fv-team-chip.correct{background:rgba(50,209,127,.14);border-color:rgba(50,209,127,.36);color:#6af0b8}
 .fv-team-chip.wrong{background:rgba(255,107,107,.13);border-color:rgba(255,107,107,.38);color:#ffb3b3}
+.fv-team-chip.pending{background:rgba(255,209,77,.13);border-color:rgba(255,209,77,.4);color:#ffd14d}
+.fv-r32-match-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:4px 0}
+.fv-r32-match-date{font-size:10px;color:#7d8db3;font-weight:800;min-width:64px;text-align:right}
 .fv-stage-toggle .league-filter{font-size:13px}
 
 /* ── Fixture View: clearer slicer/filter affordance ── */
@@ -4196,6 +4199,54 @@ function getEntryRows(){
     return String(a.name).localeCompare(String(b.name));
   });
 }
+// === LIVE ROUND OF 32 MATCH RESULTS — update this block after each game finishes ===
+// winner: 'home' | 'away' | null (null = not played yet)
+// This is the single source of truth for individual R32 results. It drives the
+// green/red/yellow highlighting on the Fixture View page, and once every match
+// here has a winner, WCP_STAGE_ACTUALS.R16 is derived automatically below so
+// Round of 16 points only get released once the full Round of 32 is finished.
+const WCP_R32_MATCH_RESULTS = [
+  {home:'Canada',        away:'South Africa',         date:'2026-06-28', winner:'home'},
+  {home:'Brazil',        away:'Japan',                date:'2026-06-29', winner:'home'},
+  {home:'Germany',       away:'Paraguay',             date:'2026-06-29', winner:'away'}, // Paraguay won on penalties
+  {home:'Netherlands',   away:'Morocco',              date:'2026-06-29', winner:'away'}, // Morocco won on penalties
+  {home:'Ivory Coast',   away:'Norway',               date:'2026-06-30', winner:'away'},
+  {home:'France',        away:'Sweden',               date:'2026-06-30', winner:null},
+  {home:'Mexico',        away:'Ecuador',              date:'2026-06-30', winner:null},
+  {home:'England',       away:'DR Congo',             date:'2026-07-01', winner:null},
+  {home:'Belgium',       away:'Senegal',              date:'2026-07-01', winner:null},
+  {home:'USA',           away:'Bosnia & Herzegovina', date:'2026-07-01', winner:null},
+  {home:'Spain',         away:'Austria',              date:'2026-07-02', winner:null},
+  {home:'Switzerland',   away:'Algeria',              date:'2026-07-02', winner:null},
+  {home:'Portugal',      away:'Croatia',              date:'2026-07-02', winner:null},
+  {home:'Australia',     away:'Egypt',                date:'2026-07-03', winner:null},
+  {home:'Argentina',     away:'Cape Verde',           date:'2026-07-03', winner:null},
+  {home:'Colombia',      away:'Ghana',                date:'2026-07-03', winner:null},
+];
+window.WCP_R32_MATCH_RESULTS = WCP_R32_MATCH_RESULTS;
+function r32MatchForTeam(team){
+  const t=String(team).trim();
+  return WCP_R32_MATCH_RESULTS.find(m=>m.home===t||m.away===t)||null;
+}
+// 'won' | 'lost' | 'pending' | 'unknown'
+function r32TeamStatus(team){
+  const m=r32MatchForTeam(team);
+  if(!m) return 'unknown';
+  if(!m.winner) return 'pending';
+  const t=String(team).trim();
+  const winningTeam = m.winner==='home' ? m.home : m.away;
+  return winningTeam===t ? 'won' : 'lost';
+}
+function r32AllMatchesPlayed(){
+  return WCP_R32_MATCH_RESULTS.length>0 && WCP_R32_MATCH_RESULTS.every(m=>!!m.winner);
+}
+function r32Winners(){
+  return WCP_R32_MATCH_RESULTS.filter(m=>m.winner).map(m=>m.winner==='home'?m.home:m.away);
+}
+window.r32MatchForTeam=r32MatchForTeam;
+window.r32TeamStatus=r32TeamStatus;
+window.r32AllMatchesPlayed=r32AllMatchesPlayed;
+window.r32Winners=r32Winners;
 // === KO STAGE ACTUALS — update as tournament progresses ===
 const WCP_STAGE_ACTUALS = {
   R32:{
@@ -4206,7 +4257,7 @@ const WCP_STAGE_ACTUALS = {
       'Portugal','Colombia','DR Congo','England','Ghana','Croatia']),
     complete:true, pts:10, max:32, dateNote:'Points Applied'
   },
-  R16: {teams:new Set([]),complete:false,pts:20,max:16,dateNote:'After 4 Jul'},
+  R16: {teams:new Set(r32AllMatchesPlayed()?r32Winners():[]),complete:r32AllMatchesPlayed(),pts:20,max:16,dateNote:'Released once all 16 R32 matches are finished'},
   QF:  {teams:new Set([]),complete:false,pts:30,max:8, dateNote:'After 7 Jul'},
   SF:  {teams:new Set([]),complete:false,pts:40,max:4, dateNote:'After 11 Jul'},
   FIN: {teams:new Set([]),complete:false,pts:50,max:2, dateNote:'After 15 Jul'},
@@ -5372,7 +5423,21 @@ function renderFixtureViewContentKO(){
     return `<span class="${cls}">${label}</span>`;
   };
 
-  const resultHtml = actual.complete
+  const r32StatusVariant={won:'correct',lost:'wrong',pending:'pending'};
+  const resultHtml = roundKey==='R32'
+    ? `<div class="fv-actual-result result-known">
+        <div class="fv-confirmed-label">⚔️ Round of 32 — Live Status</div>
+        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:11px;font-weight:800;color:#b8c9e8;margin-bottom:8px">
+          <span>🟢 Through to R16</span><span>🔴 Eliminated</span><span>🟡 Not played yet</span>
+        </div>
+        ${WCP_R32_MATCH_RESULTS.map(m=>`<div class="fv-r32-match-row">
+            <span class="fv-r32-match-date">${niceDate(m.date)}</span>
+            ${teamChip(m.home,r32StatusVariant[r32TeamStatus(m.home)])}
+            <span style="color:#7d8db3;font-weight:900">v</span>
+            ${teamChip(m.away,r32StatusVariant[r32TeamStatus(m.away)])}
+          </div>`).join('')}
+      </div>`
+    : actual.complete
     ?`<div class="fv-actual-result result-known">
         <div class="fv-confirmed-label">\u2705 ${stage.label} \u2014 Confirmed Teams</div>
         <div class="fv-qualified-chips">${[...actual.teams].map(t=>teamChip(t,'correct')).join('')}</div>
