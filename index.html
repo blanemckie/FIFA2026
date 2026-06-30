@@ -3738,8 +3738,8 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   <section id="fun" class="panel"><div class="page-head unified-final-head fun-head"><h2 class="premium-page-title">📊 Fun Stats</h2><p>Facts and Stats from the submissions so far. Discover the most popular picks, boldest predictions and tournament trends.</p></div><div class="card"><div class="league-controls upgraded fun-league-controls" id="funLeagueControls"><button class="fun-league-filter active" data-fun-league-filter="All">🏆 All Leagues</button><button class="fun-league-filter" data-fun-league-filter="Main">🌍 Main</button><button class="fun-league-filter" data-fun-league-filter="LEGO">🧱 LEGO</button><button class="fun-league-filter" data-fun-league-filter="Family">🏡 Family</button><button class="fun-league-filter" data-fun-league-filter="HFC">⚽ HFC</button></div><h3 class="fun-section-heading" id="inTournamentHeading">🔴 In Tournament Fun Stats</h3><div class="fun-stats-grid" id="inTournamentStatsGrid"><div class="stat-bubble stat-bubble-v64" style="grid-column:1/-1"><div class="stat-icon">⏳</div><div class="stat-title">Loading Match Data</div><div class="stat-value" style="font-size:16px;color:#b8c9e8">In-tournament stats will appear here once games have been played and results are entered.</div></div></div><h3 class="fun-section-heading" id="preTournamentHeading">📋 Pre Tournament Fun Stats</h3><div class="fun-stats-grid" id="funStatsGrid"></div><p class="refresh-note">These bubbles update as more locked predictions are submitted.</p></div></section>
   <section id="predictor" class="panel ai-predictor-panel"><div class="page-head unified-final-head live-table-head"><h2 class="premium-page-title">🤖 AI Probability Predictor</h2></div>
     <div class="card" style="padding:16px 18px;margin-bottom:14px;line-height:1.55">
-      <p style="margin:0 0 8px;font-size:13px;color:#b9c4dd"><b style="color:#f8c84a">How this works:</b> Each team's strength rating is built from how it actually performed in the group stage (points won, goal difference). The real Round of 32 draw is then resolved from the final group standings, and the bracket is simulated forward hundreds of times — each simulated match decided by the two teams' relative strength, not a coin flip. For any round that's already been played, the real result is used instead of a simulation. In every single simulation, each player's locked-in points are added to whatever they'd score from that simulated outcome, and whoever has the highest total in that simulation is the "winner" of that run. The percentage shown is simply how often a player comes out on top across all the simulations — so a real points lead carries its full weight, it isn't diluted just because there are still a lot of points left on the table.</p>
-      <p style="margin:0;font-size:11px;color:#6b7a99">Recalculates automatically every time the Live Table refreshes with new results — so these percentages move daily as the tournament unfolds.</p>
+      <p style="margin:0 0 6px;font-size:13.5px;color:#dce9ff;line-height:1.5"><b style="color:#f8c84a">🧠 How it works:</b> We rate every team on real group-stage form, then run the rest of the tournament <b>hundreds of times</b> over — real results used wherever they exist, pure simulation for what's still to come. Your % is simply how often you come out on top across all those simulated worlds.</p>
+      <p style="margin:0;font-size:11px;color:#8899bb">⚡ Recalculates after every result, so don't blink — your odds can swing daily.</p>
     </div>
     <div class="ai-slicer-wrap card" style="padding:14px 14px 12px;margin-bottom:14px">
       <div style="text-align:center;color:#fff3a2;font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:.10em;margin-bottom:10px">👇 Choose what you want to see</div>
@@ -3760,17 +3760,17 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     </div>
     <div class="predictor-grid" style="display:grid;grid-template-columns:1fr;gap:16px;align-items:start">
       <div class="live-table-card card ai-view-pane" id="aiViewPath" style="padding:14px">
-        <h3 style="margin:0 0 4px;font-size:15px;color:#fff3a2">🔮 AI Predicted Tournament Path <span style="font-size:9px;font-weight:1000;color:#1a1100;background:#ffc400;border-radius:6px;padding:2px 5px;margin-left:4px;vertical-align:middle">WORK IN PROGRESS</span></h3>
+        <h3 style="margin:0 0 4px;font-size:15px;color:#fff3a2">🔮 AI Predicted Tournament Path</h3>
         <p style="margin:0 0 14px;font-size:11.5px;color:#8899bb">The single most-likely winner of every remaining fixture, based on team strength — real results are used wherever a round has already been played.</p>
         <div id="aiPredictedPathBox"><div class="empty-state">Loading…</div></div>
       </div>
       <div class="live-table-card card ai-view-pane" id="aiViewTable" style="padding:14px;display:none">
-        <h3 style="margin:0 0 4px;font-size:15px;color:#fff3a2">📊 AI Predicted Final Live Table <span style="font-size:9px;font-weight:1000;color:#1a1100;background:#ffc400;border-radius:6px;padding:2px 5px;margin-left:4px;vertical-align:middle">WORK IN PROGRESS</span></h3>
+        <h3 style="margin:0 0 4px;font-size:15px;color:#fff3a2">📊 AI Predicted Final Live Table</h3>
         <p style="margin:0 0 14px;font-size:11.5px;color:#8899bb">Ranked by current real points, with the AI's projection for the rest of the tournament and each player's probability of winning the league overall.</p>
         <div id="predictorLeagueTable"><div class="empty-state">Loading…</div></div>
       </div>
       <div class="live-table-card card ai-view-pane" id="aiViewPlayer" style="padding:14px;display:none">
-        <h3 style="margin:0 0 10px;font-size:15px;color:#fff3a2">👤 Your AI Predicted Tournament Path &amp; Probability <span style="font-size:9px;font-weight:1000;color:#1a1100;background:#ffc400;border-radius:6px;padding:2px 5px;margin-left:4px;vertical-align:middle">WORK IN PROGRESS</span></h3>
+        <h3 style="margin:0 0 10px;font-size:15px;color:#fff3a2">👤 Your AI Predicted Tournament Path &amp; Probability</h3>
         <div class="ai-player-select-wrap" id="aiPlayerSelectWrap">
           <button type="button" class="ai-player-select-btn" id="predictorPlayerSelectBtn" aria-haspopup="listbox" aria-expanded="false">
             <span id="predictorPlayerSelectLabel">Loading players…</span>
@@ -4645,9 +4645,11 @@ function renderPredictorStandings(){
   // Current Rank = ordered by real points currently on the board today.
   const byCurrent=[...ranked].sort((a,b)=>(b.row._tot||0)-(a.row._tot||0));
   const currentRankByName=new Map(byCurrent.map((p,i)=>[p.name,i+1]));
-  // AI Predicted Final Ranking = ordered by AI expected final score (locked + projected remainder),
-  // tie-broken by win probability so it lines up with the headline win% order.
-  const byPredicted=[...ranked].sort((a,b)=>(b.expected-a.expected)||(b.prob-a.prob));
+  // AI Predicted Final Ranking = ordered by win probability — the actual "how often does the AI
+  // crown this player" stat — tie-broken by expected points. Sorting by expected points instead
+  // would let a higher-average-but-lower-win% player outrank someone with a better win%, which
+  // looks like a contradiction next to the Win % column.
+  const byPredicted=[...ranked].sort((a,b)=>(b.prob-a.prob)||(b.expected-a.expected));
   const predictedRankByName=new Map(byPredicted.map((p,i)=>[p.name,i+1]));
   const rows=byPredicted.map(p=>{
     const curRank=currentRankByName.get(p.name);
@@ -4762,8 +4764,8 @@ function renderPredictorPlayerDetail(name){
     : `<div style="font-size:12px;font-weight:1000;color:#fff3a2;margin-bottom:4px">Champion <span style="color:#8899bb;font-size:10px">Projected</span></div><div style="display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0"><span>${flag(pick.champPick)} ${pick.champPick||'No pick'}</span><span style="font-weight:900;color:${champProb>=15?'#32d17f':champProb>=5?'#f8c84a':'#ff8a8a'}">${(champProb||0).toFixed(0)}% → ${((champProb||0)/100*av.CHAMP.pts).toFixed(1)} pts</span></div>`;
   const gapToLeader = leader && leader.name!==name ? (leader.row._tot||0)-(p.row._tot||0) : 0;
   const summary = rank===1
-    ? `<b>${name}</b> currently leads the real-points table${gapToLeader<=0?'':''} and is the favourite in <b>${p.prob.toFixed(1)}%</b> of simulations.`
-    : `<b>${name}</b> is <b>${gapToLeader}</b> real points behind the current leader (${leader?.name}). Their <b>${p.prob.toFixed(1)}%</b> win chance reflects both that gap and how likely their remaining picks (below) are to actually come in.`;
+    ? `👑 <b>${name}</b> sits top of the table right now — and the sim agrees, backing them in <b>${p.prob.toFixed(1)}%</b> of simulated runs.`
+    : `<b>${name}</b> trails <b>${leader?.name}</b> by <b>${gapToLeader}</b> pts. Still, their picks below land them the title in <b>${p.prob.toFixed(1)}%</b> of simulations.`;
   box.innerHTML = `<div class="card" style="padding:12px 14px;margin-bottom:12px;background:rgba(179,136,255,.08);border-color:rgba(179,136,255,.25)">`
     +`<div style="font-size:13px;line-height:1.5;color:#d8d8ff">${summary}</div>`
     +`<div style="display:flex;gap:14px;margin-top:8px;font-size:12px;color:#b9c4dd">`
