@@ -3383,11 +3383,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
         <div style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(248,200,74,.22),rgba(50,209,127,.14));border:1.5px solid rgba(248,200,74,.65);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:1000;color:#fff3a2;box-shadow:0 4px 18px rgba(248,200,74,.18)">
           ✅ Round of 32 Points Now Applied!! &nbsp;·&nbsp; Check the Live Table
         </div>
-        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:7px 14px;font-size:11px;font-weight:900;color:#dce9ff">
-          🏆 GS: 10pts/game &nbsp;·&nbsp; R32: 10 &nbsp;·&nbsp; R16: 20 &nbsp;·&nbsp; QF: 30 &nbsp;·&nbsp; SF: 40 &nbsp;·&nbsp; Final: 50 &nbsp;·&nbsp; 👑 Champion: 100
-        </div>
       </div>
-      <div class="lp-closed-pill" id="lp-status-pill">🔒 Entries Are Now Closed · Tournament Underway</div>
     </div>
 
     <!-- CTA zone -->
@@ -3482,7 +3478,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
             <div class="lp-prog-stat"><b id="lpMatchesPlayed">0</b><span>Played</span></div>
             <div class="lp-prog-stat"><b id="lpMatchesLeft">104</b><span>To Go</span></div>
             <div class="lp-prog-stat"><b id="lpTotalGoals">0</b><span>Goals</span></div>
-            <div class="lp-prog-stat"><b id="lpTournamentDay">Day 1</b><span>of 64</span></div>
+            <div class="lp-prog-stat"><b id="lpTournamentDay">Day 1</b><span>of 39</span></div>
           </div>
         </div>
         <div class="lp-prog-track"><div class="lp-prog-fill" id="lpProgFill"></div></div>
@@ -4068,6 +4064,14 @@ const WCP_STAGE_ACTUALS = {
   FIN: {teams:new Set([]),complete:false,pts:50,max:2, dateNote:'After 15 Jul'},
   CHAMP:{teams:new Set([]),complete:false,pts:100,max:1, dateNote:'After 19 Jul'}
 };
+function currentTournamentStage(){
+  if(!WCP_STAGE_ACTUALS.R32.complete) return 'Group Stage';
+  if(!WCP_STAGE_ACTUALS.R16.complete) return 'Round of 16';
+  if(!WCP_STAGE_ACTUALS.QF.complete) return 'Quarter-Finals';
+  if(!WCP_STAGE_ACTUALS.SF.complete) return 'Semi-Finals';
+  if(!WCP_STAGE_ACTUALS.FIN.complete) return 'The Final';
+  return 'Champion Crowned';
+}
 function computeKoPoints(row){
   const grp=row.groupPredictions||[],rawKO=row.knockoutPicks||[];
   const bkt=row.bracket||row.state?.bracket||{};
@@ -4273,9 +4277,9 @@ function roundLabelForPick(k){
 function maxPerTeamForStage(label){
   const l=String(label||'').toLowerCase();
   if(l.includes('champion')) return 100;
-  if(l.includes('finalist')||l.includes('final')) return 50;
-  if(l.includes('semi')||l.includes('sf')) return 40;
   if(l.includes('quarter')||l.includes('qf')) return 30;
+  if(l.includes('semi')||l.includes('sf')) return 40;
+  if(l.includes('finalist')) return 50;
   if(l.includes('16')||l.includes('r16')) return 20;
   return 10; // R32 and group
 }
@@ -4479,7 +4483,7 @@ function renderSubmissionDetail(entry){
     if(actual.complete){
       summaryText = `${correctCount} of ${maxTeams} Teams Correct · ${per} pts per Team · <strong style="color:#32d17f">${earnedPts} pts earned</strong> / ${max} max · <span style="color:#32d17f;font-size:11px">✅ Points Applied</span>`;
     } else {
-      summaryText = `${per} pts per Correct Team · Max ${max} pts · <span style="color:#fff3a2">${actual.pendingDate}</span>`;
+      summaryText = `${per} pts per Correct Team · Max ${max} pts · <span style="color:#fff3a2">${actual.dateNote}</span>`;
     }
 
     const prediction=`<div class="stage-summary-box-v51 results-audit-v74"><div class="stage-picks-v51">${teamPills}</div><div class="summary-line-v51">${summaryText}</div></div>`;
@@ -5539,8 +5543,35 @@ const LP_CACHE_KEY = 'wcp-landing-data';
 const LP_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours max (score updater cache-busts earlier)
 
 async function fetchLandingData(){
-  // Use Firebase data (same source as results page) — no external API needed
-  applyLandingDataFromFirebase();
+  try {
+    const cached = JSON.parse(localStorage.getItem(LP_CACHE_KEY)||'null');
+    if(cached && Date.now() - cached.ts < LP_CACHE_TTL && Array.isArray(cached.matches) && cached.matches.length){
+      applyLandingDataFromApi(cached.matches);
+      return;
+    }
+  } catch(e){}
+  try {
+    const res = await fetch(FD_BASE_LP + '/competitions/WC/matches', { headers: { 'X-Auth-Token': FD_TOKEN_LP } });
+    if(!res.ok) throw new Error('FD API error ' + res.status);
+    const data = await res.json();
+    const matches = data.matches || [];
+    if(!matches.length) throw new Error('no matches returned from API');
+    try { localStorage.setItem(LP_CACHE_KEY, JSON.stringify({ts:Date.now(), matches})); } catch(e){}
+    applyLandingDataFromApi(matches);
+  } catch(e) {
+    console.warn('Live fixtures API unavailable, falling back to Firebase-derived data:', e);
+    applyLandingDataFromFirebase();
+  }
+}
+
+function applyLandingDataFromApi(matches){
+  const finished = matches.filter(m => m.status === 'FINISHED')
+    .sort((a,b) => new Date(a.utcDate) - new Date(b.utcDate));
+  const upcoming = matches.filter(m => m.status === 'SCHEDULED' || m.status === 'TIMED')
+    .sort((a,b) => new Date(a.utcDate) - new Date(b.utcDate));
+  applyProgressData(finished, matches.length || 104);
+  applyResultsData(finished);
+  applyFixturesData(upcoming);
 }
 
 function applyLandingDataFromFirebase(){
@@ -5588,8 +5619,10 @@ function applyProgressData(finished, totalInApi){
   const left   = total - played;
   const goals  = finished.reduce((s,m) => s+(m.score?.fullTime?.home||0)+(m.score?.fullTime?.away||0), 0);
   const start  = new Date('2026-06-11');
+  const end    = new Date('2026-07-19');
+  const totalDays = Math.round((end - start) / 86400000) + 1; // 39
   const now    = new Date();
-  const day    = Math.max(1, Math.ceil((now - start) / 86400000));
+  const day    = Math.min(totalDays, Math.max(1, Math.ceil((now - start) / 86400000)));
   const pct    = Math.min(100, (played / total * 100)).toFixed(1);
   const el = id => document.getElementById(id);
   if(el('lpMatchesPlayed')) el('lpMatchesPlayed').textContent = played;
@@ -5602,11 +5635,12 @@ function applyProgressData(finished, totalInApi){
   const rows = (typeof getEntryRows === 'function') ? getEntryRows() : [];
   if(el('lpStatEntries')) el('lpStatEntries').textContent = rows.length || '—';
   // Fun rotating sub-text
+  const stageLabel = currentTournamentStage();
   const subs = [
-    '\uD83D\uDD25 Group Stage Underway\u2026 ' + played + ' matches played, ' + left + ' to go!',
-    '\u26BD ' + goals + ' goals scored so far \u2014 and we\u2019re just getting started!',
+    '\uD83D\uDD25 ' + stageLabel + ' Underway\u2026 ' + played + ' matches played, ' + left + ' to go!',
+    '\u26BD ' + goals + ' goals scored so far \u2014 and the knockouts are heating up!',
     '\uD83C\uDFC6 48 teams. 16 venues. ' + rows.length + ' predictions. 1 champion. Let\u2019s go!',
-    '\uD83C\uDF0D Day ' + day + ' of 64 \u2014 the World Cup journey is underway!',
+    '\uD83C\uDF0D Day ' + day + ' of ' + totalDays + ' \u2014 the World Cup journey is underway!',
     '\u23F1\uFE0F ' + left + ' matches still to play \u2014 anything can happen!'
   ];
   const sub = el('lpProgSub');
@@ -5721,7 +5755,7 @@ function applyFixturesData(upcoming){
 // Bust landing cache when Firebase scores update (new data available)
 function bustLandingCache(){
   try { localStorage.removeItem(LP_CACHE_KEY); } catch(e){}
-  applyLandingDataFromFirebase();
+  fetchLandingData();
 }
 window.bustLandingCache = bustLandingCache;
 
@@ -5741,7 +5775,7 @@ function renderLandingFixtures_local(){
 
 
 // ── Newspaper (Claude API) ────────────────────────────────────────────
-const LP_NP_CACHE_KEY = 'wcp-newspaper-cache-v4'; // v4 forces cache bust with per-league tone variation
+const LP_NP_CACHE_KEY = 'wcp-newspaper-cache-v5'; // v5 forces cache bust - knockout stage commentary
 const LP_NP_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 hours - regenerates regularly during tournament
 
 function buildNewspaperPrompt(){
@@ -5757,6 +5791,7 @@ function buildNewspaperPrompt(){
     HFC:    rows.filter(r=>r.hfcLeague                          && !r.allLeagues).slice(0,5),
   };
   return 'You are writing a fun, engaging sports newspaper front page for a FIFA World Cup 2026 prediction game.\n\n' +
+    'IMPORTANT CONTEXT: The tournament is currently in the ' + currentTournamentStage() + ' stage. The group stage is finished — do NOT write as if group games are still being played. Reflect the knockout-stage tension and stakes in your tone.\n\n' +
     'Current leaderboard (top 5):\n' + ranked.slice(0,5).map((r,i)=>`${i+1}. ${r.name} — ${Number(r.totalPoints||0)} pts`).join('\n') + '\n\n' +
     'Exact score heroes: ' + (exactScorers.map(r=>r.name).join(', ')||'none yet') + '\n' +
     'Matches scored so far: ' + matchesPlayed + '\n\n' +
@@ -5849,9 +5884,9 @@ async function renderLandingNewspaper(){
       return txt.trim();
     };
     const fallback = {
-      headline: leader ? (leader.name + ' leads the pack after the opening matches') : 'The tournament has kicked off — who will come out on top?',
+      headline: leader ? (leader.name + ' leads the pack heading into the ' + currentTournamentStage()) : 'The knockout stage is here — who will come out on top?',
       byline: 'By our Prediction Correspondent',
-      lead: leader ? '<b>'+leader.name+'</b> is setting the pace with <b>'+Number(leader.totalPoints||0)+' points</b> as the World Cup group stage roars into life. The leaderboard is already taking shape — but with 100 games still to go, this is far from over.' : 'The tournament is underway and predictions are being put to the test across all leagues.',
+      lead: leader ? '<b>'+leader.name+'</b> is setting the pace with <b>'+Number(leader.totalPoints||0)+' points</b> as the World Cup reaches the ' + currentTournamentStage() + '. The leaderboard is taking shape — but with the latter knockout rounds and Champion pick still to come, this is far from over.' : 'The tournament has moved into the ' + currentTournamentStage() + ' and predictions are being put to the test across all leagues.',
       main: leagueSummary(leagueRows.Main, 'Main League'),
       lego: leagueSummary(leagueRows.LEGO, 'LEGO League'),
       family: leagueSummary(leagueRows.Family, 'Family League'),
