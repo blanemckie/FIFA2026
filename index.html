@@ -7036,9 +7036,14 @@ function renderAdminR32Panel(){
 }
 window.renderAdminR32Panel = renderAdminR32Panel;
 
+// Round of 32 results need to reach EVERY visitor, not just the admin panel — this was previously
+// only fetched when on #admin, so results entered there never actually reached normal visitors
+// browsing the site. Fetch on load, and keep it on the same cadence as the rest of the live data.
+window.loadR32ResultsFromFirestore();
+setInterval(()=>window.loadR32ResultsFromFirestore(), 2*60*1000);
+
 if(window.location.hash === '#admin'){
   renderAdminR32Panel();
-  window.loadR32ResultsFromFirestore();
 }
 
 </script>
