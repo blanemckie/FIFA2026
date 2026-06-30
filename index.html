@@ -1638,7 +1638,13 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   .ai-slicer-btn{flex-direction:row;text-align:left;padding:12px}
   .ai-slicer-btn .ai-slicer-text{flex:1}
 }
-.ai-path-round{margin-bottom:16px}
+.ai-league-filter{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:9px 14px;font-weight:1000;font-size:12px;cursor:pointer;transition:transform .15s ease,background .15s ease}
+.ai-league-filter:hover{transform:translateY(-1px)}
+.ai-league-filter.active{background:linear-gradient(135deg,var(--gold),#fff3a2);color:#071633;border-color:transparent}
+@media(max-width:760px){
+  #aiLeagueControls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .ai-league-filter{padding:8px 4px;font-size:10.5px}
+}
 .ai-path-round-title{font-size:11px;font-weight:1000;text-transform:uppercase;letter-spacing:.08em;color:#fff3a2;margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .ai-path-round-title .ai-path-round-tag{font-size:9px;font-weight:900;padding:2px 8px;border-radius:999px;background:rgba(50,209,127,.14);color:#6af0b8;border:1px solid rgba(50,209,127,.32);text-transform:none;letter-spacing:0}
 .ai-path-round-title .ai-path-round-tag.projected{background:rgba(248,200,74,.14);color:#fff3a2;border-color:rgba(248,200,74,.32)}
@@ -3738,6 +3744,15 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
         <button class="ai-slicer-btn" data-ai-view="table" type="button"><span class="ai-slicer-icon">📊</span><span class="ai-slicer-text"><b>AI Predicted Final Live Table</b><small>Projected final standings &amp; win probability</small></span></button>
         <button class="ai-slicer-btn" data-ai-view="player" type="button"><span class="ai-slicer-icon">👤</span><span class="ai-slicer-text"><b>Your AI Predicted Tournament Path</b><small>Pick your name to see your bracket &amp; probability</small></span></button>
       </div>
+      <div class="fv-control-label" style="margin-top:14px">Filter by League</div>
+      <div class="league-controls upgraded" id="aiLeagueControls" style="margin-top:8px">
+        <button class="ai-league-filter active" data-ai-league="All" type="button">🏆 All Leagues</button>
+        <button class="ai-league-filter" data-ai-league="Main" type="button">🌍 Main</button>
+        <button class="ai-league-filter" data-ai-league="LEGO" type="button">🧱 LEGO</button>
+        <button class="ai-league-filter" data-ai-league="Family" type="button">🏡 Family</button>
+        <button class="ai-league-filter" data-ai-league="HFC" type="button">⚽ HFC</button>
+      </div>
+      <p style="margin:8px 0 0;font-size:10.5px;color:#6b7a99">Win % is always calculated against the other players in the selected league, not the entire field.</p>
     </div>
     <div class="predictor-grid" style="display:grid;grid-template-columns:1fr;gap:16px;align-items:start">
       <div class="live-table-card card ai-view-pane" id="aiViewPath" style="padding:14px">
@@ -4117,6 +4132,7 @@ function renderBracket(){const wrap=$('#bracket');wrap.innerHTML='';['R32','R16'
 function pick(match,team){let ph=String(team).includes('winner')||String(team).includes('Best 3rd')||String(team).includes('Group ');return `<button class="pick ${state.bracket[match]===team?'selected':''} ${ph?'placeholder':''}" data-match="${match}" data-team="${team}">${ph?'<span class="flag">⚽</span><b class="team-name">'+team+'</b>':teamLabel(team)}</button>`}
 function clearAfter(id){if(id.startsWith('M'))Object.keys(state.bracket).forEach(k=>{if(!k.startsWith('M'))delete state.bracket[k]});if(id.startsWith('R16'))Object.keys(state.bracket).forEach(k=>{if(k.startsWith('QF')||k.startsWith('SF')||k.startsWith('FINAL'))delete state.bracket[k]});if(id.startsWith('QF'))Object.keys(state.bracket).forEach(k=>{if(k.startsWith('SF')||k.startsWith('FINAL'))delete state.bracket[k]});if(id.startsWith('SF'))Object.keys(state.bracket).forEach(k=>{if(k.startsWith('FINAL'))delete state.bracket[k]});}
 let currentLeagueFilter='All';
+let aiLeagueFilter='All';
 function normaliseLeague(value){
   const v=String(value||'').toLowerCase();
   if(v.includes('lego')) return 'LEGO';
@@ -4502,12 +4518,15 @@ let _aiTeamAdvanceProb=null;
 let _aiPickSetByName=new Map();
 function refreshAiProbabilities(){
   const allRows=getEntryRows();
-  allRows.forEach(r=>{if(!r._ko)r._ko=computeKoPoints(r);if(r._gs===undefined)r._gs=getGsPts(r);});
-  if(!allRows.length){_aiProbByName=new Map();_aiTeamAdvanceProb=null;_aiPickSetByName=new Map();return;}
-  const {scored,teamAdvanceProb}=computeAiProbabilities(allRows);
+  allRows.forEach(r=>{if(!r._ko)r._ko=computeKoPoints(r);if(r._gs===undefined)r._gs=getGsPts(r);if(r._tot===undefined)r._tot=r._gs+r._ko.r32Pts+r._ko.r16Pts+r._ko.qfPts+r._ko.sfPts+r._ko.finPts;});
+  // AI win% is "probability of winning the league table vs the other contenders in the league" —
+  // so only simulate within the currently selected league slicer, not the whole field.
+  const leagueRows=aiLeagueFilter==='All'?allRows:allRows.filter(r=>r.allLeagues || (aiLeagueFilter==='HFC' && r.hfcLeague) || normaliseLeague(r.league)===aiLeagueFilter);
+  if(!leagueRows.length){_aiProbByName=new Map();_aiTeamAdvanceProb=null;_aiPickSetByName=new Map();return;}
+  const {scored,teamAdvanceProb}=computeAiProbabilities(leagueRows);
   _aiProbByName=new Map(scored.map(p=>[p.name,p]));
   _aiTeamAdvanceProb=teamAdvanceProb;
-  _aiPickSetByName=new Map(buildPlayerPickSets(allRows).map(p=>[p.row.name,p]));
+  _aiPickSetByName=new Map(buildPlayerPickSets(leagueRows).map(p=>[p.row.name,p]));
 }
 function renderAiPredictor(){
   renderPredictorStandings();
@@ -4697,6 +4716,12 @@ function setAiPredictorView(view){
   $$('#aiSlicerGroup .ai-slicer-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.aiView===view));
 }
 $$('#aiSlicerGroup .ai-slicer-btn').forEach(btn=>btn.addEventListener('click',()=>setAiPredictorView(btn.dataset.aiView)));
+$$('.ai-league-filter').forEach(btn=>btn.addEventListener('click',()=>{
+  aiLeagueFilter=btn.dataset.aiLeague;
+  $$('.ai-league-filter').forEach(b=>b.classList.toggle('active',b.dataset.aiLeague===aiLeagueFilter));
+  refreshAiProbabilities();
+  renderAiPredictor();
+}));
 $$('.league-filter').forEach(btn=>btn.addEventListener('click',()=>{currentLeagueFilter=btn.dataset.leagueFilter;renderLeaderboard();}));
 // Re-render leaderboard on resize so mobile/desktop layout switches correctly
 let _lbResizeTimer;
