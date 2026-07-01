@@ -1992,6 +1992,7 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 .fv-actual-result{display:inline-block;margin-top:10px;padding:7px 20px;border-radius:999px;font-weight:1000;font-size:15px;letter-spacing:.04em}
 .fv-actual-result.result-known{background:rgba(50,209,127,.18);border:1px solid rgba(50,209,127,.45);color:#32d17f}
 .fv-actual-result.result-pending{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#b8c9e8}
+.fv-r32-live-status{margin-top:10px;text-align:center}
 .fv-table-wrap{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:20px;overflow:hidden}
 .fv-table{width:100%;border-collapse:collapse;font-size:13px}
 .fv-table thead tr{background:rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.12)}
@@ -2040,21 +2041,32 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
 .ai-player-select-list[hidden]{display:none}
 .ai-player-select-option{padding:11px 12px;border-radius:8px;font-size:13.5px;font-weight:700;color:#dce9ff;cursor:pointer}
 .ai-player-select-option:active,.ai-player-select-option.active{background:rgba(248,200,74,.18);color:#fff3a2}
-.fv-stage-toggle .league-filter{font-size:13px}
+.fv-stage-toggle{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.fv-stage-btn{display:flex;align-items:center;gap:10px;padding:13px 12px;border-radius:16px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.16);color:#dce9ff;cursor:pointer;transition:.15s ease;text-align:left;font-family:inherit}
+.fv-stage-icon{font-size:22px;line-height:1;flex-shrink:0}
+.fv-stage-text{min-width:0}
+.fv-stage-text b{display:block;font-size:13px;font-weight:1000;color:#fff;letter-spacing:.01em}
+.fv-stage-text small{display:block;margin-top:2px;font-size:10px;font-weight:700;color:#8899bb;line-height:1.25}
+.fv-stage-btn:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.28)}
+.fv-stage-btn.active{background:linear-gradient(135deg,rgba(55,212,255,.20),rgba(255,255,255,.06));border-color:rgba(55,212,255,.55);box-shadow:0 0 0 1px rgba(55,212,255,.18) inset}
+.fv-stage-btn.active .fv-stage-icon{filter:drop-shadow(0 0 6px rgba(55,212,255,.5))}
+.fv-stage-btn.active .fv-stage-text b{color:#b9f3ff}
+@media(max-width:520px){
+  .fv-stage-toggle{grid-template-columns:1fr;gap:7px}
+  .fv-stage-btn{padding:10px 11px}
+  .fv-stage-icon{font-size:19px}
+  .fv-stage-text b{font-size:12.5px}
+  .fv-stage-text small{font-size:9.5px}
+}
 
 /* ── Fixture View: clearer slicer/filter affordance ── */
 .fv-control-label{text-align:center;font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:.12em;color:#8899bb;margin-bottom:7px}
-#fixture-view .fv-stage-toggle .league-filter,
 #fixture-view #fvLeagueControls.league-controls.upgraded .league-filter{
   background:rgba(255,255,255,.05)!important;border:1.5px solid rgba(255,255,255,.16)!important;color:#b8c9e8!important;box-shadow:none!important;
 }
-#fixture-view .fv-stage-toggle .league-filter:after,
-#fixture-view #fvLeagueControls .league-filter:after{content:'';}
-#fixture-view .fv-stage-toggle .league-filter:not(.active):hover,
 #fixture-view #fvLeagueControls .league-filter:not(.active):hover{
   background:rgba(255,255,255,.11)!important;border-color:rgba(255,255,255,.30)!important;color:#fff!important;
 }
-#fixture-view .fv-stage-toggle .league-filter.active,
 #fixture-view #fvLeagueControls .league-filter.active{
   background:linear-gradient(135deg,#fff3a2,#f8c84a)!important;border-color:transparent!important;color:#071633!important;
   box-shadow:0 8px 20px rgba(248,200,74,.38)!important;transform:translateY(-1px);
@@ -2941,66 +2953,74 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
   .live-results-submissions .submission-picker,.live-results-submissions .player-picker{max-width:100%!important;margin-bottom:12px!important;}
   .live-results-submissions .picker-card{border-radius:18px!important;padding:10px!important;}
   .live-results-submissions .player-dropdown{height:46px!important;min-height:46px!important;font-size:15px!important;border-radius:15px!important;}
-  .live-results-submissions .player-result-strip{border-radius:18px!important;padding:12px!important;display:block!important;text-align:center!important;}
-  .live-results-submissions .points-total-card{margin:10px auto 0!important;max-width:210px!important;}
+  .live-results-submissions .player-result-strip{border-radius:18px!important;padding:10px!important;display:block!important;text-align:center!important;}
+  .live-results-submissions .points-total-card{margin:8px auto 0!important;max-width:210px!important;}
   .live-results-submissions .results-grid-v51,
   .live-results-submissions .results-grid-row{
     display:block!important;
   }
   .live-results-submissions .results-grid-header{display:none!important;}
-  .live-results-submissions .stage-divider-v51{font-size:18px!important;min-height:44px!important;margin:14px 0 8px!important;padding:8px 10px!important;border-radius:18px!important;}
+  .live-results-submissions .stage-divider-v51{font-size:16px!important;min-height:36px!important;margin:10px 0 6px!important;padding:6px 10px!important;border-radius:16px!important;}
   .live-results-submissions .results-grid-row{
-    margin-bottom:12px!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    grid-template-areas:"pred pred" "actual points"!important;
+    gap:0!important;
+    margin-bottom:7px!important;
     padding:0!important;
-    border-radius:22px!important;
+    border-radius:16px!important;
     background:rgba(255,255,255,.05)!important;
     border:1px solid rgba(255,255,255,.10)!important;
     overflow:hidden!important;
   }
+  .live-results-submissions .prediction-cell{grid-area:pred!important;}
+  .live-results-submissions .actual-cell{grid-area:actual!important;border-right:1px solid rgba(255,255,255,.10)!important;border-top:1px solid rgba(255,255,255,.10)!important;}
+  .live-results-submissions .points-cell{grid-area:points!important;border-top:1px solid rgba(255,255,255,.10)!important;}
   .live-results-submissions .results-cell{
     display:block!important;
     min-height:auto!important;
     border:0!important;
     border-radius:0!important;
     background:transparent!important;
-    padding:8px 10px!important;
+    padding:5px 8px 6px!important;
   }
   .live-results-submissions .results-cell::before{
     content:attr(data-label)!important;
     display:block!important;
     text-align:center!important;
     color:#fff3a2!important;
-    font-size:10px!important;
-    letter-spacing:.1em!important;
+    font-size:9px!important;
+    letter-spacing:.08em!important;
     text-transform:uppercase!important;
     font-weight:1000!important;
-    margin-bottom:6px!important;
+    margin-bottom:3px!important;
   }
   .live-results-submissions .prediction-cell::before{display:none!important;}
   .live-results-submissions .fixture-card-v51{
-    grid-template-columns:minmax(0,1fr) 78px minmax(0,1fr)!important;
-    gap:7px!important;
-    padding:10px!important;
-    border-radius:20px!important;
+    grid-template-columns:minmax(0,1fr) 68px minmax(0,1fr)!important;
+    gap:5px!important;
+    padding:7px!important;
+    border-radius:14px!important;
   }
   .live-results-submissions .fixture-team-v51{
-    min-height:50px!important;
-    padding:8px 7px!important;
-    font-size:12px!important;
-    border-radius:15px!important;
+    min-height:38px!important;
+    padding:6px 6px!important;
+    font-size:11.5px!important;
+    border-radius:12px!important;
   }
   .live-results-submissions .fixture-team-v51.home{justify-content:flex-start!important;text-align:left!important;}
   .live-results-submissions .fixture-team-v51.away{justify-content:flex-end!important;text-align:right!important;}
-  .live-results-submissions .fixture-score-v51{min-width:78px!important;font-size:15px!important;padding:10px 5px!important;border-radius:14px!important;}
-  .live-results-submissions .flag-img,.live-results-submissions .fixture-team-v51 img{width:25px!important;height:19px!important;min-width:25px!important;}
-  .live-results-submissions .fixture-meta-v51 span{font-size:10px!important;padding:4px 6px!important;}
+  .live-results-submissions .fixture-score-v51{min-width:68px!important;font-size:13px!important;padding:8px 4px!important;border-radius:12px!important;}
+  .live-results-submissions .flag-img,.live-results-submissions .fixture-team-v51 img{width:22px!important;height:16px!important;min-width:22px!important;}
+  .live-results-submissions .fixture-meta-v51{margin-top:0!important;gap:4px!important;}
+  .live-results-submissions .fixture-meta-v51 span{font-size:9px!important;padding:3px 5px!important;}
   .live-results-submissions .actual-cell,.live-results-submissions .points-cell{text-align:center!important;}
-  .live-results-submissions .actual-pending{font-size:10.5px!important;padding:7px 10px!important;}
-  .live-results-submissions .points-cell{font-size:18px!important;}
+  .live-results-submissions .actual-pending{font-size:10px!important;padding:5px 8px!important;}
+  .live-results-submissions .points-cell{font-size:15px!important;}
   .live-results-submissions .stage-team-pill{font-size:12px!important;}
   .live-results-submissions .summary-line-v51{font-size:12px!important;line-height:1.3!important;}
-  .live-results-submissions .results-total-row{display:block!important;text-align:center!important;font-size:22px!important;padding:14px!important;}
-  .live-results-submissions .results-total-row>div:last-child{margin-top:8px!important;font-size:26px!important;}
+  .live-results-submissions .results-total-row{display:block!important;text-align:center!important;font-size:20px!important;padding:11px!important;}
+  .live-results-submissions .results-total-row>div:last-child{margin-top:6px!important;font-size:23px!important;}
 }
 
 
@@ -3704,10 +3724,10 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     <div class="status-ticker" id="fvStatusTicker" style="margin-bottom:10px"><div class="st-label"><span id="fvDot" style="width:8px;height:8px;border-radius:50%;background:#f8c84a;display:inline-block;box-shadow:0 0 6px rgba(248,200,74,.5)"></span>Live Status</div><div class="st-track"><div class="st-marquee" id="fvTickerMarquee"><span class="st-item gold">⏳ Scores updating shortly</span><span class="st-dot">•</span><span class="st-item">Fixture data refreshes automatically</span><span class="st-dot">•</span><span class="st-item cyan">Select a game to compare all predictions</span></div></div></div>
     <div class="world-cup-ticker" id="fvWorldCupTicker" aria-label="World Cup Wire - Fixture View" style="margin-bottom:14px"><div class="ticker-label">🔴 World Cup Wire</div><div class="ticker-track"><div class="ticker-marquee"><span class="ticker-item">Loading latest player points updates…</span></div></div></div>
     <div class="card" style="padding:18px 20px 14px">
-      <div class="fv-control-label">View</div>
-      <div class="fv-stage-toggle" id="fvStageToggle" style="display:flex;gap:8px;margin-bottom:16px;justify-content:center;flex-wrap:wrap">
-        <button class="league-filter active" data-fv-stage="group">⚽ Group Stage</button>
-        <button class="league-filter" data-fv-stage="knockout">🏆 Knockout Stages</button>
+      <div class="fv-control-label">Tournament Stage</div>
+      <div class="fv-stage-toggle" id="fvStageToggle">
+        <button class="fv-stage-btn active" data-fv-stage="group" type="button"><span class="fv-stage-icon">⚽</span><span class="fv-stage-text"><b>Group Stage</b><small>Browse individual group fixtures</small></span></button>
+        <button class="fv-stage-btn" data-fv-stage="knockout" type="button"><span class="fv-stage-icon">🏆</span><span class="fv-stage-text"><b>Knockout Stage</b><small>Round of 32 through to the Final</small></span></button>
       </div>
       <div class="fv-control-label">Filter by League</div>
       <div class="league-controls upgraded" id="fvLeagueControls" style="margin-bottom:14px">
@@ -4378,7 +4398,6 @@ function renderLeaderboard(){
     r._tot=r._gs+r._ko.r32Pts+r._ko.r16Pts+r._ko.qfPts+r._ko.sfPts+r._ko.finPts;
   });
   const isMobile=window.innerWidth<=650;
-  const aiProbMap=new Map([..._aiProbByName.entries()].map(([name,p])=>[name,p.prob]));
   if(isMobile){
     const av=WCP_STAGE_ACTUALS;
     const stageChip=(label,val,act)=>{
@@ -4391,8 +4410,6 @@ function renderLeaderboard(){
     const cards=filtered.map((r,i)=>{
       const ko=r._ko||{};
       const medal=i===0?'\ud83e\udd47 ':i===1?'\ud83e\udd48 ':i===2?'\ud83e\udd49 ':'';
-      const aiP=aiProbMap.get(r.name);
-      const aiChip=aiP!==undefined?`<div class="lb-mc-stat" style="background:rgba(179,136,255,.10)!important;border-color:rgba(179,136,255,.28)!important"><span class="lb-mc-val" style="color:#b388ff">${aiP.toFixed(1)}%</span><span class="lb-mc-lbl">🤖 AI Win</span></div>`:'';
       return `<div class="lb-mobile-card">`
         +`<div class="lb-mc-top"><span class="rank-badge">${i+1}</span>`
         +`<div class="lb-mc-info"><span class="leader-player">${medal}${r.name||'?'}</span>`
@@ -4405,7 +4422,6 @@ function renderLeaderboard(){
         +stageChip('QF',ko.qfPts,av.QF)
         +stageChip('SF',ko.sfPts,av.SF)
         +stageChip('Final',ko.finPts,av.FIN)
-        +aiChip
         +`</div></div>`;
     }).join('');
     $('#leaderboardList').innerHTML=summary+`<div class="lb-mobile-list">${cards}</div>`;
@@ -4421,13 +4437,10 @@ function renderLeaderboard(){
       +`<th style="width:36px">Rank</th><th>Player</th><th>Entry</th>`
       +`<th style="text-align:center;font-size:11px;color:#37d4ff">GS<br><span style="font-size:9px;opacity:.8">\u2705 Applied</span></th>`
       +hdr('R32',av.R32)+hdr('R16',av.R16)+hdr('QF',av.QF)+hdr('SF',av.SF)+hdr('Final',av.FIN)
-      +`<th style="text-align:right;color:#f8c84a">Total</th>`
-      +`<th style="text-align:center;font-size:11px;color:#b388ff">🤖 AI Win %</th></tr></thead><tbody>`
+      +`<th style="text-align:right;color:#f8c84a">Total</th></tr></thead><tbody>`
       +filtered.map((r,i)=>{
         const ko=r._ko||{};
         const medal=i===0?'\ud83e\udd47 ':i===1?'\ud83e\udd48 ':i===2?'\ud83e\udd49 ':'';
-        const aiP=aiProbMap.get(r.name);
-        const aiCell=aiP!==undefined?`<span style="font-weight:1000;font-size:13px;color:#b388ff">${aiP.toFixed(1)}%</span>`:'<span style="color:#6b7a99;font-size:12px">—</span>';
         return `<tr>`
           +`<td><span class="rank-badge">${i+1}</span></td>`
           +`<td><span class="leader-player">${medal}${r.name||'?'}</span></td>`
@@ -4439,7 +4452,6 @@ function renderLeaderboard(){
           +`<td style="text-align:center">${pend(ko.sfPts, av.SF)}</td>`
           +`<td style="text-align:center">${pend(ko.finPts,av.FIN)}</td>`
           +`<td style="text-align:right"><span class="points-badge" style="width:78px;text-align:center;font-variant-numeric:tabular-nums">${r._tot} pts</span></td>`
-          +`<td style="text-align:center">${aiCell}</td>`
           +`</tr>`;
       }).join('')
       +`</tbody></table></div>`;
@@ -5598,8 +5610,8 @@ function renderFixtureViewContentKO(){
     return `<div class="ai-path-match played"><div class="fv-r32-match-date" style="text-align:left;margin-bottom:5px">${niceDate(m.date)}</div>${row(m.home)}${row(m.away)}</div>`;
   };
   const resultHtml = roundKey==='R32'
-    ? `<div class="fv-actual-result result-known">
-        <div class="fv-confirmed-label">⚔️ Round of 32 — Live Status</div>
+    ? `<div class="fv-r32-live-status">
+        <div class="fv-confirmed-label" style="color:#dce9ff">⚔️ Round of 32 — Live Status</div>
         <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:11px;font-weight:800;color:#b8c9e8;margin-bottom:8px">
           <span>✅ Through to R16</span><span>🔴 Eliminated</span><span>🟡 Not played yet</span>
         </div>
@@ -7771,62 +7783,63 @@ if(window.location.hash === '#admin'){
 }
 
 /* ===== LB Mobile Cards v96b ===== */
-.lb-mobile-list{display:flex;flex-direction:column;gap:6px;width:100%;}
+.lb-mobile-list{display:flex;flex-direction:column;gap:5px;width:100%;}
 .lb-mobile-card{
   background:linear-gradient(135deg,rgba(255,255,255,.11),rgba(255,255,255,.055));
   border:1px solid rgba(255,255,255,.14);
-  border-radius:14px;
-  padding:9px 10px 8px;
+  border-radius:12px;
+  padding:7px 9px 6px;
   box-shadow:0 3px 10px rgba(0,0,0,.14);
 }
 .lb-mc-top{
   display:grid;
-  grid-template-columns:28px 1fr auto;
+  grid-template-columns:26px 1fr auto;
   align-items:center;
-  gap:8px;
-  margin-bottom:6px;
+  gap:7px;
+  margin-bottom:5px;
 }
-.lb-mc-info{display:flex;flex-direction:column;gap:2px;min-width:0;}
-.lb-mc-entry{margin-top:1px;}
-.lb-mc-pts{font-size:14px!important;padding:4px 8px!important;min-width:50px!important;border-radius:9px!important;white-space:nowrap;}
+.lb-mc-info{display:flex;flex-direction:column;gap:1px;min-width:0;}
+.lb-mc-entry{margin-top:0;}
+.lb-mc-pts{font-size:13px!important;padding:3px 7px!important;min-width:46px!important;border-radius:8px!important;white-space:nowrap;}
 .lb-mc-stats{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:5px;
+  gap:4px;
+  row-gap:4px;
   border-top:1px solid rgba(255,255,255,.09);
-  padding-top:6px;
+  padding-top:5px;
 }
 .lb-mc-stat{
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:1px;
+  gap:0;
   background:rgba(55,212,255,.08);
   border:1px solid rgba(55,212,255,.18);
-  border-radius:8px;
-  padding:4px 3px;
+  border-radius:7px;
+  padding:3px 2px;
 }
 .lb-mc-stat-exact{
   background:rgba(248,200,74,.10);
   border-color:rgba(248,200,74,.28);
 }
-.lb-mc-val{font-size:14px;font-weight:1000;color:#37d4ff;line-height:1;}
+.lb-mc-val{font-size:13px;font-weight:1000;color:#37d4ff;line-height:1.15;}
 .lb-mc-val-gold{color:#f8c84a;}
-.lb-mc-lbl{font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#8899bb;line-height:1;}
+.lb-mc-lbl{font-size:7.5px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#8899bb;line-height:1.2;}
 
 /* ===== Extra compact Live Table on mobile ===== */
 @media(max-width:480px){
-  .lb-mobile-list{gap:5px;}
-  .lb-mobile-card{padding:8px 9px 7px;border-radius:12px;}
-  .lb-mc-top{grid-template-columns:26px 1fr auto;gap:7px;margin-bottom:5px;}
-  .lb-mc-pts{font-size:13px!important;padding:3px 7px!important;min-width:44px!important;}
-  .lb-mc-val{font-size:13px;}
-  .lb-mc-lbl{font-size:7.5px;}
-  .lb-mc-stats{gap:4px;padding-top:5px;}
-  .lb-mc-stat{padding:3px 2px;border-radius:7px;}
-  .leader-player{font-size:13px!important;}
+  .lb-mobile-list{gap:4px;}
+  .lb-mobile-card{padding:6px 8px 5px;border-radius:11px;}
+  .lb-mc-top{grid-template-columns:24px 1fr auto;gap:6px;margin-bottom:4px;}
+  .lb-mc-pts{font-size:12px!important;padding:3px 6px!important;min-width:40px!important;}
+  .lb-mc-val{font-size:12px;}
+  .lb-mc-lbl{font-size:7px;}
+  .lb-mc-stats{gap:3px;row-gap:3px;padding-top:4px;}
+  .lb-mc-stat{padding:2px 2px;border-radius:6px;}
+  .leader-player{font-size:12.5px!important;}
   .league-type{font-size:8px!important;padding:2px 4px!important;}
-  .rank-badge{width:26px!important;height:26px!important;font-size:11px!important;}
+  .rank-badge{width:24px!important;height:24px!important;font-size:10.5px!important;}
   /* Summary tiles even more compact */
   .live-table-summary .summary-tile b{font-size:15px!important;}
   .live-table-summary .summary-tile span{font-size:7px!important;}
