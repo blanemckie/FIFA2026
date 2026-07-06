@@ -3677,6 +3677,13 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
     <button onclick="loadR32ResultsFromFirestore()" style="margin-top:14px;padding:11px 22px;border-radius:999px;background:linear-gradient(135deg,#32d17f,#9af7c4);color:#071633;font-weight:1000;border:0;font-size:14px;cursor:pointer">🔄 Load / Refresh Results</button>
   </div>
   <div id="adminR32Results" style="color:#dce9ff;font-weight:800;text-align:center;padding:20px">Loading fixtures…</div>
+
+  <div style="text-align:center;margin:32px 0 18px;padding:22px;border-radius:24px;background:linear-gradient(135deg,rgba(55,212,255,.14),rgba(248,200,74,.10));border:1px solid rgba(55,212,255,.35)">
+    <div style="font-size:28px;margin-bottom:8px">🏆 Admin: Round of 16 Results</div>
+    <p style="color:#dce9ff;font-weight:850;margin:0">Same as above — tick a result off here the moment it's confirmed, and Fixture View, the AI Predictor, and the Live Table all update instantly for everyone.</p>
+    <button onclick="loadR16ResultsFromFirestore()" style="margin-top:14px;padding:11px 22px;border-radius:999px;background:linear-gradient(135deg,#37d4ff,#9ee9ff);color:#071633;font-weight:1000;border:0;font-size:14px;cursor:pointer">🔄 Load / Refresh Results</button>
+  </div>
+  <div id="adminR16Results" style="color:#dce9ff;font-weight:800;text-align:center;padding:20px">Loading fixtures…</div>
 </div>
 <main class="app hidden" id="app">
   <section id="predictions" class="panel active">
@@ -4152,7 +4159,7 @@ function updateKickoffCountdown(){
 }
 updateKickoffCountdown();
 
-function renderAll(){if(typeof syncR16FromR32==='function') syncR16FromR32();if(typeof refreshAiProbabilities==='function') refreshAiProbabilities();renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();renderFixtureView();updateProgress();updateKickoffCountdown();if(window.updateStatusBars)window.updateStatusBars(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);if(typeof renderFvKoSummary==='function') renderFvKoSummary();if(typeof renderAiPredictor==='function') renderAiPredictor();}
+function renderAll(){if(typeof syncR16FromR32==='function') syncR16FromR32();if(typeof syncQFFromR16==='function') syncQFFromR16();if(typeof refreshAiProbabilities==='function') refreshAiProbabilities();renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();renderFixtureView();updateProgress();updateKickoffCountdown();if(window.updateStatusBars)window.updateStatusBars(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);if(typeof renderFvKoSummary==='function') renderFvKoSummary();if(typeof renderAiPredictor==='function') renderAiPredictor();}
 
 /* V61: auto-advance between group-stage score boxes after typing */
 const scoreAdvanceTimers = new WeakMap();
@@ -4176,7 +4183,11 @@ function renderFixtures(){const wrap=$('#fixturesList');wrap.innerHTML='';fixtur
 function updateProgress(){let done=fixtures.filter(f=>{const p=state.predictions[f.id];return p&&p.home!==''&&p.home!==undefined&&p.away!==''&&p.away!==undefined;}).length;$('#progressText').textContent=`${done} / ${fixtures.length} group scores complete`;$('#progressFill').style.width=(done/fixtures.length*100)+'%';}
 function calcTables(){const t={};fixtures.forEach(f=>{t[f.group]??={};[f.home,f.away].forEach(x=>t[f.group][x]??={team:x,p:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0});const p=state.predictions[f.id];if(!p||p.home===''||p.away===''||p.home===undefined||p.away===undefined)return;let H=t[f.group][f.home],A=t[f.group][f.away];H.p++;A.p++;H.gf+=p.home;H.ga+=p.away;A.gf+=p.away;A.ga+=p.home;H.gd=H.gf-H.ga;A.gd=A.gf-A.ga;if(p.home>p.away){H.w++;A.l++;H.pts+=3}else if(p.home<p.away){A.w++;H.l++;A.pts+=3}else{H.d++;A.d++;H.pts++;A.pts++;}});const out={};Object.keys(t).forEach(g=>out[g]=Object.values(t[g]).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf||a.team.localeCompare(b.team)));return out;}
 function teamFromSlot(slot,pool){const tables=calcTables();const m=String(slot).match(/Group ([A-L]) (winners|runners-up)/);if(m){let arr=tables[m[1]]||[];return m[2]==='winners'?arr[0]?.team||slot:arr[1]?.team||slot}if(String(slot).includes('Best 3rd')) return pool.shift()?.team||slot;return slot}
-function r32(){const tables=calcTables();const thirds=Object.keys(tables).map(g=>(tables[g]||[])[2]).filter(Boolean).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf).slice(0,8);const pool=[...thirds];return ko.map(m=>({...m,home:teamFromSlot(m.homeSlot,pool),away:teamFromSlot(m.awaySlot,pool)}));}
+// Real Round of 32 matchups (WCP_R32_BY_ID) reflect FIFA's actual confirmed Annex C third-place
+// allocation for this tournament's specific qualifying combination — they are used here in
+// preference to the generic slot-guessing below, which only approximates that allocation and can
+// misassign "Best 3rd place" slots. Falls back to slot-guessing only for any match not yet resolved.
+function r32(){const tables=calcTables();const thirds=Object.keys(tables).map(g=>(tables[g]||[])[2]).filter(Boolean).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf).slice(0,8);const pool=[...thirds];const real=(typeof WCP_R32_BY_ID!=='undefined')?WCP_R32_BY_ID:null;return ko.map(m=>{const known=real&&real[m.id];return known?{...m,home:known.home,away:known.away}:{...m,home:teamFromSlot(m.homeSlot,pool),away:teamFromSlot(m.awaySlot,pool)};});}
 const flows={R16:[['M73','M75'],['M74','M77'],['M76','M78'],['M79','M80'],['M83','M84'],['M81','M82'],['M86','M88'],['M85','M87']],QF:[['R16-1','R16-2'],['R16-5','R16-6'],['R16-3','R16-4'],['R16-7','R16-8']],SF:[['QF-1','QF-2'],['QF-3','QF-4']],FINAL:[['SF-1','SF-2']]};const names={R32:'Round of 32',R16:'Round of 16',QF:'Quarter-finals',SF:'Semi-finals',FINAL:'Final'};function win(id){return state.bracket[id]}
 function round(key){if(key==='R32')return r32().map(m=>({id:m.id,home:m.home,away:m.away,date:m.date,ukTime:m.ukTime}));return flows[key].map((p,i)=>({id:`${key}-${i+1}`,home:win(p[0])||`${p[0]} winner`,away:win(p[1])||`${p[1]} winner`}));}
 const scoringNotes={R32:'10 pts per team · max 320 pts',R16:'20 pts per team · max 320 pts',QF:'30 pts per team · max 240 pts',SF:'40 pts per team · max 160 pts',FINAL:'50 pts per finalist · max 100 pts'};
@@ -4253,17 +4264,17 @@ const WCP_R32_MATCH_RESULTS = [
   {home:'Germany',       away:'Paraguay',             date:'2026-06-29', winner:'away'}, // Paraguay won on penalties
   {home:'Netherlands',   away:'Morocco',              date:'2026-06-29', winner:'away'}, // Morocco won on penalties
   {home:'Ivory Coast',   away:'Norway',               date:'2026-06-30', winner:'away'},
-  {home:'France',        away:'Sweden',               date:'2026-06-30', winner:null},
-  {home:'Mexico',        away:'Ecuador',              date:'2026-06-30', winner:null},
-  {home:'England',       away:'DR Congo',             date:'2026-07-01', winner:null},
-  {home:'Belgium',       away:'Senegal',              date:'2026-07-01', winner:null},
-  {home:'USA',           away:'Bosnia & Herzegovina', date:'2026-07-01', winner:null},
-  {home:'Spain',         away:'Austria',              date:'2026-07-02', winner:null},
-  {home:'Switzerland',   away:'Algeria',              date:'2026-07-02', winner:null},
-  {home:'Portugal',      away:'Croatia',              date:'2026-07-02', winner:null},
-  {home:'Australia',     away:'Egypt',                date:'2026-07-03', winner:null},
-  {home:'Argentina',     away:'Cape Verde',           date:'2026-07-03', winner:null},
-  {home:'Colombia',      away:'Ghana',                date:'2026-07-03', winner:null},
+  {home:'France',        away:'Sweden',               date:'2026-06-30', winner:'home'},
+  {home:'Mexico',        away:'Ecuador',              date:'2026-06-30', winner:'home'},
+  {home:'England',       away:'DR Congo',             date:'2026-07-01', winner:'home'},
+  {home:'Belgium',       away:'Senegal',              date:'2026-07-01', winner:'home'}, // 3-2 AET
+  {home:'USA',           away:'Bosnia & Herzegovina', date:'2026-07-01', winner:'home'},
+  {home:'Spain',         away:'Austria',              date:'2026-07-02', winner:'home'},
+  {home:'Switzerland',   away:'Algeria',              date:'2026-07-02', winner:'home'},
+  {home:'Portugal',      away:'Croatia',              date:'2026-07-02', winner:'home'},
+  {home:'Australia',     away:'Egypt',                date:'2026-07-03', winner:'away'}, // Egypt won on penalties
+  {home:'Argentina',     away:'Cape Verde',           date:'2026-07-03', winner:'home'}, // 3-2 AET
+  {home:'Colombia',      away:'Ghana',                date:'2026-07-03', winner:'home'},
 ];
 window.WCP_R32_MATCH_RESULTS = WCP_R32_MATCH_RESULTS;
 function r32MatchForTeam(team){
@@ -4289,6 +4300,53 @@ window.r32MatchForTeam=r32MatchForTeam;
 window.r32TeamStatus=r32TeamStatus;
 window.r32AllMatchesPlayed=r32AllMatchesPlayed;
 window.r32Winners=r32Winners;
+// === Round of 16 results (same pattern as Round of 32 above) ===
+// Confirmed as of 6 July 2026: Morocco, France, Norway and England already through.
+// Portugal v Spain is in second-half stoppage time (Spain 1-0) but not yet officially final,
+// so it stays winner:null until confirmed. USA v Belgium (7pm ET tonight), Argentina v Egypt and
+// Switzerland v Colombia (both 7 July) are still to be played.
+const WCP_R16_MATCH_RESULTS = [
+  {home:'Canada',    away:'Morocco',     date:'2026-07-04', winner:'away'},
+  {home:'Paraguay',  away:'France',      date:'2026-07-04', winner:'away'},
+  {home:'Brazil',    away:'Norway',      date:'2026-07-05', winner:'away'},
+  {home:'Mexico',    away:'England',     date:'2026-07-05', winner:'away'},
+  {home:'Portugal',  away:'Spain',       date:'2026-07-06', winner:null},
+  {home:'USA',       away:'Belgium',     date:'2026-07-06', winner:null},
+  {home:'Argentina', away:'Egypt',       date:'2026-07-07', winner:null},
+  {home:'Switzerland',away:'Colombia',   date:'2026-07-07', winner:null},
+];
+window.WCP_R16_MATCH_RESULTS = WCP_R16_MATCH_RESULTS;
+function r16MatchForTeam(team){
+  const t=String(team).trim();
+  return WCP_R16_MATCH_RESULTS.find(m=>m.home===t||m.away===t)||null;
+}
+function r16TeamStatus(team){
+  const m=r16MatchForTeam(team);
+  if(!m) return 'unknown';
+  if(!m.winner) return 'pending';
+  const t=String(team).trim();
+  const winningTeam = m.winner==='home' ? m.home : m.away;
+  return winningTeam===t ? 'won' : 'lost';
+}
+function r16AllMatchesPlayed(){
+  return WCP_R16_MATCH_RESULTS.length>0 && WCP_R16_MATCH_RESULTS.every(m=>!!m.winner);
+}
+function r16Winners(){
+  return WCP_R16_MATCH_RESULTS.filter(m=>m.winner).map(m=>m.winner==='home'?m.home:m.away);
+}
+window.r16MatchForTeam=r16MatchForTeam;
+window.r16TeamStatus=r16TeamStatus;
+window.r16AllMatchesPlayed=r16AllMatchesPlayed;
+window.r16Winners=r16Winners;
+// Recomputes WCP_STAGE_ACTUALS.QF from the current state of WCP_R16_MATCH_RESULTS, the same way
+// syncR16FromR32 keeps R16 in sync with R32. Called automatically whenever an R16 result changes.
+function syncQFFromR16(){
+  if(typeof WCP_STAGE_ACTUALS==='undefined'||!WCP_STAGE_ACTUALS.QF) return;
+  const done=r16AllMatchesPlayed();
+  WCP_STAGE_ACTUALS.QF.complete=done;
+  WCP_STAGE_ACTUALS.QF.teams=new Set(done?r16Winners():[]);
+}
+window.syncQFFromR16=syncQFFromR16;
 // WCP_STAGE_ACTUALS.R16 is built once when the page first loads. If R32 results change later
 // (e.g. via the admin panel, asynchronously after that object already exists), this recomputes
 // R16's complete/teams from the current state of WCP_R32_MATCH_RESULTS so everything downstream
@@ -4481,6 +4539,44 @@ function getActualGroupResults(){
     return {group:f.group,homeTeam:f.home,awayTeam:f.away,homeScore:Number.isFinite(hs)?hs:null,awayScore:Number.isFinite(as)?as:null};
   });
 }
+// === Bookmaker odds snapshot ===
+// This is a SNAPSHOT, not a live feed — betting sites can't be scraped from inside the app.
+// Update the decimal odds below periodically (bet365/ESPN/Squawka etc. all publish outright
+// winner prices); the rest of the pipeline (implied-probability conversion + blending) is
+// automatic. Decimal odds format: 2.64 = "+164" American = "13/8" fractional.
+// Snapshot taken: 6 July 2026 (post Round of 16).
+const WCP_BOOKIE_ODDS = {
+  'France':2.64,'Argentina':5.5,'Spain':7.0,'Portugal':17,'England':11,'Brazil':12,
+  'Morocco':21,'Mexico':26,'Colombia':26,'USA':21,'Belgium':31,'Switzerland':41,
+  'Norway':46,'Egypt':51,'Ghana':67,'Netherlands':17,'Germany':17,'Croatia':41
+};
+// Turns decimal odds into implied probabilities and strips the bookmaker's overround
+// (margin) so the remaining figures are genuine relative probabilities, not inflated ones.
+function impliedProbsFromOdds(oddsMap){
+  const raw={};Object.keys(oddsMap).forEach(t=>raw[t]=1/oddsMap[t]);
+  const overround=Object.values(raw).reduce((a,b)=>a+b,0)||1;
+  const norm={};Object.keys(raw).forEach(t=>norm[t]=raw[t]/overround);
+  return norm;
+}
+// Blends the bookmaker signal into the group-form Elo ratings. Teams with no bookmaker price
+// (already eliminated, or simply not listed) are left on their form-only rating. `weight` controls
+// how much the market moves the needle — 0.35 means ratings stay majority form-driven, with the
+// market pulling teams toward/away from favouritism on top of that.
+function blendBookieIntoRatings(ratings,weight=0.35){
+  const probs=impliedProbsFromOdds(WCP_BOOKIE_ODDS);
+  const vals=Object.values(probs);
+  if(!vals.length) return ratings;
+  const meanProb=vals.reduce((a,b)=>a+b,0)/vals.length;
+  const blended={...ratings};
+  Object.keys(probs).forEach(team=>{
+    const base=ratings[team]??1500;
+    // Convert this team's implied tournament-winner probability into an Elo-style rating,
+    // scaled relative to the field average of teams currently priced by bookmakers.
+    const bookieElo=1500+400*Math.log10(probs[team]/meanProb);
+    blended[team]=base*(1-weight)+bookieElo*weight;
+  });
+  return blended;
+}
 function computeTeamStrengths(groupResults){
   const stats={};
   groupResults.forEach(g=>{
@@ -4497,7 +4593,10 @@ function computeTeamStrengths(groupResults){
     const s=stats[t], ppg=s.p?s.pts/s.p:1, gdpg=s.p?(s.gf-s.ga)/s.p:0;
     ratings[t]=1500+ppg*150+gdpg*60; // Elo-style baseline, nudged by group-stage form
   });
-  return ratings;
+  // Blend in the bookmaker snapshot on top of group-stage form. This is the single point where
+  // every AI Predictor view (Monte Carlo win%, Predicted Final Table, per-player breakdown, and
+  // the deterministic chalk path) picks up the market signal, since they all call this function.
+  return blendBookieIntoRatings(ratings);
 }
 function resolveActualR32Matchups(groupResults){
   const tables=buildGroupTablesFromSubmission(groupResults);
@@ -7048,6 +7147,67 @@ function renderAdminR32Panel(){
 }
 window.renderAdminR32Panel = renderAdminR32Panel;
 
+// ── Admin: Round of 16 results (same Firestore-persisted pattern as R32 above) ──
+const R16_RESULTS_DOC = () => doc(db, "tournamentData", "r16Results");
+const r16Key = (home,away) => home+'|'+away;
+
+function applyR16ResultsMap(map){
+  if(!map) return;
+  (window.WCP_R16_MATCH_RESULTS||[]).forEach(m=>{
+    const v = map[r16Key(m.home,m.away)];
+    if(v!==undefined) m.winner = v;
+  });
+  if(typeof window.syncQFFromR16==='function') window.syncQFFromR16();
+}
+
+window.loadR16ResultsFromFirestore = async function(){
+  try{
+    const snap = await getDoc(R16_RESULTS_DOC());
+    if(snap.exists()) applyR16ResultsMap(snap.data().results||{});
+  }catch(e){ console.error('r16Results load failed:', e); }
+  if(typeof window.renderAll==='function') window.renderAll();
+  renderAdminR16Panel();
+};
+
+window.setR16Winner = async function(home, away, winner){
+  const m = (window.WCP_R16_MATCH_RESULTS||[]).find(x=>x.home===home && x.away===away);
+  if(!m) return;
+  m.winner = winner;
+  if(typeof window.syncQFFromR16==='function') window.syncQFFromR16();
+  if(typeof window.renderAll==='function') window.renderAll();
+  renderAdminR16Panel();
+  try{
+    const ref = R16_RESULTS_DOC();
+    const snap = await getDoc(ref);
+    const existing = snap.exists() ? (snap.data().results||{}) : {};
+    existing[r16Key(home,away)] = winner;
+    await setDoc(ref, {results: existing, updatedAt: serverTimestamp()}, {merge:true});
+  }catch(e){
+    console.error('Failed to save R16 result:', e);
+    alert('Saved on your screen, but failed to save to the database — check your connection and try again, or other visitors won\'t see this result.');
+  }
+};
+
+function renderAdminR16Panel(){
+  const box = document.getElementById('adminR16Results');
+  if(!box) return;
+  const matches = window.WCP_R16_MATCH_RESULTS||[];
+  if(!matches.length){ box.innerHTML = '<div class="empty-state">No R16 fixtures found.</div>'; return; }
+  const esc = s => String(s).replace(/'/g,"\\'");
+  const btn = (home,away,label,val,active) => `<button onclick="setR16Winner('${esc(home)}','${esc(away)}',${val===null?'null':`'${val}'`})" style="padding:8px 14px;border-radius:999px;border:1px solid ${active?'#32d17f':'rgba(255,255,255,.25)'};background:${active?'rgba(50,209,127,.18)':'rgba(255,255,255,.05)'};color:${active?'#aef7cf':'#dce9ff'};font-weight:900;font-size:12px;cursor:pointer;margin:3px">${label}</button>`;
+  box.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;text-align:left">' + matches.map(m=>{
+    return `<div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px">`
+      + `<div style="font-weight:900;color:#fff;min-width:200px">${m.home} <span style="color:#7d8db3">vs</span> ${m.away}</div>`
+      + `<div>${btn(m.home,m.away,m.home+' won','home',m.winner==='home')}${btn(m.home,m.away,m.away+' won','away',m.winner==='away')}${btn(m.home,m.away,'Not played yet',null,!m.winner)}</div>`
+      + `</div>`;
+  }).join('') + '</div>';
+}
+window.renderAdminR16Panel = renderAdminR16Panel;
+
+// Same reasoning as the R32 fetch below: results need to reach every visitor, not just #admin.
+window.loadR16ResultsFromFirestore();
+setInterval(()=>window.loadR16ResultsFromFirestore(), 2*60*1000);
+
 // Round of 32 results need to reach EVERY visitor, not just the admin panel — this was previously
 // only fetched when on #admin, so results entered there never actually reached normal visitors
 // browsing the site. Fetch on load, and keep it on the same cadence as the rest of the live data.
@@ -7056,6 +7216,7 @@ setInterval(()=>window.loadR32ResultsFromFirestore(), 2*60*1000);
 
 if(window.location.hash === '#admin'){
   renderAdminR32Panel();
+  renderAdminR16Panel();
 }
 
 </script>
