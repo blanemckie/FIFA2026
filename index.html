@@ -4191,7 +4191,7 @@ function teamFromSlot(slot,pool){const tables=calcTables();const m=String(slot).
 // preference to the generic slot-guessing below, which only approximates that allocation and can
 // misassign "Best 3rd place" slots. Falls back to slot-guessing only for any match not yet resolved.
 function r32(){const tables=calcTables();const thirds=Object.keys(tables).map(g=>(tables[g]||[])[2]).filter(Boolean).sort((a,b)=>b.pts-a.pts||b.gd-a.gd||b.gf-a.gf).slice(0,8);const pool=[...thirds];const real=(typeof WCP_R32_BY_ID!=='undefined')?WCP_R32_BY_ID:null;return ko.map(m=>{const known=real&&real[m.id];return known?{...m,home:known.home,away:known.away}:{...m,home:teamFromSlot(m.homeSlot,pool),away:teamFromSlot(m.awaySlot,pool)};});}
-const flows={R16:[['M73','M75'],['M74','M77'],['M76','M78'],['M79','M80'],['M83','M84'],['M81','M82'],['M86','M88'],['M85','M87']],QF:[['R16-1','R16-2'],['R16-5','R16-6'],['R16-3','R16-4'],['R16-7','R16-8']],SF:[['QF-1','QF-2'],['QF-3','QF-4']],FINAL:[['SF-1','SF-2']]};const names={R32:'Round of 32',R16:'Round of 16',QF:'Quarter-finals',SF:'Semi-finals',FINAL:'Final'};function win(id){return state.bracket[id]}
+const flows={R16:[['M73','M75'],['M74','M77'],['M76','M78'],['M79','M80'],['M83','M84'],['M81','M82'],['M86','M88'],['M85','M87']],QF:[['R16-1','R16-3'],['R16-5','R16-6'],['R16-2','R16-4'],['R16-7','R16-8']],SF:[['QF-1','QF-2'],['QF-3','QF-4']],FINAL:[['SF-1','SF-2']]};const names={R32:'Round of 32',R16:'Round of 16',QF:'Quarter-finals',SF:'Semi-finals',FINAL:'Final'};function win(id){return state.bracket[id]}
 function round(key){if(key==='R32')return r32().map(m=>({id:m.id,home:m.home,away:m.away,date:m.date,ukTime:m.ukTime}));return flows[key].map((p,i)=>({id:`${key}-${i+1}`,home:win(p[0])||`${p[0]} winner`,away:win(p[1])||`${p[1]} winner`}));}
 const scoringNotes={R32:'10 pts per team · max 320 pts',R16:'20 pts per team · max 320 pts',QF:'30 pts per team · max 240 pts',SF:'40 pts per team · max 160 pts',FINAL:'50 pts per finalist · max 100 pts'};
 function renderBracket(){const wrap=$('#bracket');wrap.innerHTML='';['R32','R16','QF','SF','FINAL'].forEach(r=>{const stage=document.createElement('section');stage.className='stage-section';stage.innerHTML=`<div class="stage-head"><h3>${names[r]}</h3><span class="stage-score">${scoringNotes[r]}</span></div><div class="ko-list"></div>`;const list=stage.querySelector('.ko-list');round(r).forEach(m=>{const div=document.createElement('article');div.className='fixture-bar ko-fixture';div.dataset.matchId=m.id;const meta=m.date?`<span>📅 ${niceDate(m.date)}</span><span>🕒 ${ukToCet(m.date,m.ukTime)}</span>`:`<span>Auto-filled</span><span>From previous picks</span>`;div.innerHTML=`<div class="fixture-meta"><span class="group-tag">${names[r]}</span>${meta}</div><div class="fixture-teams"><div class="team home">${pick(m.id,m.home)}</div><div class="score-inputs"><span class="vs">v</span></div><div class="team away">${pick(m.id,m.away)}</div></div><div class="status-pill">Pick winner</div>`;list.appendChild(div);});wrap.appendChild(stage);});$$('.pick').forEach(btn=>btn.addEventListener('click',()=>{if(btn.classList.contains('placeholder'))return;state.bracket[btn.dataset.match]=btn.dataset.team;clearAfter(btn.dataset.match);save();renderBracket();}));updateWinnerReveal();}
@@ -4393,6 +4393,17 @@ function getR32KnownWinner(teamA,teamB){
 }
 window.getR32MatchupsForPredictor=getR32MatchupsForPredictor;
 window.getR32KnownWinner=getR32KnownWinner;
+// Looks up the confirmed winner of a single Round of 16 match, regardless of home/away order.
+// Unlike the av.R16/av.QF "is the whole round finished" flags, this checks the individual
+// match result the moment it's entered in the admin panel — so results flow through to the
+// AI Predictor immediately instead of waiting for all 8 R16 matches to be complete.
+function getR16KnownWinner(teamA,teamB){
+  const m=(typeof r16MatchForTeam==='function')?r16MatchForTeam(teamA):null;
+  if(!m||!m.winner) return null;
+  const winningTeam = m.winner==='home'?m.home:m.away;
+  return (winningTeam===String(teamA).trim()||winningTeam===String(teamB).trim()) ? winningTeam : null;
+}
+window.getR16KnownWinner=getR16KnownWinner;
 // === KO STAGE ACTUALS — update as tournament progresses ===
 const WCP_STAGE_ACTUALS = {
   R32:{
@@ -4639,7 +4650,7 @@ function simulateBracketOnce(matchups,ratings){
   const qf={};
   flows.R16.forEach((pair,i)=>{
     const key='R16-'+(i+1), t1=r16[pair[0]], t2=r16[pair[1]];
-    qf[key]=(av.QF.complete?getMatchWinnerFromActual(t1,t2,av.QF.teams):null)||simulateMatch(t1,t2,ratings);
+    qf[key]=getR16KnownWinner(t1,t2)||simulateMatch(t1,t2,ratings);
   });
   const sf={};
   flows.QF.forEach((pair,i)=>{
@@ -4985,7 +4996,7 @@ function buildAiChalkPath(){
   const qf={};
   rounds.push({key:'R16',label:'Round of 16',complete:!!av.R16.complete,matches:flows.R16.map((pair,i)=>{
     const t1=r16[pair[0]], t2=r16[pair[1]];
-    const known=av.R16.complete?getMatchWinnerFromActual(t1,t2,av.R16.teams):null;
+    const known=getR16KnownWinner(t1,t2);
     const res=chalkWinner(t1,t2,known);
     const key='R16-'+(i+1); qf[key]=res.team;
     const {p1,p2}=matchProb(t1,t2);
