@@ -3534,13 +3534,16 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
       <h1 class="lp-h1">FIFA World Cup 2026</h1>
       <div class="lp-sub">Prediction Challenge</div>
       <div class="lp-gold-rule"></div>
-      <!-- !! R32 / R16 Points Announcements !! -->
+      <!-- !! R32 / R16 / QF Points Announcements !! -->
       <div style="display:flex;flex-direction:column;gap:7px;align-items:center;margin:4px 0 10px">
         <div style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(248,200,74,.22),rgba(50,209,127,.14));border:1.5px solid rgba(248,200,74,.65);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:1000;color:#fff3a2;box-shadow:0 4px 18px rgba(248,200,74,.18)">
           ✅ Round of 32 Points Now Applied!! &nbsp;·&nbsp; Check the Live Table
         </div>
         <div style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(248,200,74,.22),rgba(50,209,127,.14));border:1.5px solid rgba(248,200,74,.65);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:1000;color:#fff3a2;box-shadow:0 4px 18px rgba(248,200,74,.18)">
           ✅ Round of 16 Points Now Applied!! &nbsp;·&nbsp; Check the Live Table
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(248,200,74,.22),rgba(50,209,127,.14));border:1.5px solid rgba(248,200,74,.65);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:1000;color:#fff3a2;box-shadow:0 4px 18px rgba(248,200,74,.18)">
+          ✅ Quarter-Final Team Selection Points Now Applied!! &nbsp;·&nbsp; Check the Live Table
         </div>
       </div>
     </div>
@@ -3603,11 +3606,11 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
             <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Complete</div>
             <div style="font-size:9px;color:#6af0b8;font-weight:900;margin-top:3px">Points Locked · Based on R32 Results</div>
           </div>
-          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 8px;text-align:center">
-            <div style="font-size:17px;margin-bottom:3px">&#x23F3;</div>
-            <div style="font-size:11px;font-weight:1000;color:#dce9ff;margin-bottom:2px">Quarter-Finals</div>
-            <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Pending</div>
-            <div style="font-size:9px;color:#8899bb;font-weight:900;margin-top:3px">30 pts/team · After 7 Jul</div>
+          <div style="background:rgba(50,209,127,.12);border:1px solid rgba(50,209,127,.38);border-radius:14px;padding:10px 8px;text-align:center">
+            <div style="font-size:17px;margin-bottom:3px">&#x2705;</div>
+            <div style="font-size:11px;font-weight:1000;color:#32d17f;margin-bottom:2px">Quarter-Finals</div>
+            <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Complete</div>
+            <div style="font-size:9px;color:#6af0b8;font-weight:900;margin-top:3px">Points Locked · Based on R16 Results</div>
           </div>
           <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 8px;text-align:center">
             <div style="font-size:17px;margin-bottom:3px">&#x23F3;</div>
@@ -4304,19 +4307,19 @@ window.r32TeamStatus=r32TeamStatus;
 window.r32AllMatchesPlayed=r32AllMatchesPlayed;
 window.r32Winners=r32Winners;
 // === Round of 16 results (same pattern as Round of 32 above) ===
-// Confirmed as of 6 July 2026: Morocco, France, Norway and England already through.
-// Portugal v Spain is in second-half stoppage time (Spain 1-0) but not yet officially final,
-// so it stays winner:null until confirmed. USA v Belgium (7pm ET tonight), Argentina v Egypt and
-// Switzerland v Colombia (both 7 July) are still to be played.
+// Confirmed as of 7 July 2026: all eight Round of 16 matches complete. Morocco, France, Norway,
+// England, Spain (1-0 Portugal, Merino 90+1), Belgium (4-1 USA), Argentina (3-2 Egypt, Fernandez
+// 90+2 after coming back from 2-0 down) and Switzerland (beat Colombia on penalties after 0-0 AET)
+// are the eight quarter-finalists. QF picks now score — see WCP_STAGE_ACTUALS.QF below.
 const WCP_R16_MATCH_RESULTS = [
   {home:'Canada',    away:'Morocco',     date:'2026-07-04', winner:'away'},
   {home:'Paraguay',  away:'France',      date:'2026-07-04', winner:'away'},
   {home:'Brazil',    away:'Norway',      date:'2026-07-05', winner:'away'},
   {home:'Mexico',    away:'England',     date:'2026-07-05', winner:'away'},
-  {home:'Portugal',  away:'Spain',       date:'2026-07-06', winner:null},
-  {home:'USA',       away:'Belgium',     date:'2026-07-06', winner:null},
-  {home:'Argentina', away:'Egypt',       date:'2026-07-07', winner:null},
-  {home:'Switzerland',away:'Colombia',   date:'2026-07-07', winner:null},
+  {home:'Portugal',  away:'Spain',       date:'2026-07-06', winner:'away'}, // Spain won 1-0
+  {home:'USA',       away:'Belgium',     date:'2026-07-06', winner:'away'}, // Belgium won 4-1
+  {home:'Argentina', away:'Egypt',       date:'2026-07-07', winner:'home'}, // Argentina won 3-2
+  {home:'Switzerland',away:'Colombia',   date:'2026-07-07', winner:'home'}, // Switzerland won on penalties (0-0 AET)
 ];
 window.WCP_R16_MATCH_RESULTS = WCP_R16_MATCH_RESULTS;
 function r16MatchForTeam(team){
@@ -4415,7 +4418,7 @@ const WCP_STAGE_ACTUALS = {
     complete:true, pts:10, max:32, dateNote:'Points Applied'
   },
   R16: {teams:new Set(r32AllMatchesPlayed()?r32Winners():[]),complete:r32AllMatchesPlayed(),pts:20,max:16,dateNote:'Released once all 16 R32 matches are finished'},
-  QF:  {teams:new Set([]),complete:false,pts:30,max:8, dateNote:'After 7 Jul'},
+  QF:  {teams:new Set(r16AllMatchesPlayed()?r16Winners():[]),complete:r16AllMatchesPlayed(),pts:30,max:8, dateNote:'Points Applied'},
   SF:  {teams:new Set([]),complete:false,pts:40,max:4, dateNote:'After 11 Jul'},
   FIN: {teams:new Set([]),complete:false,pts:50,max:2, dateNote:'After 15 Jul'},
   CHAMP:{teams:new Set([]),complete:false,pts:100,max:1, dateNote:'After 19 Jul'}
@@ -4558,11 +4561,12 @@ function getActualGroupResults(){
 // Update the decimal odds below periodically (bet365/ESPN/Squawka etc. all publish outright
 // winner prices); the rest of the pipeline (implied-probability conversion + blending) is
 // automatic. Decimal odds format: 2.64 = "+164" American = "13/8" fractional.
-// Snapshot taken: 6 July 2026 (post Round of 16).
+// Snapshot taken: 7 July 2026 (Round of 16 complete; all four QF pairings confirmed).
+// Eliminated teams (Portugal, USA, Mexico, Brazil, Canada, Paraguay, Egypt, Colombia, etc.)
+// dropped from the list — only the eight confirmed quarter-finalists remain priced.
 const WCP_BOOKIE_ODDS = {
-  'France':2.64,'Argentina':5.5,'Spain':7.0,'Portugal':17,'England':11,'Brazil':12,
-  'Morocco':21,'Mexico':26,'Colombia':26,'USA':21,'Belgium':31,'Switzerland':41,
-  'Norway':46,'Egypt':51,'Ghana':67,'Netherlands':17,'Germany':17,'Croatia':41
+  'France':2.75,'Argentina':5.5,'England':6.5,'Spain':7.0,
+  'Belgium':31,'Norway':17,'Morocco':34,'Switzerland':41
 };
 // Turns decimal odds into implied probabilities and strips the bookmaker's overround
 // (margin) so the remaining figures are genuine relative probabilities, not inflated ones.
