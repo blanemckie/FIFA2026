@@ -125,6 +125,15 @@
   <div class="table-wrap" style="padding:6px 0" id="r32Wrap">
     <div id="r32List" class="empty">Loading fixtures…</div>
   </div>
+
+  <div class="header" style="margin-top:36px">
+    <h1 style="font-size:clamp(20px,3.4vw,28px)">🏆 Round of <span>16</span> Results</h1>
+    <button class="refresh-btn" id="r16RefreshBtn">🔄 Refresh</button>
+  </div>
+  <p style="color:var(--muted);font-weight:700;font-size:13px;margin:-12px 0 16px">Same as above — tap a result and it updates the Fixture View, AI Predictor, and Live Table on the main site instantly.</p>
+  <div class="table-wrap" style="padding:6px 0" id="r16Wrap">
+    <div id="r16List" class="empty">Loading fixtures…</div>
+  </div>
 </div>
 
 <script type="module">
@@ -166,6 +175,7 @@ function checkPassword(){
     document.getElementById('adminContent').style.display = 'block';
     loadVisits();
     loadR32Results();
+    loadR16Results();
   } else {
     document.getElementById('pwError').textContent = 'Wrong password. Try again.';
     document.getElementById('pwInput').value = '';
@@ -382,6 +392,71 @@ window.setR32Result = async function(home, away, winner){
     r32Winners = existing;
   }catch(e){
     console.error('Failed to save R32 result', e);
+    alert('Saved on this screen, but failed to save to the database — check your connection and try again, or other visitors won\'t see this result.');
+  }
+};
+
+// ── Round of 16 results (same Firestore-persisted pattern as R32 above) ──
+// Keep this list in sync with WCP_R16_MATCH_RESULTS in index.html if the bracket ever changes.
+const WCP_R16_FIXTURES = [
+  {home:'Canada',      away:'Morocco',   date:'2026-07-04'},
+  {home:'Paraguay',    away:'France',    date:'2026-07-04'},
+  {home:'Brazil',      away:'Norway',    date:'2026-07-05'},
+  {home:'Mexico',      away:'England',   date:'2026-07-05'},
+  {home:'Portugal',    away:'Spain',     date:'2026-07-06'},
+  {home:'USA',         away:'Belgium',   date:'2026-07-06'},
+  {home:'Argentina',   away:'Egypt',     date:'2026-07-07'},
+  {home:'Switzerland', away:'Colombia',  date:'2026-07-07'},
+];
+const R16_DOC = () => doc(db, 'tournamentData', 'r16Results');
+const r16Key = (home,away) => home+'|'+away;
+let r16Winners = {};
+
+document.getElementById('r16RefreshBtn').addEventListener('click', loadR16Results);
+
+async function loadR16Results(){
+  const box = document.getElementById('r16List');
+  box.textContent = 'Loading fixtures…';
+  try{
+    const snap = await getDoc(R16_DOC());
+    r16Winners = snap.exists() ? (snap.data().results||{}) : {};
+  }catch(e){
+    console.error('Failed to load R16 results', e);
+    box.textContent = 'Error loading fixtures: ' + e.message;
+    return;
+  }
+  renderR16List();
+}
+
+function renderR16List(){
+  const box = document.getElementById('r16List');
+  const niceDate = d => new Date(d+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+  box.className = '';
+  box.innerHTML = WCP_R16_FIXTURES.map(f=>{
+    const key = r16Key(f.home,f.away);
+    const w = r16Winners[key];
+    const pill = w ? '<span class="badge-today">✅ Played</span>' : '<span class="badge-count">⏳ Not played</span>';
+    const btn = (label,val,active) => `<button class="r32-btn${active?' active':''}" onclick="setR16Result('${escAttr(f.home)}','${escAttr(f.away)}',${val===null?'null':"'"+val+"'"})">${label}</button>`;
+    return `<div class="r32-row">
+        <div class="r32-info"><span class="r32-date">${niceDate(f.date)}</span><span class="r32-teams">${f.home} <span class="vs">vs</span> ${f.away}</span>${pill}</div>
+        <div class="r32-btns">${btn(f.home+' won','home',w==='home')}${btn(f.away+' won','away',w==='away')}${btn('Reset',null,!w)}</div>
+      </div>`;
+  }).join('');
+}
+
+window.setR16Result = async function(home, away, winner){
+  const key = r16Key(home,away);
+  r16Winners[key] = winner;
+  renderR16List();
+  try{
+    const ref = R16_DOC();
+    const snap = await getDoc(ref);
+    const existing = snap.exists() ? (snap.data().results||{}) : {};
+    existing[key] = winner;
+    await setDoc(ref, {results: existing, updatedAt: serverTimestamp()}, {merge:true});
+    r16Winners = existing;
+  }catch(e){
+    console.error('Failed to save R16 result', e);
     alert('Saved on this screen, but failed to save to the database — check your connection and try again, or other visitors won\'t see this result.');
   }
 };
