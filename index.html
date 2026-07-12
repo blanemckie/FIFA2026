@@ -3545,6 +3545,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
         <div style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(248,200,74,.22),rgba(50,209,127,.14));border:1.5px solid rgba(248,200,74,.65);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:1000;color:#fff3a2;box-shadow:0 4px 18px rgba(248,200,74,.18)">
           ✅ Quarter-Final Team Selection Points Now Applied!! &nbsp;·&nbsp; Check the Live Table
         </div>
+        <div style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(248,200,74,.22),rgba(50,209,127,.14));border:1.5px solid rgba(248,200,74,.65);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:1000;color:#fff3a2;box-shadow:0 4px 18px rgba(248,200,74,.18)">
+          ✅ Semi-Final Team Selection Points Now Applied!! &nbsp;·&nbsp; Check the Live Table
+        </div>
       </div>
     </div>
 
@@ -3612,11 +3615,11 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
             <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Complete</div>
             <div style="font-size:9px;color:#6af0b8;font-weight:900;margin-top:3px">Points Locked · Based on R16 Results</div>
           </div>
-          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 8px;text-align:center">
-            <div style="font-size:17px;margin-bottom:3px">&#x23F3;</div>
-            <div style="font-size:11px;font-weight:1000;color:#dce9ff;margin-bottom:2px">Semi-Finals</div>
-            <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Pending</div>
-            <div style="font-size:9px;color:#8899bb;font-weight:900;margin-top:3px">40 pts/team · After 11 Jul</div>
+          <div style="background:rgba(50,209,127,.12);border:1px solid rgba(50,209,127,.38);border-radius:14px;padding:10px 8px;text-align:center">
+            <div style="font-size:17px;margin-bottom:3px">&#x2705;</div>
+            <div style="font-size:11px;font-weight:1000;color:#32d17f;margin-bottom:2px">Semi-Finals</div>
+            <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Complete</div>
+            <div style="font-size:9px;color:#6af0b8;font-weight:900;margin-top:3px">Points Locked · Based on QF Results</div>
           </div>
           <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 8px;text-align:center">
             <div style="font-size:17px;margin-bottom:3px">&#x1F3C6;</div>
@@ -4165,7 +4168,7 @@ function updateKickoffCountdown(){
 }
 updateKickoffCountdown();
 
-function renderAll(){if(typeof syncR16FromR32==='function') syncR16FromR32();if(typeof syncQFFromR16==='function') syncQFFromR16();if(typeof refreshAiProbabilities==='function') refreshAiProbabilities();renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();renderFixtureView();updateProgress();updateKickoffCountdown();if(window.updateStatusBars)window.updateStatusBars(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);if(typeof renderFvKoSummary==='function') renderFvKoSummary();if(typeof renderAiPredictor==='function') renderAiPredictor();}
+function renderAll(){if(typeof syncR16FromR32==='function') syncR16FromR32();if(typeof syncQFFromR16==='function') syncQFFromR16();if(typeof syncSFFromQF==='function') syncSFFromQF();if(typeof refreshAiProbabilities==='function') refreshAiProbabilities();renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();renderFixtureView();updateProgress();updateKickoffCountdown();if(window.updateStatusBars)window.updateStatusBars(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);if(typeof renderFvKoSummary==='function') renderFvKoSummary();if(typeof renderAiPredictor==='function') renderAiPredictor();}
 
 /* V61: auto-advance between group-stage score boxes after typing */
 const scoreAdvanceTimers = new WeakMap();
@@ -4353,6 +4356,59 @@ function syncQFFromR16(){
   WCP_STAGE_ACTUALS.QF.teams=new Set(done?r16Winners():[]);
 }
 window.syncQFFromR16=syncQFFromR16;
+// === Quarter-final results (same pattern as Round of 32 / Round of 16 above) ===
+// Confirmed as of 12 July 2026: all four Quarter-Final matches complete. France (2-0 Morocco),
+// Spain (2-1 Belgium), England (2-1 Norway AET) and Argentina (3-1 Switzerland AET) are the four
+// semi-finalists. Semi-final picks now score — see WCP_STAGE_ACTUALS.SF below. Semi-finals: France
+// v Spain (14 Jul, Arlington) and England v Argentina (15 Jul, Atlanta).
+const WCP_QF_MATCH_RESULTS = [
+  {home:'France',    away:'Morocco',     date:'2026-07-09', winner:'home'}, // France won 2-0
+  {home:'Spain',      away:'Belgium',     date:'2026-07-10', winner:'home'}, // Spain won 2-1
+  {home:'Norway',     away:'England',     date:'2026-07-11', winner:'away'}, // England won 2-1 AET
+  {home:'Argentina',  away:'Switzerland', date:'2026-07-11', winner:'home'}, // Argentina won 3-1 AET
+];
+window.WCP_QF_MATCH_RESULTS = WCP_QF_MATCH_RESULTS;
+function qfMatchForTeam(team){
+  const t=String(team).trim();
+  return WCP_QF_MATCH_RESULTS.find(m=>m.home===t||m.away===t)||null;
+}
+function qfTeamStatus(team){
+  const m=qfMatchForTeam(team);
+  if(!m) return 'unknown';
+  if(!m.winner) return 'pending';
+  const t=String(team).trim();
+  const winningTeam = m.winner==='home' ? m.home : m.away;
+  return winningTeam===t ? 'won' : 'lost';
+}
+function qfAllMatchesPlayed(){
+  return WCP_QF_MATCH_RESULTS.length>0 && WCP_QF_MATCH_RESULTS.every(m=>!!m.winner);
+}
+function qfWinners(){
+  return WCP_QF_MATCH_RESULTS.filter(m=>m.winner).map(m=>m.winner==='home'?m.home:m.away);
+}
+window.qfMatchForTeam=qfMatchForTeam;
+window.qfTeamStatus=qfTeamStatus;
+window.qfAllMatchesPlayed=qfAllMatchesPlayed;
+window.qfWinners=qfWinners;
+// Looks up the confirmed winner of a single Quarter-Final match, regardless of home/away order.
+// Same purpose as getR16KnownWinner — lets the AI Predictor pick up the real semi-finalist the
+// moment it's known, rather than waiting for the whole round-complete flag.
+function getQFKnownWinner(teamA,teamB){
+  const m=(typeof qfMatchForTeam==='function')?qfMatchForTeam(teamA):null;
+  if(!m||!m.winner) return null;
+  const winningTeam = m.winner==='home'?m.home:m.away;
+  return (winningTeam===String(teamA).trim()||winningTeam===String(teamB).trim()) ? winningTeam : null;
+}
+window.getQFKnownWinner=getQFKnownWinner;
+// Recomputes WCP_STAGE_ACTUALS.SF from the current state of WCP_QF_MATCH_RESULTS, the same way
+// syncQFFromR16 keeps QF in sync with R16. Called automatically whenever a QF result changes.
+function syncSFFromQF(){
+  if(typeof WCP_STAGE_ACTUALS==='undefined'||!WCP_STAGE_ACTUALS.SF) return;
+  const done=qfAllMatchesPlayed();
+  WCP_STAGE_ACTUALS.SF.complete=done;
+  WCP_STAGE_ACTUALS.SF.teams=new Set(done?qfWinners():[]);
+}
+window.syncSFFromQF=syncSFFromQF;
 // WCP_STAGE_ACTUALS.R16 is built once when the page first loads. If R32 results change later
 // (e.g. via the admin panel, asynchronously after that object already exists), this recomputes
 // R16's complete/teams from the current state of WCP_R32_MATCH_RESULTS so everything downstream
@@ -4419,7 +4475,7 @@ const WCP_STAGE_ACTUALS = {
   },
   R16: {teams:new Set(r32AllMatchesPlayed()?r32Winners():[]),complete:r32AllMatchesPlayed(),pts:20,max:16,dateNote:'Released once all 16 R32 matches are finished'},
   QF:  {teams:new Set(r16AllMatchesPlayed()?r16Winners():[]),complete:r16AllMatchesPlayed(),pts:30,max:8, dateNote:'Points Applied'},
-  SF:  {teams:new Set([]),complete:false,pts:40,max:4, dateNote:'After 11 Jul'},
+  SF:  {teams:new Set(qfAllMatchesPlayed()?qfWinners():[]),complete:qfAllMatchesPlayed(),pts:40,max:4, dateNote:'Points Applied'},
   FIN: {teams:new Set([]),complete:false,pts:50,max:2, dateNote:'After 15 Jul'},
   CHAMP:{teams:new Set([]),complete:false,pts:100,max:1, dateNote:'After 19 Jul'}
 };
