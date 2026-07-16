@@ -3548,6 +3548,9 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
         <div style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(248,200,74,.22),rgba(50,209,127,.14));border:1.5px solid rgba(248,200,74,.65);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:1000;color:#fff3a2;box-shadow:0 4px 18px rgba(248,200,74,.18)">
           ✅ Semi-Final Team Selection Points Now Applied!! &nbsp;·&nbsp; Check the Live Table
         </div>
+        <div style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(248,200,74,.22),rgba(50,209,127,.14));border:1.5px solid rgba(248,200,74,.65);border-radius:999px;padding:9px 18px;font-size:13px;font-weight:1000;color:#fff3a2;box-shadow:0 4px 18px rgba(248,200,74,.18)">
+          ✅ Final Team Selection Points Now Applied!! &nbsp;·&nbsp; Check the Live Table
+        </div>
       </div>
     </div>
 
@@ -3621,11 +3624,17 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
             <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Complete</div>
             <div style="font-size:9px;color:#6af0b8;font-weight:900;margin-top:3px">Points Locked · Based on QF Results</div>
           </div>
+          <div style="background:rgba(50,209,127,.12);border:1px solid rgba(50,209,127,.38);border-radius:14px;padding:10px 8px;text-align:center">
+            <div style="font-size:17px;margin-bottom:3px">&#x2705;</div>
+            <div style="font-size:11px;font-weight:1000;color:#32d17f;margin-bottom:2px">Final</div>
+            <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Complete</div>
+            <div style="font-size:9px;color:#6af0b8;font-weight:900;margin-top:3px">Points Locked · Based on SF Results</div>
+          </div>
           <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 8px;text-align:center">
             <div style="font-size:17px;margin-bottom:3px">&#x1F3C6;</div>
-            <div style="font-size:11px;font-weight:1000;color:#dce9ff;margin-bottom:2px">Final &amp; Champion</div>
+            <div style="font-size:11px;font-weight:1000;color:#dce9ff;margin-bottom:2px">Champion</div>
             <div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.05em">Pending</div>
-            <div style="font-size:9px;color:#8899bb;font-weight:900;margin-top:3px">50 pts/finalist · 100 pts Champion</div>
+            <div style="font-size:9px;color:#8899bb;font-weight:900;margin-top:3px">100 pts Champion</div>
           </div>
         </div>
         <div style="margin-top:10px;text-align:center;color:#b8c9e8;font-size:11px;font-weight:800;line-height:1.4">
@@ -3633,40 +3642,6 @@ button{font:inherit;border:0;cursor:pointer;border-radius:999px;font-weight:950;
         </div>
       </div>
     </div>
-
-    <!-- Tournament progress -->
-    <div class="lp-prog-wrap">
-      <div class="lp-prog-card">
-        <div class="lp-prog-top">
-          <span class="lp-prog-title">Tournament Progress</span>
-          <div class="lp-prog-stats" id="lpProgStats">
-            <div class="lp-prog-stat"><b id="lpMatchesPlayed">0</b><span>Played</span></div>
-            <div class="lp-prog-stat"><b id="lpMatchesLeft">104</b><span>To Go</span></div>
-            <div class="lp-prog-stat"><b id="lpTotalGoals">0</b><span>Goals</span></div>
-            <div class="lp-prog-stat"><b id="lpTournamentDay">Day 1</b><span>of 39</span></div>
-          </div>
-        </div>
-        <div class="lp-prog-track"><div class="lp-prog-fill" id="lpProgFill"></div></div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 8px;text-align:center">
-              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.2);border-radius:12px;padding:8px 4px"><div style="font-size:16px;font-weight:1000;color:#fff3a2" id="lpStatTeams">48</div><div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.06em">⚽ Teams</div></div>
-              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.2);border-radius:12px;padding:8px 4px"><div style="font-size:16px;font-weight:1000;color:#fff3a2">16</div><div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.06em">🏟️ Venues</div></div>
-              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.2);border-radius:12px;padding:8px 4px"><div style="font-size:16px;font-weight:1000;color:#fff3a2" id="lpStatEntries">—</div><div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.06em">🎯 Predictions</div></div>
-              <div style="background:rgba(255,255,255,.06);border:1px solid rgba(248,200,74,.2);border-radius:12px;padding:8px 4px"><div style="font-size:16px;font-weight:1000;color:#fff3a2">1</div><div style="font-size:9px;color:#b8c9e8;font-weight:900;text-transform:uppercase;letter-spacing:.06em">👑 Champion</div></div>
-            </div>
-            <div class="lp-prog-sub" id="lpProgSub">Group Stage Underway… loading stats</div>
-      </div>
-    </div>
-
-    <!-- Upcoming fixtures -->
-    <div class="lp-centre">
-      <div class="lp-wc-col">
-        <div>
-          <div class="lp-sec-head"><div class="lp-sec-line"></div><span class="lp-sec-text">Next 5 Fixtures</span><div class="lp-sec-line"></div></div>
-          <div class="lp-fix-list" id="lpNextFixtures">
-            <div class="lp-rc-pending">Loading upcoming fixtures…</div>
-          </div>
-        </div>
-      </div>
 
     </div>
   </div>
@@ -4168,7 +4143,7 @@ function updateKickoffCountdown(){
 }
 updateKickoffCountdown();
 
-function renderAll(){if(typeof syncR16FromR32==='function') syncR16FromR32();if(typeof syncQFFromR16==='function') syncQFFromR16();if(typeof syncSFFromQF==='function') syncSFFromQF();if(typeof refreshAiProbabilities==='function') refreshAiProbabilities();renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();renderFixtureView();updateProgress();updateKickoffCountdown();if(window.updateStatusBars)window.updateStatusBars(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);if(typeof renderFvKoSummary==='function') renderFvKoSummary();if(typeof renderAiPredictor==='function') renderAiPredictor();}
+function renderAll(){if(typeof syncR16FromR32==='function') syncR16FromR32();if(typeof syncQFFromR16==='function') syncQFFromR16();if(typeof syncSFFromQF==='function') syncSFFromQF();if(typeof syncFINFromSF==='function') syncFINFromSF();if(typeof refreshAiProbabilities==='function') refreshAiProbabilities();renderFixtures();renderBracket();renderLeaderboard();renderSubmissions();renderResults();renderFunStats();renderFixtureView();updateProgress();updateKickoffCountdown();if(window.updateStatusBars)window.updateStatusBars(); if(typeof renderWorldCupTicker==='function') renderWorldCupTicker(WORLD_CUP_TICKER_FALLBACK);if(typeof renderFvKoSummary==='function') renderFvKoSummary();if(typeof renderAiPredictor==='function') renderAiPredictor();}
 
 /* V61: auto-advance between group-stage score boxes after typing */
 const scoreAdvanceTimers = new WeakMap();
@@ -4409,6 +4384,58 @@ function syncSFFromQF(){
   WCP_STAGE_ACTUALS.SF.teams=new Set(done?qfWinners():[]);
 }
 window.syncSFFromQF=syncSFFromQF;
+// === Semi-final results (same pattern as Round of 32 / Round of 16 / Quarter-Finals above) ===
+// Confirmed as of 15 July 2026: both Semi-Final matches complete. Spain beat France 2-0 (Arlington)
+// and Argentina beat England 2-1 AET (Atlanta). Spain and Argentina are the two finalists — Final
+// picks now score, see WCP_STAGE_ACTUALS.FIN below. Champion points remain pending. Final: Spain v
+// Argentina, 19 Jul, MetLife Stadium. Third-place match: France v England, 18 Jul, Hard Rock Stadium.
+const WCP_SF_MATCH_RESULTS = [
+  {home:'France',   away:'Spain',     date:'2026-07-14', winner:'away'}, // Spain won 2-0
+  {home:'England',  away:'Argentina', date:'2026-07-15', winner:'away'}, // Argentina won 2-1 AET
+];
+window.WCP_SF_MATCH_RESULTS = WCP_SF_MATCH_RESULTS;
+function sfMatchForTeam(team){
+  const t=String(team).trim();
+  return WCP_SF_MATCH_RESULTS.find(m=>m.home===t||m.away===t)||null;
+}
+function sfTeamStatus(team){
+  const m=sfMatchForTeam(team);
+  if(!m) return 'unknown';
+  if(!m.winner) return 'pending';
+  const t=String(team).trim();
+  const winningTeam = m.winner==='home' ? m.home : m.away;
+  return winningTeam===t ? 'won' : 'lost';
+}
+function sfAllMatchesPlayed(){
+  return WCP_SF_MATCH_RESULTS.length>0 && WCP_SF_MATCH_RESULTS.every(m=>!!m.winner);
+}
+function sfWinners(){
+  return WCP_SF_MATCH_RESULTS.filter(m=>m.winner).map(m=>m.winner==='home'?m.home:m.away);
+}
+window.sfMatchForTeam=sfMatchForTeam;
+window.sfTeamStatus=sfTeamStatus;
+window.sfAllMatchesPlayed=sfAllMatchesPlayed;
+window.sfWinners=sfWinners;
+// Looks up the confirmed winner of a single Semi-Final match, regardless of home/away order.
+// Same purpose as getQFKnownWinner — lets the AI Predictor pick up the real finalist the
+// moment it's known, rather than waiting for the whole round-complete flag.
+function getSFKnownWinner(teamA,teamB){
+  const m=(typeof sfMatchForTeam==='function')?sfMatchForTeam(teamA):null;
+  if(!m||!m.winner) return null;
+  const winningTeam = m.winner==='home'?m.home:m.away;
+  return (winningTeam===String(teamA).trim()||winningTeam===String(teamB).trim()) ? winningTeam : null;
+}
+window.getSFKnownWinner=getSFKnownWinner;
+// Recomputes WCP_STAGE_ACTUALS.FIN from the current state of WCP_SF_MATCH_RESULTS, the same way
+// syncSFFromQF keeps SF in sync with QF. Called automatically whenever an SF result changes.
+function syncFINFromSF(){
+  if(typeof WCP_STAGE_ACTUALS==='undefined'||!WCP_STAGE_ACTUALS.FIN) return;
+  const done=sfAllMatchesPlayed();
+  WCP_STAGE_ACTUALS.FIN.complete=done;
+  WCP_STAGE_ACTUALS.FIN.teams=new Set(done?sfWinners():[]);
+  WCP_STAGE_ACTUALS.FIN.dateNote=done?'Points Applied':'After 15 Jul';
+}
+window.syncFINFromSF=syncFINFromSF;
 // WCP_STAGE_ACTUALS.R16 is built once when the page first loads. If R32 results change later
 // (e.g. via the admin panel, asynchronously after that object already exists), this recomputes
 // R16's complete/teams from the current state of WCP_R32_MATCH_RESULTS so everything downstream
@@ -4476,7 +4503,7 @@ const WCP_STAGE_ACTUALS = {
   R16: {teams:new Set(r32AllMatchesPlayed()?r32Winners():[]),complete:r32AllMatchesPlayed(),pts:20,max:16,dateNote:'Released once all 16 R32 matches are finished'},
   QF:  {teams:new Set(r16AllMatchesPlayed()?r16Winners():[]),complete:r16AllMatchesPlayed(),pts:30,max:8, dateNote:'Points Applied'},
   SF:  {teams:new Set(qfAllMatchesPlayed()?qfWinners():[]),complete:qfAllMatchesPlayed(),pts:40,max:4, dateNote:'Points Applied'},
-  FIN: {teams:new Set([]),complete:false,pts:50,max:2, dateNote:'After 15 Jul'},
+  FIN: {teams:new Set(sfAllMatchesPlayed()?sfWinners():[]),complete:sfAllMatchesPlayed(),pts:50,max:2, dateNote:sfAllMatchesPlayed()?'Points Applied':'After 15 Jul'},
   CHAMP:{teams:new Set([]),complete:false,pts:100,max:1, dateNote:'After 19 Jul'}
 };
 function currentTournamentStage(){
@@ -4485,6 +4512,7 @@ function currentTournamentStage(){
   if(!WCP_STAGE_ACTUALS.QF.complete) return 'Round of 16';
   if(!WCP_STAGE_ACTUALS.SF.complete) return 'Quarter-Finals';
   if(!WCP_STAGE_ACTUALS.FIN.complete) return 'Semi-Finals';
+  if(!WCP_STAGE_ACTUALS.CHAMP.complete) return 'Final';
   return 'Champion Crowned';
 }
 function computeKoPoints(row){
@@ -4496,10 +4524,15 @@ function computeKoPoints(row){
   const qfT=(typeof teamsFromSavedIds==='function')?teamsFromSavedIds(m,id=>/^R16-/i.test(id),8):[];
   const sfT=(typeof teamsFromSavedIds==='function')?teamsFromSavedIds(m,id=>/^QF-/i.test(id),4):[];
   const finT=(typeof teamsFromSavedIds==='function')?teamsFromSavedIds(m,id=>/^SF-/i.test(id),2):[];
+  // Champion pick, resolved the same way as championFromSubmission()/buildPlayerPickSets() —
+  // via the saved bracket id map first, falling back to any legacy fields on the row.
+  const champPick=m['FINAL-1']||m['FINAL']||row.predictedWinner||row.champion||row.winner||'';
   const sc=(pred,act)=>act.complete?pred.filter(t=>act.teams.has(String(t).trim())).length*act.pts:0;
-  return {r32Pts:sc(r32T,WCP_STAGE_ACTUALS.R32),r16Pts:sc(r16T,WCP_STAGE_ACTUALS.R16),
-    qfPts:sc(qfT,WCP_STAGE_ACTUALS.QF),sfPts:sc(sfT,WCP_STAGE_ACTUALS.SF),
-    finPts:sc(finT,WCP_STAGE_ACTUALS.FIN),champPts:0};
+  const av=WCP_STAGE_ACTUALS;
+  const champPts=(av.CHAMP.complete && champPick && av.CHAMP.teams.has(String(champPick).trim()))?av.CHAMP.pts:0;
+  return {r32Pts:sc(r32T,av.R32),r16Pts:sc(r16T,av.R16),
+    qfPts:sc(qfT,av.QF),sfPts:sc(sfT,av.SF),
+    finPts:sc(finT,av.FIN),champPts:champPts};
 }
 function getGsPts(row){return Number(row.groupStagePoints||row.totalPoints||0);}
 function getGrandTotal(row){const ko=computeKoPoints(row);return getGsPts(row)+ko.r32Pts+ko.r16Pts+ko.qfPts+ko.sfPts+ko.finPts+ko.champPts;}
@@ -4526,7 +4559,7 @@ function renderLeaderboard(){
   filtered.forEach(r=>{
     r._ko=computeKoPoints(r);
     r._gs=getGsPts(r);
-    r._tot=r._gs+r._ko.r32Pts+r._ko.r16Pts+r._ko.qfPts+r._ko.sfPts+r._ko.finPts;
+    r._tot=r._gs+r._ko.r32Pts+r._ko.r16Pts+r._ko.qfPts+r._ko.sfPts+r._ko.finPts+r._ko.champPts;
   });
   const isMobile=window.innerWidth<=650;
   if(isMobile){
@@ -4553,6 +4586,7 @@ function renderLeaderboard(){
         +stageChip('QF',ko.qfPts,av.QF)
         +stageChip('SF',ko.sfPts,av.SF)
         +stageChip('Final',ko.finPts,av.FIN)
+        +stageChip('Champ',ko.champPts,av.CHAMP)
         +`</div></div>`;
     }).join('');
     $('#leaderboardList').innerHTML=summary+`<div class="lb-mobile-list">${cards}</div>`;
@@ -4563,11 +4597,11 @@ function renderLeaderboard(){
       :'<span style="color:#6b7a99;font-size:12px">\u2014</span>';
     const hdr=(lbl,act)=>`<th style="text-align:center;font-size:11px;padding:6px 8px;color:${act.complete?'#32d17f':'#8899bb'}">`
       +`${lbl}<br><span style="font-size:9px;font-weight:800;opacity:.8">${act.complete?'\u2705 Applied':act.dateNote}</span></th>`;
-    const table=`<div style="overflow-x:auto"><table class="league-table upgraded-table lb-expanded" style="min-width:780px">`
+    const table=`<div style="overflow-x:auto"><table class="league-table upgraded-table lb-expanded" style="min-width:860px">`
       +`<thead><tr>`
       +`<th style="width:36px">Rank</th><th>Player</th><th>Entry</th>`
       +`<th style="text-align:center;font-size:11px;color:#37d4ff">GS<br><span style="font-size:9px;opacity:.8">\u2705 Applied</span></th>`
-      +hdr('R32',av.R32)+hdr('R16',av.R16)+hdr('QF',av.QF)+hdr('SF',av.SF)+hdr('Final',av.FIN)
+      +hdr('R32',av.R32)+hdr('R16',av.R16)+hdr('QF',av.QF)+hdr('SF',av.SF)+hdr('Final',av.FIN)+hdr('👑',av.CHAMP)
       +`<th style="text-align:right;color:#f8c84a">Total</th></tr></thead><tbody>`
       +filtered.map((r,i)=>{
         const ko=r._ko||{};
@@ -4582,6 +4616,7 @@ function renderLeaderboard(){
           +`<td style="text-align:center">${pend(ko.qfPts, av.QF)}</td>`
           +`<td style="text-align:center">${pend(ko.sfPts, av.SF)}</td>`
           +`<td style="text-align:center">${pend(ko.finPts,av.FIN)}</td>`
+          +`<td style="text-align:center">${pend(ko.champPts,av.CHAMP)}</td>`
           +`<td style="text-align:right"><span class="points-badge" style="width:78px;text-align:center;font-variant-numeric:tabular-nums">${r._tot} pts</span></td>`
           +`</tr>`;
       }).join('')
@@ -4715,12 +4750,12 @@ function simulateBracketOnce(matchups,ratings){
   const sf={};
   flows.QF.forEach((pair,i)=>{
     const key='QF-'+(i+1), t1=qf[pair[0]], t2=qf[pair[1]];
-    sf[key]=(av.SF.complete?getMatchWinnerFromActual(t1,t2,av.SF.teams):null)||simulateMatch(t1,t2,ratings);
+    sf[key]=getQFKnownWinner(t1,t2)||simulateMatch(t1,t2,ratings);
   });
   const fin={};
   flows.SF.forEach((pair,i)=>{
     const key='SF-'+(i+1), t1=sf[pair[0]], t2=sf[pair[1]];
-    fin[key]=(av.FIN.complete?getMatchWinnerFromActual(t1,t2,av.FIN.teams):null)||simulateMatch(t1,t2,ratings);
+    fin[key]=getSFKnownWinner(t1,t2)||simulateMatch(t1,t2,ratings);
   });
   const fp=flows.FINAL[0], t1=fin[fp[0]], t2=fin[fp[1]];
   const champion=(av.CHAMP.complete?getMatchWinnerFromActual(t1,t2,av.CHAMP.teams):null)||simulateMatch(t1,t2,ratings);
@@ -4754,7 +4789,7 @@ function getLockedScore(r){
   // Must match getGrandTotal/_tot exactly (the figure shown on the real Live Table) for any
   // round that's actually locked in, or the AI Predicted Final Table's "Locked" column drifts
   // out of sync with the league table itself.
-  return getGsPts(r)+(av.R32.complete?ko.r32Pts:0)+(av.R16.complete?ko.r16Pts:0)+(av.QF.complete?ko.qfPts:0)+(av.SF.complete?ko.sfPts:0)+(av.FIN.complete?ko.finPts:0);
+  return getGsPts(r)+(av.R32.complete?ko.r32Pts:0)+(av.R16.complete?ko.r16Pts:0)+(av.QF.complete?ko.qfPts:0)+(av.SF.complete?ko.sfPts:0)+(av.FIN.complete?ko.finPts:0)+(av.CHAMP.complete?ko.champPts:0);
 }
 function computeAiProbabilities(rows){
   const av=WCP_STAGE_ACTUALS;
@@ -4831,7 +4866,7 @@ let _aiTeamAdvanceProb=null;
 let _aiPickSetByName=new Map();
 function refreshAiProbabilities(){
   const allRows=getEntryRows();
-  allRows.forEach(r=>{if(!r._ko)r._ko=computeKoPoints(r);if(r._gs===undefined)r._gs=getGsPts(r);if(r._tot===undefined)r._tot=r._gs+r._ko.r32Pts+r._ko.r16Pts+r._ko.qfPts+r._ko.sfPts+r._ko.finPts;});
+  allRows.forEach(r=>{if(!r._ko)r._ko=computeKoPoints(r);if(r._gs===undefined)r._gs=getGsPts(r);if(r._tot===undefined)r._tot=r._gs+r._ko.r32Pts+r._ko.r16Pts+r._ko.qfPts+r._ko.sfPts+r._ko.finPts+r._ko.champPts;});
   // AI win% is "probability of winning the league table vs the other contenders in the league" —
   // so only simulate within the currently selected league slicer, not the whole field.
   const leagueRows=aiLeagueFilter==='All'?allRows:allRows.filter(r=>r.allLeagues || (aiLeagueFilter==='HFC' && r.hfcLeague) || normaliseLeague(r.league)===aiLeagueFilter);
@@ -5064,9 +5099,9 @@ function buildAiChalkPath(){
   })});
   // Quarter-finals
   const sf={};
-  rounds.push({key:'QF',label:'Quarter-Finals',complete:!!av.QF.complete,matches:flows.QF.map((pair,i)=>{
+  rounds.push({key:'QF',label:'Quarter-Finals',complete:!!av.SF.complete,matches:flows.QF.map((pair,i)=>{
     const t1=qf[pair[0]], t2=qf[pair[1]];
-    const known=av.QF.complete?getMatchWinnerFromActual(t1,t2,av.QF.teams):null;
+    const known=getQFKnownWinner(t1,t2);
     const res=chalkWinner(t1,t2,known);
     const key='QF-'+(i+1); sf[key]=res.team;
     const {p1,p2}=matchProb(t1,t2);
@@ -5074,9 +5109,9 @@ function buildAiChalkPath(){
   })});
   // Semi-finals
   const fin={};
-  rounds.push({key:'SF',label:'Semi-Finals',complete:!!av.SF.complete,matches:flows.SF.map((pair,i)=>{
+  rounds.push({key:'SF',label:'Semi-Finals',complete:!!av.FIN.complete,matches:flows.SF.map((pair,i)=>{
     const t1=sf[pair[0]], t2=sf[pair[1]];
-    const known=av.SF.complete?getMatchWinnerFromActual(t1,t2,av.SF.teams):null;
+    const known=getSFKnownWinner(t1,t2);
     const res=chalkWinner(t1,t2,known);
     const key='SF-'+(i+1); fin[key]=res.team;
     const {p1,p2}=matchProb(t1,t2);
@@ -5084,10 +5119,10 @@ function buildAiChalkPath(){
   })});
   // Final
   const fp=flows.FINAL[0], ft1=fin[fp[0]], ft2=fin[fp[1]];
-  const finKnown=av.FIN.complete?getMatchWinnerFromActual(ft1,ft2,av.FIN.teams):null;
+  const finKnown=av.CHAMP.complete?getMatchWinnerFromActual(ft1,ft2,av.CHAMP.teams):null;
   const finalRes=chalkWinner(ft1,ft2,finKnown);
   const finProb=matchProb(ft1,ft2);
-  rounds.push({key:'FIN',label:'Final',complete:!!av.FIN.complete,matches:[{id:'FINAL-1',t1:ft1,t2:ft2,winner:finalRes.team,isReal:finalRes.isReal,p1:finProb.p1,p2:finProb.p2}]});
+  rounds.push({key:'FIN',label:'Final',complete:!!av.CHAMP.complete,matches:[{id:'FINAL-1',t1:ft1,t2:ft2,winner:finalRes.team,isReal:finalRes.isReal,p1:finProb.p1,p2:finProb.p2}]});
   const champProb=finalRes.isReal?100:(_aiTeamAdvanceProb?.champion?.[finalRes.team]??(finalRes.team===ft1?finProb.p1:finProb.p2));
   return {rounds,champion:finalRes.team,champReal:finalRes.isReal,champProb};
 }
